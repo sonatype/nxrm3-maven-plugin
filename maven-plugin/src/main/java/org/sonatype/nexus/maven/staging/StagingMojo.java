@@ -12,35 +12,15 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import java.io.File;
-
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-@Mojo(name = "deploy", requiresOnline = true)
-public class StagingDeployMojo
-    extends StagingMojo
+public abstract class StagingMojo
+    extends AbstractMojo
 {
-  @Parameter(property = "repository", required = true)
-  private String repository;
+  @Parameter(property = "serverId", required = true)
+  private String serverId;
 
-  @Parameter(property = "tag")
-  private String tag;
-
-  @Parameter(property = "tagFile")
-  private File tagFile;
-
-  @Override
-  public void execute() throws MojoExecutionException {
-    if (tag != null && !tag.isEmpty()) {
-      getLog().info("Deploying to repository " + repository + " with tag " + tag);
-    }
-    else if (tagFile != null) {
-      getLog().info("Deploying to repository " + repository + " with tag from file " + tagFile);
-    }
-    else {
-      throw new MojoExecutionException("One of the parameters 'tag' or 'tagFile' are required");
-    }
-  }
+  @Parameter(property = "nexusUrl", required = true)
+  private String nexusUrl;
 }

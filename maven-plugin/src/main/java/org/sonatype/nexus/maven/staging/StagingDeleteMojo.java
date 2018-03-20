@@ -12,13 +12,12 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 @Mojo(name = "delete", requiresOnline = true)
 public class StagingDeleteMojo
-    extends AbstractMojo
+    extends StagingMojo
 {
   @Parameter(property = "tag", required = true)
   private String tag;

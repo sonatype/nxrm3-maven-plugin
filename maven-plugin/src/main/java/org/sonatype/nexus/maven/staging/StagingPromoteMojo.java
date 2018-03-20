@@ -12,13 +12,12 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 @Mojo(name = "promote", requiresOnline = true)
 public class StagingPromoteMojo
-    extends AbstractMojo
+    extends StagingMojo
 {
   @Parameter(property = "repository", required = true)
   private String repository;
