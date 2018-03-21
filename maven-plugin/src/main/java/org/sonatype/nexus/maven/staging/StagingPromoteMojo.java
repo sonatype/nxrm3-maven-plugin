@@ -27,6 +27,6 @@ public class StagingPromoteMojo
 
   @Override
   public void execute() {
-    getLog().info("Promoting components with tag " + tag + " to repository " + repository);
+    getLog().info(String.format("Promoting components with tag '%s' to repository '%s'", tag, repository));
   }
 }

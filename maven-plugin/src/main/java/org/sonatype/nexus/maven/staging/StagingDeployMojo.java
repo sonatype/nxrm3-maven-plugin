@@ -34,10 +34,10 @@ public class StagingDeployMojo
   @Override
   public void execute() throws MojoExecutionException {
     if (tag != null && !tag.isEmpty()) {
-      getLog().info("Deploying to repository " + repository + " with tag " + tag);
+      getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
     }
     else if (tagFile != null) {
-      getLog().info("Deploying to repository " + repository + " with tag from file " + tagFile);
+      getLog().info(String.format("Deploying to repository '%s' with tag from file '%s'", repository, tagFile));
     }
     else {
       throw new MojoExecutionException("One of the parameters 'tag' or 'tagFile' are required");

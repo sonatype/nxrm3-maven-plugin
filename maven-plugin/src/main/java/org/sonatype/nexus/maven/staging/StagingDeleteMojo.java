@@ -24,6 +24,6 @@ public class StagingDeleteMojo
 
   @Override
   public void execute() {
-    getLog().info("Deleting all components with tag " + tag);
+    getLog().info(String.format("Deleting all components with tag '%s'", tag));
   }
 }
