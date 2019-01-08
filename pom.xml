@@ -82,6 +82,17 @@
         <version>${maven.plugin.annotations.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>com.sonatype.nexus</groupId>
+        <artifactId>nexus-platform-api</artifactId>
+        <!--<version>3.2-SNAPSHOT</version>-->
+        <version>3.4.20181205-180005.1567c7b</version>
+      </dependency>
+      <!--<dependency>
+        <groupId>com.sonatype.nexus</groupId>
+        <artifactId>nxr-java-api</artifactId>
+        <version>3.2-SNAPSHOT</version>
+      </dependency>-->
     </dependencies>
   </dependencyManagement>
 </project>

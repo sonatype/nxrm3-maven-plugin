@@ -12,6 +12,14 @@
  */
 package org.sonatype.nexus.maven.staging;
 
+import java.net.URI;
+
+import com.sonatype.nexus.api.common.Authentication;
+import com.sonatype.nexus.api.common.ServerConfig;
+import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3ClientBuilder;
+
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
@@ -23,4 +31,34 @@ public abstract class StagingMojo
 
   @Parameter(property = "nexusUrl", required = true)
   private String nexusUrl;
+
+  //These come from the settings.xml file...need to see how that works...
+  //for now I'm making them parameters in the pom.xml file
+  @Parameter(property = "username", required = true)
+  private String username;
+
+  @Parameter(property = "password", required = true)
+  private String password;
+
+
+
+  protected  final String servicesBase = "/service/rest/beta";
+
+  protected String getNexusUrl() {
+    return nexusUrl;
+  }
+
+  protected String getServerId() {
+    return serverId;
+  }
+
+  protected ServerConfig getServerConfiguration() {
+    return new ServerConfig(URI.create(nexusUrl), new Authentication("admin", "admin123"));
+  }
+
+  protected RepositoryManagerV3Client getClient() {
+    final ServerConfig serverConfig = getServerConfiguration();
+    RepositoryManagerV3Client client = RepositoryManagerV3ClientBuilder.create().withServerConfig(serverConfig).build();
+    return client;
+  }
 }

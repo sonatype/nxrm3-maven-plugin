@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-present Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,27 +12,33 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import com.sonatype.nexus.api.exception.RepositoryManagerException;
+import java.io.File;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import com.google.common.base.Preconditions;
+import org.apache.maven.artifact.Artifact;
 
-@Mojo(name = "delete", requiresOnline = true)
-public class StagingDeleteMojo
-    extends StagingMojo
+/**
+ * Encapsulation of a deployable "pair": the {@link File} and the {@link Artifact}.
+ *
+ * @author cstamas
+ * @since 1.1
+ */
+public class DeployableArtifact
 {
-  @Parameter(property = "tag", required = true)
-  private String tag;
+  private final File file;
 
-  @Override
-  public void execute() throws MojoExecutionException {
-    getLog().info(String.format("Deleting all components with tag '%s'", tag));
-    try {
-      getClient().delete(tag);
-    }
-    catch (RepositoryManagerException e) {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
+  private final Artifact artifact;
+
+  public DeployableArtifact(final File file, final Artifact artifact) {
+    this.file = Preconditions.checkNotNull(file, "DeployableArtifact.file is null!");
+    this.artifact = Preconditions.checkNotNull(artifact, "DeployableArtifact.artifact is null!");
+  }
+
+  public File getFile() {
+    return file;
+  }
+
+  public Artifact getArtifact() {
+    return artifact;
   }
 }

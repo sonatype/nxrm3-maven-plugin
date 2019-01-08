@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.maven.staging;
 
+import com.sonatype.nexus.api.exception.RepositoryManagerException;
+
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
@@ -26,7 +29,13 @@ public class StagingPromoteMojo
   private String tag;
 
   @Override
-  public void execute() {
+  public void execute() throws MojoExecutionException {
     getLog().info(String.format("Promoting components with tag '%s' to repository '%s'", tag, repository));
+    try {
+      getClient().move(repository, tag);
+    }
+    catch (RepositoryManagerException e) {
+      throw new MojoExecutionException(e.getMessage(), e);
+    }
   }
 }
