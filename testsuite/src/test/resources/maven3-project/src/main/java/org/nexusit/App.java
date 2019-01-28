@@ -10,35 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.maven.staging;
-
-import java.io.File;
-
-import com.google.common.base.Preconditions;
-import org.apache.maven.artifact.Artifact;
+package org.nexusit;
 
 /**
- * Encapsulation of a deployable "pair": the {@link File} and the {@link Artifact}.
- *
- * @author cstamas
- * @since 1.1
+ * Hello world!
  */
-public class DeployableArtifact
+public class App
 {
-  private final File file;
-
-  private final Artifact artifact;
-
-  public DeployableArtifact(final File file, final Artifact artifact) {
-    this.file = Preconditions.checkNotNull(file, "DeployableArtifact.file is null!");
-    this.artifact = Preconditions.checkNotNull(artifact, "DeployableArtifact.artifact is null!");
-  }
-
-  public File getFile() {
-    return file;
-  }
-
-  public Artifact getArtifact() {
-    return artifact;
+  public static void main(String[] args) {
+    System.out.println("Hello World!");
   }
 }

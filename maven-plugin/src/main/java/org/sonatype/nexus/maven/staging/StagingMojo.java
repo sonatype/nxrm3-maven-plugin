@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.maven.staging;
 
+import java.io.File;
 import java.net.URI;
 
 import com.sonatype.nexus.api.common.Authentication;
@@ -19,30 +20,118 @@ import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3ClientBuilder;
 
+import org.sonatype.maven.mojo.execution.MojoExecution;
+import org.sonatype.maven.mojo.settings.MavenSettings;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Server;
 
 public abstract class StagingMojo
     extends AbstractMojo
 {
+  private static final String NEXUS_STAGING_OUTPUT_DIRECTORY = "nexus-staging";
+
+  @Parameter(defaultValue = "${session}", readonly = true, required = true)
+  private MavenSession mavenSession;
+  
   @Parameter(property = "serverId", required = true)
   private String serverId;
 
   @Parameter(property = "nexusUrl", required = true)
   private String nexusUrl;
 
-  //These come from the settings.xml file...need to see how that works...
-  //for now I'm making them parameters in the pom.xml file
-  @Parameter(property = "username", required = true)
-  private String username;
+  /**
+   * Specifies an alternative staging directory to which the project artifacts should be "locally staged". By
+   * default, staging directory will be looked for under {@code $}{{@code project.build.directory} {@code
+   * /nexus-staging}
+   * folder of the first encountered module that has this Mojo defined for execution (Warning: this means, if top
+   * level POM is an aggregator, it will be NOT in top level!).
+   */
+  @Parameter(property = "altStagingDirectory")
+  private File altStagingDirectory;
 
-  @Parameter(property = "password", required = true)
-  private String password;
+  @Parameter(defaultValue = "${plugin.groupId}", readonly = true, required = true)
+  private String pluginGroupId;
 
+  @Parameter(defaultValue = "${plugin.artifactId}", readonly = true, required = true)
+  private String pluginArtifactId;
 
+  @Component
+  private SecDispatcher secDispatcher;
 
-  protected  final String servicesBase = "/service/rest/beta";
+  protected ServerConfig getServerConfiguration(final MavenSession mavenSession) {
+    final Server server = MavenSettings.selectServer(mavenSession.getSettings(), serverId);
+    try {
+      if (server != null) {
+        Server decryptedServer = MavenSettings.decrypt(secDispatcher, server);
+
+        return new ServerConfig(URI.create(nexusUrl),
+            new Authentication(decryptedServer.getUsername(), decryptedServer.getPassword()));
+      }
+      else {
+        throw new IllegalArgumentException("Server with ID \"" + serverId + "\" not found!");
+      }
+    }
+    catch (SecDispatcherException e) {
+      throw new IllegalArgumentException("Cannot decipher credentials to be used with Nexus!", e);
+    }
+  }
+
+  protected RepositoryManagerV3Client getClient(final MavenSession mavenSession) {
+    final ServerConfig serverConfig = getServerConfiguration(mavenSession);
+    RepositoryManagerV3Client client = RepositoryManagerV3ClientBuilder.create().withServerConfig(serverConfig).build();
+    return client;
+  }
+
+  /**
+   * Returns the working directory root, that is either set explicitly by user in plugin configuration
+   * (see {@link #altStagingDirectory} parameter), or it's location is calculated taking as base the first project in
+   * this reactor that will/was executing this plugin.
+   */
+  protected File getWorkDirectoryRoot() {
+    if (altStagingDirectory != null) {
+      return altStagingDirectory;
+    }
+    else {
+      final MavenProject firstWithThisMojo = getFirstProjectWithThisPluginDefined();
+      if (firstWithThisMojo != null) {
+        final File firstWithThisMojoBuildDir;
+        if (firstWithThisMojo.getBuild() != null && firstWithThisMojo.getBuild().getDirectory() != null) {
+          firstWithThisMojoBuildDir =
+              new File(firstWithThisMojo.getBuild().getDirectory()).getAbsoluteFile();
+        }
+        else {
+          firstWithThisMojoBuildDir = new File(firstWithThisMojo.getBasedir().getAbsoluteFile(), "target");
+        }
+        return new File(firstWithThisMojoBuildDir, NEXUS_STAGING_OUTPUT_DIRECTORY);
+      }
+      else {
+        return new File(getMavenSession().getExecutionRootDirectory() + "/target/" + NEXUS_STAGING_OUTPUT_DIRECTORY);
+      }
+    }
+  }
+
+  /**
+   * Returns the first project in reactor that has this plugin defined.
+   */
+  protected MavenProject getFirstProjectWithThisPluginDefined() {
+    return MojoExecution.getFirstProjectWithMojoInExecution(mavenSession, pluginGroupId, pluginArtifactId, null);
+  }
+
+  /**
+   * Returns the staging directory root, that is either set explicitly by user in plugin configuration
+   * (see {@link #altStagingDirectory} parameter), or it's location is calculated taking as base the first project in
+   * this reactor that will/was executing this plugin.
+   */
+  protected File getStagingDirectoryRoot() {
+    return new File(getWorkDirectoryRoot(), "staging");
+  }
 
   protected String getNexusUrl() {
     return nexusUrl;
@@ -52,13 +141,7 @@ public abstract class StagingMojo
     return serverId;
   }
 
-  protected ServerConfig getServerConfiguration() {
-    return new ServerConfig(URI.create(nexusUrl), new Authentication("admin", "admin123"));
-  }
-
-  protected RepositoryManagerV3Client getClient() {
-    final ServerConfig serverConfig = getServerConfiguration();
-    RepositoryManagerV3Client client = RepositoryManagerV3ClientBuilder.create().withServerConfig(serverConfig).build();
-    return client;
+  protected MavenSession getMavenSession() {
+    return mavenSession;
   }
 }

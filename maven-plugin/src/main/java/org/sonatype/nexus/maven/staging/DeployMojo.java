@@ -12,27 +12,17 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import com.sonatype.nexus.api.exception.RepositoryManagerException;
-
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 
-@Mojo(name = "delete", requiresOnline = true)
-public class StagingDeleteMojo
-    extends StagingMojo
+/**
+ * This Mojo aliases staging-deploy and overrides the default deploy goal to make it easier for users migrating from
+ * the NXRM2 version of the staging plugin.
+ *
+ * @since 3.next
+ */
+@Mojo(name = "deploy", defaultPhase = LifecyclePhase.DEPLOY, requiresOnline = true, threadSafe = true)
+public class DeployMojo
+    extends StagingDeployMojo
 {
-  @Parameter(property = "tag", required = true)
-  private String tag;
-
-  @Override
-  public void execute() throws MojoExecutionException {
-    getLog().info(String.format("Deleting all components with tag '%s'", tag));
-    try {
-      getClient().delete(tag);
-    }
-    catch (RepositoryManagerException e) {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
-  }
 }
