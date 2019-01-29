@@ -13,7 +13,14 @@
 package org.sonatype.nexus.maven.staging;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import com.sonatype.nexus.api.common.Authentication;
 import com.sonatype.nexus.api.common.ServerConfig;
@@ -40,6 +47,8 @@ import org.apache.maven.settings.Server;
 public abstract class StagingMojo
     extends AbstractMojo
 {
+  private static final String TAG_ID = "staging.tag";
+  
   private static final String STAGING_PROPERTIES_FILENAME = "staging.properties";
   
   private static final String NEXUS_STAGING_OUTPUT_DIRECTORY = "nexus-staging";
@@ -121,6 +130,37 @@ public abstract class StagingMojo
       else {
         return new File(getMavenSession().getExecutionRootDirectory() + "/target/" + NEXUS_STAGING_OUTPUT_DIRECTORY);
       }
+    }
+  }
+
+  protected void storeTagInPropertiesFile(final String tag) {
+    Map<String, String> properties = new HashMap<>();
+
+    properties.put(TAG_ID, tag);
+
+    saveStagingProperties(properties);
+  }
+
+  protected void saveStagingProperties(final Map<String, String> properties) {
+    final Properties stagingProperties = new Properties();
+
+    for (Entry<String, String> entry : properties.entrySet()) {
+      stagingProperties.put(entry.getKey(), entry.getValue());
+    }
+
+    final File stagingPropertiesFile = getStagingPropertiesFile();
+
+    if (!stagingPropertiesFile.getParentFile().isDirectory()) {
+      stagingPropertiesFile.getParentFile().mkdirs();
+    }
+
+    try (OutputStream out = new FileOutputStream(stagingPropertiesFile)) {
+      getLog().info(String.format("Saving staging information to %s", stagingPropertiesFile.getAbsolutePath()));
+
+      stagingProperties.store(out, "NXRM3 Maven staging plugin");
+    }
+    catch (IOException e) {
+      getLog().error(e);
     }
   }
 

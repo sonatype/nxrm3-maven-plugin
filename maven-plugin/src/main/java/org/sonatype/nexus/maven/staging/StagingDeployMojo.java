@@ -14,13 +14,9 @@ package org.sonatype.nexus.maven.staging;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 
 import com.sonatype.nexus.api.exception.RepositoryManagerException;
 import com.sonatype.nexus.api.repository.v3.DefaultAsset;
@@ -47,8 +43,6 @@ public class StagingDeployMojo
     extends StagingMojo
 {
   private static final String FORMAT = "maven2";
-
-  private static final String TAG_ID = "staging.tag";
 
   @Parameter(property = "repository", required = true)
   private String repository;
@@ -111,26 +105,6 @@ public class StagingDeployMojo
     }
 
     storeTagInPropertiesFile(tag);
-  }
-
-  private void storeTagInPropertiesFile(final String tag) {
-    final Properties stagingProperties = new Properties();
-    stagingProperties.put(TAG_ID, tag);
-
-    final File stagingPropertiesFile = getStagingPropertiesFile();
-
-    if (!stagingPropertiesFile.getParentFile().isDirectory()) {
-      stagingPropertiesFile.getParentFile().mkdirs();
-    }
-
-    try (OutputStream out = new FileOutputStream(stagingPropertiesFile)) {
-      getLog().info(String.format("Saving staging information to %s", stagingPropertiesFile.getAbsolutePath()));
-
-      stagingProperties.store(out, "NXRM3 Maven staging plugin");
-    }
-    catch (IOException e) {
-      getLog().error(e);
-    }
   }
 
   private DefaultComponent getDefaultComponent(Artifact artifact) {
