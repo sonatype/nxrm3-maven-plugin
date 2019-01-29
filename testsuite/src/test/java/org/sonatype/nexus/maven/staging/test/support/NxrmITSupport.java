@@ -19,12 +19,15 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 
 import static com.jayway.awaitility.Awaitility.await;
 import static java.util.Arrays.stream;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertNotNull;
@@ -55,6 +58,14 @@ public abstract class NxrmITSupport
     return System.getProperty(NX3_PORT_SYS_PROP);
   }
 
+  protected ComponentItem waitForComponentWithTags(final Map<String, String> search, String... tags) {
+    waitForComponent(search);
+
+    Matcher<? extends Iterable<?>> tagMatcher = (tags == null || tags.length == 0) ? hasSize(0) : contains(tags);
+    return await().atMost(10, SECONDS)
+        .until(() -> componentSearch(search).items.get(0), hasProperty("tags", tagMatcher));
+  }
+
   ComponentItem waitForComponent(final Map<String, String> search) {
     return await().atMost(10, SECONDS).until(() -> componentSearch(search).items, hasSize(1)).get(0);
   }
@@ -72,7 +83,7 @@ public abstract class NxrmITSupport
     ComponentItem component;
 
     try {
-      component = waitForComponent(search);
+      component = waitForComponentWithTags(search, tags);
     }
     catch (Exception e) {
       throw new AssertionError("Component (group: " + group + "; name: " + name + "; version: " + version +

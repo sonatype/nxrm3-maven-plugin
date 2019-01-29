@@ -103,21 +103,38 @@ public class StagingDeployIT
     assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
   }
 
+  @Test
+  public void deployWithoutMainArtifact() throws Exception {
+    String tag = randomUUID().toString();
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add("javadoc:jar");
+    goals.add(STAGING_DEPLOY);
+
+    assertStagingWithDeployGoal(goals, tag);
+  }
+
   private void assertStagingWithDeployGoal(final String deployGoal) throws Exception {
     assertStagingWithDeployGoal(deployGoal, randomUUID().toString());
   }
 
   private void assertStagingWithDeployGoal(final String deployGoal, final String tag) throws Exception {
+    List<String> goals = new ArrayList<>();
+
+    goals.add("install");
+    goals.add("javadoc:jar");
+    goals.add(deployGoal);
+    
+    assertStagingWithDeployGoal(goals, tag);
+  }
+
+  private void assertStagingWithDeployGoal(final List<String> goals, final String tag) throws Exception {
     String groupId = GROUP_ID;
     String artifactId = randomUUID().toString();
     String version = VERSION;
 
     createProject(RELEASE_REPOSITORY, groupId, artifactId, version);
-
-    List<String> goals = new ArrayList<>();
-
-    goals.add("install");
-    goals.add(deployGoal);
 
     verifier.setDebug(true);
 
