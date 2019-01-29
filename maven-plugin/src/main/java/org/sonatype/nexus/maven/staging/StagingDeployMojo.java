@@ -73,9 +73,6 @@ public class StagingDeployMojo
   @Parameter(defaultValue = "${project.attachedArtifacts}", readonly = true, required = true)
   private List<Artifact> attachedArtifacts;
 
-  @Parameter(property = "updateReleaseInfo")
-  private boolean updateReleaseInfo;
-
   @Parameter(defaultValue = "${settings.offline}", readonly = true, required = true)
   private boolean offline;
 
@@ -187,10 +184,6 @@ public class StagingDeployMojo
             repositorySystem.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(),
                 artifact.getBaseVersion());
         pomArtifact.setFile(pomFile);
-
-        if (updateReleaseInfo) {
-          pomArtifact.setRelease(true);
-        }
 
         deployables.add(pomArtifact);
         
