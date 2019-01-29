@@ -169,9 +169,7 @@ public class StagingDeployMojo
   private List<Artifact> prepareDeployables() throws MojoExecutionException {
     final List<Artifact> deployables = new ArrayList<>();
 
-    boolean isPomArtifact = "pom".equals(packaging);
-
-    if (isPomArtifact) {
+    if ("pom".equals(packaging)) {
       deployables.add(artifact);
     }
     else {
