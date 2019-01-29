@@ -35,6 +35,8 @@ import org.apache.maven.settings.Server;
 public abstract class StagingMojo
     extends AbstractMojo
 {
+  private static final String STAGING_PROPERTIES_FILENAME = "staging.properties";
+  
   private static final String NEXUS_STAGING_OUTPUT_DIRECTORY = "nexus-staging";
 
   @Parameter(defaultValue = "${session}", readonly = true, required = true)
@@ -143,5 +145,9 @@ public abstract class StagingMojo
 
   protected MavenSession getMavenSession() {
     return mavenSession;
+  }
+
+  protected File getStagingPropertiesFile() {
+    return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
   }
 }

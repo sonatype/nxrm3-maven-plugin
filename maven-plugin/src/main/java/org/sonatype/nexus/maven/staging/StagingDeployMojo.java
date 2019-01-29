@@ -50,8 +50,6 @@ public class StagingDeployMojo
 
   private static final String TAG_ID = "staging.tag";
 
-  private static final String STAGING_PROPERTIES_FILENAME = "staging.properties";
-
   @Parameter(property = "repository", required = true)
   private String repository;
 
@@ -119,7 +117,7 @@ public class StagingDeployMojo
     final Properties stagingProperties = new Properties();
     stagingProperties.put(TAG_ID, tag);
 
-    final File stagingPropertiesFile = new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
+    final File stagingPropertiesFile = getStagingPropertiesFile();
 
     if (!stagingPropertiesFile.getParentFile().isDirectory()) {
       stagingPropertiesFile.getParentFile().mkdirs();
