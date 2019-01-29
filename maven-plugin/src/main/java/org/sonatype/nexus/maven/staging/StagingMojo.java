@@ -53,7 +53,7 @@ public abstract class StagingMojo
    * default, staging directory will be looked for under {@code $}{{@code project.build.directory} {@code
    * /nexus-staging}
    * folder of the first encountered module that has this Mojo defined for execution (Warning: this means, if top
-   * level POM is an aggregator, it will be NOT in top level!).
+   * level POM is an aggregator, it will NOT be in the top level!).
    */
   @Parameter(property = "altStagingDirectory")
   private File altStagingDirectory;
