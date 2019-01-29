@@ -32,6 +32,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 
+/**
+ * Parent for all staging MOJOs (goals)
+ * 
+ * @since 1.0.0
+ */
 public abstract class StagingMojo
     extends AbstractMojo
 {

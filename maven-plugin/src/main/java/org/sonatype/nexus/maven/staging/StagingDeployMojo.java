@@ -40,7 +40,7 @@ import org.apache.maven.repository.RepositorySystem;
 /**
  * Goal to tag and deploy artifacts to NXRM 3.
  *
- * @since 3.next
+ * @since 1.0.0
  */
 @Mojo(name = "staging-deploy", requiresOnline = true, threadSafe = true)
 public class StagingDeployMojo
