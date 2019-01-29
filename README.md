@@ -42,7 +42,7 @@ The plugin currently requires that a tag is specified via ```-Dtag```
 
 e.g. ```mvn install nexus-staging:deploy -Dtag=test```
 #Integration testing
-To run the integration tests against a docker instance specifty the port you would like the tests to run on:
+To run the integration tests against a docker instance specify the port you would like the tests to run on:
 
 ```-Dnexus.it.port=8085``` 
 
