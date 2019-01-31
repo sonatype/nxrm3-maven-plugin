@@ -41,6 +41,12 @@ To override the default deploy goal add the following to the plugin
 The plugin currently requires that a tag is specified via ```-Dtag```
 
 e.g. ```mvn install nexus-staging:deploy -Dtag=test```
+
+# Mutation testing
+
+Run ```mvn -DwithHistory org.pitest:pitest-maven:mutationCoverage ``` to calculate mutation coverage. This needs to be 
+run from inside the maven-plugin directory rather than at the root of the project to detect the tests
+
 #Integration testing
 To run the integration tests against a docker instance specify the port you would like the tests to run on:
 

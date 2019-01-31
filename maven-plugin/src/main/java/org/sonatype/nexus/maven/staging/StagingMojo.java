@@ -24,14 +24,13 @@ import java.util.Properties;
 
 import com.sonatype.nexus.api.common.Authentication;
 import com.sonatype.nexus.api.common.ServerConfig;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3ClientBuilder;
 
 import org.sonatype.maven.mojo.execution.MojoExecution;
 import org.sonatype.maven.mojo.settings.MavenSettings;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Component;
@@ -81,6 +80,8 @@ public abstract class StagingMojo
   @Component
   private SecDispatcher secDispatcher;
 
+  private Nxrm3ClientFactory clientFactory = new Nxrm3ClientFactory();
+
   protected ServerConfig getServerConfiguration(final MavenSession mavenSession) {
     final Server server = MavenSettings.selectServer(mavenSession.getSettings(), serverId);
     try {
@@ -97,12 +98,6 @@ public abstract class StagingMojo
     catch (SecDispatcherException e) {
       throw new IllegalArgumentException("Cannot decipher credentials to be used with Nexus!", e);
     }
-  }
-
-  protected RepositoryManagerV3Client getClient(final MavenSession mavenSession) {
-    final ServerConfig serverConfig = getServerConfiguration(mavenSession);
-    RepositoryManagerV3Client client = RepositoryManagerV3ClientBuilder.create().withServerConfig(serverConfig).build();
-    return client;
   }
 
   /**
@@ -194,5 +189,29 @@ public abstract class StagingMojo
 
   protected File getStagingPropertiesFile() {
     return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
+  }
+
+  @VisibleForTesting
+  void setMavenSession(final MavenSession session) {
+    this.mavenSession = session;
+  }
+
+  @VisibleForTesting
+  void setSecDispatcher(final SecDispatcher secDispatcher) {
+    this.secDispatcher = secDispatcher;
+  }
+
+  protected Nxrm3ClientFactory getClientFactory() {
+    return clientFactory;
+  }
+
+  @VisibleForTesting
+  void setClientFactory(final Nxrm3ClientFactory clientFactory) {
+    this.clientFactory = clientFactory;
+  }
+  
+  @VisibleForTesting
+  void setAltStagingDirectory(final File altStagingDirectory) {
+    this.altStagingDirectory = altStagingDirectory;
   }
 }

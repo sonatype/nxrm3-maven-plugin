@@ -24,6 +24,7 @@ import com.sonatype.nexus.api.repository.v3.DefaultComponent;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 import com.sonatype.nexus.api.repository.v3.Tag;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -70,7 +71,7 @@ public class StagingDeployMojo
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-    RepositoryManagerV3Client client = getClient(getMavenSession());
+    RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
 
     failIfOffline();
 
@@ -85,6 +86,9 @@ public class StagingDeployMojo
       else {
         throw new MojoExecutionException("The parameters 'tag' is required");
       }
+    }
+    catch (MojoExecutionException e) {
+      throw e;
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
@@ -136,39 +140,42 @@ public class StagingDeployMojo
   }
 
   private List<Artifact> prepareDeployables() throws MojoExecutionException {
-    final List<Artifact> deployables = new ArrayList<>();
+    List<Artifact> deployables = new ArrayList<>();
 
-    if ("pom".equals(packaging)) {
+    boolean pomProject = "pom".equals(packaging);
+
+    if (!pomProject) {
+      artifact.addMetadata(new ProjectArtifactMetadata(artifact, pomFile));
+    }
+
+    File file = artifact.getFile();
+
+    if (file != null && file.isFile()) {
       deployables.add(artifact);
     }
+    else if (!attachedArtifacts.isEmpty() && !pomProject) {
+      getLog().info("No primary artifact to deploy, deploying attached artifacts instead.");
+
+      Artifact pomArtifact = createPomArtifact();
+
+      deployables.add(pomArtifact);
+    }
     else {
-      artifact.addMetadata(new ProjectArtifactMetadata(artifact, pomFile));
-      
-      final File file = artifact.getFile();
-
-      if (file != null && file.isFile()) {
-        deployables.add(artifact);
-      }
-      else if (!attachedArtifacts.isEmpty()) {
-        getLog().info("No primary artifact to deploy, deploying attached artifacts instead.");
-
-        final Artifact pomArtifact =
-            repositorySystem.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(),
-                artifact.getBaseVersion());
-        pomArtifact.setFile(pomFile);
-
-        deployables.add(pomArtifact);
-        
-        artifact.setResolvedVersion(pomArtifact.getVersion());
-      }
-      else {
-        throw new MojoExecutionException("The packaging for this project did not assign a file to the build artifact");
-      }
+      throw new MojoExecutionException("The packaging for this project did not assign a file to the build artifact");
     }
 
     deployables.addAll(attachedArtifacts);
 
     return deployables;
+  }
+
+  private Artifact createPomArtifact() {
+    Artifact pomArtifact = repositorySystem.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(),
+        artifact.getBaseVersion());
+
+    pomArtifact.setFile(pomFile);
+
+    return pomArtifact;
   }
 
   /**
@@ -183,5 +190,35 @@ public class StagingDeployMojo
       throw new MojoFailureException(
           "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
     }
+  }
+
+  @VisibleForTesting
+  void setOffline(final boolean offline) {
+    this.offline = offline;
+  }
+
+  @VisibleForTesting
+  void setArtifact(final Artifact artifact) {
+    this.artifact = artifact;
+  }
+
+  @VisibleForTesting
+  void setTag(final String tag) {
+    this.tag = tag;
+  }
+
+  @VisibleForTesting
+  void setAttachedArtifacts(final List<Artifact> attachedArtifacts) {
+    this.attachedArtifacts = attachedArtifacts;
+  }
+
+  @VisibleForTesting
+  void setPomFile(final File pomFile) {
+    this.pomFile = pomFile;
+  }
+  
+  @VisibleForTesting
+  void setPackaging(final String packaging) {
+    this.packaging = packaging;
   }
 }
