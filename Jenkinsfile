@@ -14,7 +14,7 @@ properties([
 ])
 
 String apiToken = null
-withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'integrations-github-api',
+withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'sonatype-ci',
                   usernameVariable: 'GITHUB_API_USERNAME', passwordVariable: 'GITHUB_API_PASSWORD']]) {
   apiToken = env.GITHUB_API_PASSWORD
 }
@@ -137,7 +137,7 @@ if (!params.isRelease) {
     }
     input 'Push tags?'
     stage('Push tags') {
-      withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'integrations-github-api',
+      withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'sonatype-ci',
                         usernameVariable: 'GITHUB_API_USERNAME', passwordVariable: 'GITHUB_API_PASSWORD']]) {
         OsTools.runSafe(this,
             "git push https://${env.GITHUB_API_USERNAME}:${env.GITHUB_API_PASSWORD}@github.com/sonatype/maven-staging-plugin.git ${pom.artifactId}-${version}")
