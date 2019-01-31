@@ -7,6 +7,8 @@
 import com.sonatype.jenkins.pipeline.GitHub
 import com.sonatype.jenkins.pipeline.OsTools
 
+Map<String, ?> pipelineCommon = pipelineCommon([:]
+
 properties([
     parameters([
         booleanParam(defaultValue: false, description: 'Maven Staging Plugin for NXRM3', name: 'isRelease')
@@ -14,7 +16,7 @@ properties([
 ])
 
 String apiToken = null
-withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'sonatype-ci',
+withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: pipelineCommon.keystoreCredentialsId,
                   usernameVariable: 'GITHUB_API_USERNAME', passwordVariable: 'GITHUB_API_PASSWORD']]) {
   apiToken = env.GITHUB_API_PASSWORD
 }
