@@ -50,12 +50,10 @@ public class StagingDeployIT
 
   @Test
   public void failIfOffline() throws Exception {
-    String groupId = GROUP_ID;
     String artifactId = randomUUID().toString();
-    String version = VERSION;
     String tag = randomUUID().toString();
 
-    createProject(RELEASE_REPOSITORY, groupId, artifactId, version);
+    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
 
     List<String> goals = new ArrayList<>();
 
