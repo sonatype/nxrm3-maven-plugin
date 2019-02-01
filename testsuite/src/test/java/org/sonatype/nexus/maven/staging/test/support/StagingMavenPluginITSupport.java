@@ -13,6 +13,8 @@
 package org.sonatype.nexus.maven.staging.test.support;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -69,17 +71,22 @@ public abstract class StagingMavenPluginITSupport
     properties.setProperty("test.project.artifactId", artifactId);
     properties.setProperty("test.project.version", version);
 
-    logger.info("PATH >>> " + pom.getAbsolutePath());
-
     fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
   }
 
   private void initialiseVerifier() throws Exception {
-    verifier = new Verifier(testDir.getAbsolutePath());
+    String settingsXml = new File(testDir, "preset-nexus-maven-settings.xml").getAbsolutePath();
+    
+    verifier = new Verifier(testDir.getAbsolutePath(), settingsXml);
 
     verifier.setMavenDebug(true);
 
     // Cleanup the artifact in case it was previously built
     verifier.deleteArtifact(GROUP_ID, ARTIFACT_ID, VERSION, PACKAGING);
+
+    List<String> options = new ArrayList<>();
+    options.add("-Djava.awt.headless=true"); // on Mac a Dock icon bumps on ever Verifier invocation
+    options.add("-s " + settingsXml);
+    verifier.setCliOptions(options);
   }
 }

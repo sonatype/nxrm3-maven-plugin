@@ -83,7 +83,7 @@
           <nexusUrl>${nexus.url}</nexusUrl>
           
           <!-- The server "id" element from settings to use authentication from -->
-          <serverId>local-nexus</serverId>
+          <serverId>local-nexus3</serverId>
          
           <!-- Which repository to deploy to -->
           <repository>${nexus.repository}</repository>
