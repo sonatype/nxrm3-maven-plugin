@@ -145,7 +145,9 @@ public abstract class StagingMojo
     final File stagingPropertiesFile = getStagingPropertiesFile();
 
     if (!stagingPropertiesFile.getParentFile().isDirectory()) {
-      stagingPropertiesFile.getParentFile().mkdirs();
+      if (!stagingPropertiesFile.getParentFile().mkdirs()) {
+        getLog().warn("Unable to create directory for stagings properties file");
+      }
     }
 
     try (OutputStream out = new FileOutputStream(stagingPropertiesFile)) {
