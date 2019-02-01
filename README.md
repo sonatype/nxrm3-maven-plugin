@@ -13,6 +13,7 @@
 
 -->
 # NXRM3 Maven Staging Plugin
+
 This plugin allows Maven projects to be staged in a Nexus Repository Manager 3 repository.
 
 # Example configuration
