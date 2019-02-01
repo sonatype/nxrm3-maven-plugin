@@ -73,7 +73,7 @@ public abstract class NxrmITSupport
         .until(() -> componentSearch(search).items.get(0), hasProperty("tags", tagMatcher));
   }
 
-  ComponentItem waitForComponent(final Map<String, String> search) {
+  protected ComponentItem waitForComponent(final Map<String, String> search) {
     return await().atMost(10, SECONDS).until(() -> componentSearch(search).items, hasSize(1)).get(0);
   }
 
