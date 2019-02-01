@@ -14,6 +14,7 @@ package org.sonatype.nexus.maven.staging;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -123,20 +124,32 @@ public class StagingDeployMojo
                         final List<Artifact> deployables,
                         final String tag) throws Exception
   {
-    DefaultComponent component = getDefaultComponent(deployables.get(0));
+    List<InputStream> streams = new ArrayList<>();
+    
+    try {
+      DefaultComponent component = getDefaultComponent(deployables.get(0));
 
-    for (Artifact artifact : deployables) {
-      DefaultAsset asset = new DefaultAsset(artifact.getFile().getName(), new FileInputStream(artifact.getFile()));
+      for (Artifact artifact : deployables) {
+        FileInputStream stream = new FileInputStream(artifact.getFile());
+        streams.add(stream);
 
-      asset.addAttribute("extension", artifact.getType());
+        DefaultAsset asset = new DefaultAsset(artifact.getFile().getName(), stream);
 
-      if (artifact.getClassifier() != null) {
-        asset.addAttribute("classifier", artifact.getClassifier());
+        asset.addAttribute("extension", artifact.getType());
+
+        if (artifact.getClassifier() != null) {
+          asset.addAttribute("classifier", artifact.getClassifier());
+        }
+        component.addAsset(asset);
       }
-      component.addAsset(asset);
-    }
 
-    client.upload(repository, component, tag);
+      client.upload(repository, component, tag);
+    }
+    finally {
+      for (InputStream stream : streams) {
+        stream.close();
+      }
+    }
   }
 
   private List<Artifact> prepareDeployables() throws MojoExecutionException {
