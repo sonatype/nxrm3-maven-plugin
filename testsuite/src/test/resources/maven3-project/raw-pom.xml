@@ -82,7 +82,7 @@
           <!-- The Base URL of Nexus instance where we want to stage -->
           <nexusUrl>${nexus.url}</nexusUrl>
           
-          <!-- The server "id" element from settings to use authentication from -->
+          <!-- The server "id" element from settings to use authentication from settings.xml-->
           <serverId>local-nexus3</serverId>
          
           <!-- Which repository to deploy to -->

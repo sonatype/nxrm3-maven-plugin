@@ -28,7 +28,7 @@ The basic build configuration requires a url (nexusUrl), repository to deploy (r
         <configuration>
           <nexusUrl>http://localhost:8081</nexusUrl>
           
-          <!-- The server "id" element from settings to use authentication from -->
+          <!-- The server "id" element from settings to use authentication from settings.xml-->
           <serverId>local-nexus</serverId>
          
           <!-- Which repository to deploy to -->
