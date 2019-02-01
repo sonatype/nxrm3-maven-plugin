@@ -24,7 +24,6 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3ClientBuilder;
 public class Nxrm3ClientFactory
 {
   public RepositoryManagerV3Client build(final ServerConfig serverConfig) {
-    RepositoryManagerV3Client client = RepositoryManagerV3ClientBuilder.create().withServerConfig(serverConfig).build();
-    return client;
+    return RepositoryManagerV3ClientBuilder.create().withServerConfig(serverConfig).build();
   }
 }
