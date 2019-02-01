@@ -129,16 +129,16 @@ public class StagingDeployMojo
     try {
       DefaultComponent component = getDefaultComponent(deployables.get(0));
 
-      for (Artifact artifact : deployables) {
-        FileInputStream stream = new FileInputStream(artifact.getFile());
+      for (Artifact deployableArtifact : deployables) {
+        FileInputStream stream = new FileInputStream(deployableArtifact.getFile());
         streams.add(stream);
 
-        DefaultAsset asset = new DefaultAsset(artifact.getFile().getName(), stream);
+        DefaultAsset asset = new DefaultAsset(deployableArtifact.getFile().getName(), stream);
 
-        asset.addAttribute("extension", artifact.getType());
+        asset.addAttribute("extension", deployableArtifact.getType());
 
-        if (artifact.getClassifier() != null) {
-          asset.addAttribute("classifier", artifact.getClassifier());
+        if (deployableArtifact.getClassifier() != null) {
+          asset.addAttribute("classifier", deployableArtifact.getClassifier());
         }
         component.addAsset(asset);
       }
