@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-present Sonatype, Inc.
+    Copyright (c) 2019-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,7 +22,7 @@
   <parent>
     <artifactId>nexus-staging</artifactId>
     <groupId>org.sonatype.plugins</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -32,6 +32,16 @@
   <description>
     Provides support to access staging functionality in a remote Nexus Professional server.
   </description>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <version>1.4.3</version>
+      </plugin>
+    </plugins>
+  </build>
 
   <dependencies>
     <dependency>
@@ -46,5 +56,33 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.sonatype.nexus</groupId>
+      <artifactId>nexus-platform-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.maven</groupId>
+      <artifactId>nexus-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.plugin-testing</groupId>
+      <artifactId>maven-plugin-testing-harness</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <version>3.6.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

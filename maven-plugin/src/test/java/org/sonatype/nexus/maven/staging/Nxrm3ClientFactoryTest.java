@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-present Sonatype, Inc.
+ * Copyright (c) 2019-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,21 +12,28 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import com.sonatype.nexus.api.common.ServerConfig;
+import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
-@Mojo(name = "promote", requiresOnline = true)
-public class StagingPromoteMojo
-    extends StagingMojo
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+
+@RunWith(MockitoJUnitRunner.class)
+public class Nxrm3ClientFactoryTest
 {
-  @Parameter(property = "repository", required = true)
-  private String repository;
+  @Mock
+  private ServerConfig serverConfig;
 
-  @Parameter(property = "tag", required = true)
-  private String tag;
+  @Test
+  public void buildClient() throws Exception {
+    RepositoryManagerV3Client client = new Nxrm3ClientFactory().build(serverConfig);
 
-  @Override
-  public void execute() {
-    getLog().info(String.format("Promoting components with tag '%s' to repository '%s'", tag, repository));
+    assertThat(client, is(notNullValue()));
   }
 }
