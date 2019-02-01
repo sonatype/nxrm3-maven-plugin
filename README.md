@@ -37,7 +37,8 @@ The basic build configuration requires a url (nexusUrl), repository to deploy (r
       </plugin>
 ```
 
-To override the default deploy goal add the following to the plugin
+To override the default deploy goal add the following to the plugin. This can be used if more control is desired over 
+when the plugins deploy goal is activated. 
 
 ```
         <executions>
