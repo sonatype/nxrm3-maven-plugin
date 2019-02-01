@@ -48,6 +48,8 @@ import static org.junit.Assert.assertNotNull;
 public abstract class NxrmITSupport
     extends InjectedTestSupport
 {
+  private static final ObjectMapper mapper = new ObjectMapper();
+
   static final String NX3_PORT_SYS_PROP = "nexus3.it.port";
 
   protected static URI nexusItUri;
@@ -119,7 +121,7 @@ public abstract class NxrmITSupport
     get.setHeader("Accept", "application/json");
     CloseableHttpClient http = HttpClientBuilder.create().build();
     String responseBody = http.execute(get, new BasicResponseHandler());
-    return new ObjectMapper().readerFor(ComponentsResponse.class).readValue(responseBody);
+    return mapper.readerFor(ComponentsResponse.class).readValue(responseBody);
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
