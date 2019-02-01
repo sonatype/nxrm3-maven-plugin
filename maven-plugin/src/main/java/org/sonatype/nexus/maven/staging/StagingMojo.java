@@ -64,9 +64,8 @@ public abstract class StagingMojo
   /**
    * Specifies an alternative staging directory to which the project artifacts should be "locally staged". By
    * default, staging directory will be looked for under {@code $}{{@code project.build.directory} {@code
-   * /nexus-staging}
-   * folder of the first encountered module that has this Mojo defined for execution (Warning: this means, if top
-   * level POM is an aggregator, it will NOT be in the top level!).
+   * /nexus-staging} folder of the first encountered module that has this Mojo defined for execution (Warning: this 
+   * means, if top level POM is an aggregator, it will NOT be in the top level!).
    */
   @Parameter(property = "altStagingDirectory")
   private File altStagingDirectory;
@@ -101,8 +100,8 @@ public abstract class StagingMojo
   }
 
   /**
-   * Returns the working directory root, that is either set explicitly by user in plugin configuration
-   * (see {@link #altStagingDirectory} parameter), or it's location is calculated taking as base the first project in
+   * Returns the working directory root, that is either set explicitly by the user in the plugin configuration
+   * (see {@link #altStagingDirectory} parameter), or its location is calculated taking as base the first project in
    * this reactor that will/was executing this plugin.
    */
   protected File getWorkDirectoryRoot() {
@@ -167,8 +166,8 @@ public abstract class StagingMojo
   }
 
   /**
-   * Returns the staging directory root, that is either set explicitly by user in plugin configuration
-   * (see {@link #altStagingDirectory} parameter), or it's location is calculated taking as base the first project in
+   * Returns the staging directory root, that is either set explicitly by the user in the plugin configuration
+   * (see {@link #altStagingDirectory} parameter), or its location is calculated taking as base the first project in
    * this reactor that will/was executing this plugin.
    */
   protected File getStagingDirectoryRoot() {
