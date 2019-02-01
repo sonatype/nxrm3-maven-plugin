@@ -52,9 +52,19 @@ To override the default deploy goal add the following to the plugin
 
 # Example usage
 
-The plugin currently requires that a tag is specified via ```-Dtag```
+The plugin currently requires that a tag is specified via ```-Dtag``` or as a parameter in the plugin configuration 
+in the pom file.
 
-e.g. ```mvn install nexus-staging:deploy -Dtag=test```
+e.g. ```mvn install nexus-staging:deploy -Dtag=test``` or 
+
+```
+<plugin>
+    ...
+    <configuration>
+      ...
+      <tag>...</tag>
+       ...
+```
 
 # Mutation testing
 
