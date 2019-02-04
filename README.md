@@ -71,9 +71,10 @@ e.g. ```mvn install nexus-staging:deploy -Dtag=test``` or
 # Mutation testing
 
 Run ```mvn -DwithHistory org.pitest:pitest-maven:mutationCoverage``` to calculate mutation coverage. This needs to be 
-run from inside the maven-plugin directory rather than at the root of the project to detect the tests
+run from inside the maven-plugin directory rather than at the root of the project to detect the tests.
 
-#Integration testing
+# Integration testing
+
 To run the integration tests against a docker instance specify the port you would like the tests to run on:
 
 ```-Dnexus.it.port=8085``` 
