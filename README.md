@@ -70,7 +70,7 @@ e.g. ```mvn install nexus-staging:deploy -Dtag=test``` or
 
 # Mutation testing
 
-Run ```mvn -DwithHistory org.pitest:pitest-maven:mutationCoverage ``` to calculate mutation coverage. This needs to be 
+Run ```mvn -DwithHistory org.pitest:pitest-maven:mutationCoverage``` to calculate mutation coverage. This needs to be 
 run from inside the maven-plugin directory rather than at the root of the project to detect the tests
 
 #Integration testing
