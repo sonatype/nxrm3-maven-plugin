@@ -106,7 +106,7 @@ public class StagingDeployMojo
       client.createTag(tag);
     }
     else {
-      getLog().info(String.format("Tag %s  already exists, skipping creation", tag));
+      getLog().info(String.format("Tag %s already exists, skipping creation", tag));
     }
 
     storeTagInPropertiesFile(tag);
