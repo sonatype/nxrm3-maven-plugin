@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
@@ -47,6 +48,8 @@ public class StagingDeployMojo
     extends StagingMojo
 {
   private static final String FORMAT = "maven2";
+
+  private static final Predicate<String> IS_NOT_EMPTY = ((Predicate<String>) String::isEmpty).negate();
 
   @Parameter(property = "repository", required = true)
   private String repository;
@@ -100,7 +103,7 @@ public class StagingDeployMojo
 
     try {
       tag = Optional.ofNullable(tag)
-          .filter(tagValue -> !tagValue.isEmpty())
+          .filter(IS_NOT_EMPTY)
           .orElseGet(() -> tagGenerator.generate(projectName, artifact.getBaseVersion()));
 
       maybeCreateTag(client, tag);
