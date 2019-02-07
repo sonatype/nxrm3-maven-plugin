@@ -64,12 +64,15 @@ import static org.mockito.Mockito.when;
 public class StagingDeployMojoTest
     extends AbstractMojoTestCase
 {
+  private static final String PROJECT_NAME ="projectName";
 
   private static final String USERNAME = "username";
 
   private static final String PASSWORD = "password";
 
   private static final String TAG = "tag";
+
+  private static final String GENERATED_TAG = "generatedTag";
 
   private static final String VERSION = "1.0.0";
 
@@ -104,6 +107,9 @@ public class StagingDeployMojoTest
 
   @Mock
   private Artifact artifact, attachedArtifact;
+
+  @Mock
+  private TagGenerator tagGenerator;
 
   @Mock
   private Nxrm3ClientFactory clientFactory;
@@ -166,13 +172,6 @@ public class StagingDeployMojoTest
     underTest.execute();
   }
 
-  @Test(expected = MojoExecutionException.class)
-  public void failWhenTagNotSet() throws Exception {
-    underTest.setTag(null);
-
-    underTest.execute();
-  }
-
   @Test
   public void createTagWhenSetAndDoesNotExist() throws Exception {
     when(client.getTag(TAG)).thenReturn(Optional.empty());
@@ -180,6 +179,16 @@ public class StagingDeployMojoTest
     underTest.execute();
 
     verify(client).createTag(TAG);
+  }
+
+  @Test
+  public void generateTagWhenTagNotSet() throws Exception {
+    underTest.setTag(null);
+    when(client.getTag(GENERATED_TAG)).thenReturn(Optional.empty());
+
+    underTest.execute();
+
+    verify(client).createTag(GENERATED_TAG);
   }
 
   @Test
@@ -319,11 +328,13 @@ public class StagingDeployMojoTest
     File testPom = getPom();
     StagingDeployMojo mojo = (StagingDeployMojo) lookupMojo("staging-deploy", testPom);
 
+    mojo.setProjectName(PROJECT_NAME);
     mojo.setMavenSession(session);
     mojo.setArtifact(artifact);
     mojo.setTag(TAG);
     mojo.setSkip(false);
     mojo.setAttachedArtifacts(ImmutableList.of(attachedArtifact));
+    mojo.setTagGenerator(tagGenerator);
     mojo.setClientFactory(clientFactory);
     mojo.setPomFile(testPom);
 
@@ -347,6 +358,8 @@ public class StagingDeployMojoTest
 
     mockArtifact(artifact);
     mockArtifact(attachedArtifact);
+
+    when(tagGenerator.generate(PROJECT_NAME, VERSION)).thenReturn(GENERATED_TAG);
 
     when(clientFactory.build(any())).thenReturn(client);
 
