@@ -113,6 +113,16 @@ public class StagingDeployIT
     assertStagingWithDeployGoal(goals, tag);
   }
 
+  @Test
+  public void stagingDeployPomProject() throws Exception {
+    List<String> goals = new ArrayList<>();
+
+    goals.add("install");
+    goals.add(STAGING_DEPLOY);
+
+    assertStagingWithDeployGoal(goals, randomUUID().toString(), POM_PACKAGING);
+  }
+
   private void assertStagingWithDeployGoal(final String deployGoal) throws Exception {
     assertStagingWithDeployGoal(deployGoal, randomUUID().toString());
   }
@@ -127,7 +137,16 @@ public class StagingDeployIT
     assertStagingWithDeployGoal(goals, tag);
   }
 
-  private void assertStagingWithDeployGoal(final List<String> goals, final String tag) throws Exception {
+  private void assertStagingWithDeployGoal(final List<String> goals,
+                                           final String tag) throws Exception
+  {
+    assertStagingWithDeployGoal(goals, tag, JAR_PACKAGING);
+  }
+
+  private void assertStagingWithDeployGoal(final List<String> goals,
+                                           final String tag,
+                                           final String packaging) throws Exception
+  {
     String groupId = GROUP_ID;
     String artifactId = randomUUID().toString();
     String version = VERSION;
@@ -140,6 +159,6 @@ public class StagingDeployIT
 
     verifier.executeGoals(goals);
 
-    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag, packaging);
   }
 }

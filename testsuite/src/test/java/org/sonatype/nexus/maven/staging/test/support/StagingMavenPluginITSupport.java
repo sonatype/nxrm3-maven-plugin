@@ -38,7 +38,9 @@ public abstract class StagingMavenPluginITSupport
 
   private static final String VERSION = "1.0.0";
 
-  private static final String PACKAGING = "pom";
+  protected static final String POM_PACKAGING = "pom";
+
+  protected static final String JAR_PACKAGING = "jar";
 
   protected static final String RELEASE_REPOSITORY = "maven-releases";
 
@@ -59,7 +61,15 @@ public abstract class StagingMavenPluginITSupport
   protected void createProject(final String repository,
                                final String groupId,
                                final String artifactId,
-                               final String version)
+                               final String version) {
+    createProject(repository, groupId, artifactId, version, JAR_PACKAGING);
+  }
+
+  protected void createProject(final String repository,
+                               final String groupId,
+                               final String artifactId,
+                               final String version,
+                               final String packaging)
   {
     final File pom = new File(testDir, "pom.xml");
     final File rawPom = new File(testDir, "raw-pom.xml");
@@ -70,6 +80,7 @@ public abstract class StagingMavenPluginITSupport
     properties.setProperty("test.project.groupId", groupId);
     properties.setProperty("test.project.artifactId", artifactId);
     properties.setProperty("test.project.version", version);
+    properties.setProperty("test.project.packaging", packaging);
 
     fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
   }
@@ -82,7 +93,7 @@ public abstract class StagingMavenPluginITSupport
     verifier.setMavenDebug(true);
 
     // Cleanup the artifact in case it was previously built
-    verifier.deleteArtifact(GROUP_ID, ARTIFACT_ID, VERSION, PACKAGING);
+    verifier.deleteArtifact(GROUP_ID, ARTIFACT_ID, VERSION, POM_PACKAGING);
 
     List<String> options = new ArrayList<>();
     options.add("-Djava.awt.headless=true"); // on Mac a Dock icon bumps on ever Verifier invocation

@@ -20,7 +20,7 @@
   <artifactId>${test.project.artifactId}</artifactId>
   <version>${test.project.version}</version>
   
-  <packaging>jar</packaging>
+  <packaging>${test.project.packaging}</packaging>
 
   <name>artifact</name>
   <description>Artifact</description>
