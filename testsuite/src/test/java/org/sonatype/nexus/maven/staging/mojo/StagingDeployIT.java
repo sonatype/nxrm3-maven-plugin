@@ -151,7 +151,7 @@ public class StagingDeployIT
     String artifactId = randomUUID().toString();
     String version = VERSION;
 
-    createProject(RELEASE_REPOSITORY, groupId, artifactId, version);
+    createProject(RELEASE_REPOSITORY, groupId, artifactId, version, packaging);
 
     verifier.setDebug(true);
 
@@ -159,6 +159,6 @@ public class StagingDeployIT
 
     verifier.executeGoals(goals);
 
-    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag, packaging);
+    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
   }
 }
