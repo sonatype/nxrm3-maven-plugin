@@ -49,7 +49,7 @@ public class StagingDeployMojo
 {
   private static final String FORMAT = "maven2";
 
-  private static final Predicate<String> IS_NOT_EMPTY = ((Predicate<String>) String::isEmpty).negate();
+  private static final Predicate<String> IS_NOT_EMPTY = tag -> !tag.isEmpty();
 
   @Parameter(property = "repository", required = true)
   private String repository;
