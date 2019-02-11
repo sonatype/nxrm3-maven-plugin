@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>${test.project.groupId}</groupId>
+  <artifactId>${test.project.artifactId}</artifactId>
+  <version>${test.project.version}</version>
+  
+  <packaging>pom</packaging>
+  
+  <dependencies>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib-nodep</artifactId>
+      <version>3.2.0</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>default-deploy</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>deploy</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <!-- The Base URL of Nexus instance where we want to stage -->
+          <nexusUrl>${nexus.url}</nexusUrl>
+
+          <!-- The server "id" element from settings to use authentication from settings.xml-->
+          <serverId>local-nexus3</serverId>
+
+          <!-- Which repository to deploy to -->
+          <repository>${nexus.repository}</repository>
+
+          <!-- the below config is not used by the NXRM3 version of this plugin but is left in to ensure that it 
+            is safely ignored and causes no issues -->
+          <autoDropAfterRelease>false</autoDropAfterRelease>
+          <stagingDescriptions>
+            <start>start</start>
+            <finish>finish</finish>
+          </stagingDescriptions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <modules>
+    <module>Proj1</module>
+    <module>Proj2</module>
+  </modules>
+</project>

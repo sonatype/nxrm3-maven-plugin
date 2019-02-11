@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>${test.project.groupId}</groupId>
+    <artifactId>${test.project.artifactId}</artifactId>
+    <version>${test.project.version}</version>
+  </parent>
+
+  <artifactId>${test.project.artifactId}-module2</artifactId>
+  
+  <dependencies>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib-nodep</artifactId>
+      <version>3.2.0</version>
+    </dependency>
+  </dependencies>
+</project>
