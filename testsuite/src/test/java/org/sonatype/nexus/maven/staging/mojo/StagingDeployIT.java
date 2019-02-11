@@ -149,6 +149,8 @@ public class StagingDeployIT
 
   @Test
   public void stagingDeployPomProject() throws Exception {
+    initialiseVerifier(projectDir);
+    
     List<String> goals = new ArrayList<>();
 
     goals.add("install");
