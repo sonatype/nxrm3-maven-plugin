@@ -64,8 +64,6 @@ import static org.mockito.Mockito.when;
 public class StagingDeployMojoTest
     extends AbstractMojoTestCase
 {
-  private static final String PROJECT_NAME ="projectName";
-
   private static final String USERNAME = "username";
 
   private static final String PASSWORD = "password";
@@ -297,7 +295,6 @@ public class StagingDeployMojoTest
     File testPom = getPom();
     StagingDeployMojo mojo = (StagingDeployMojo) lookupMojo("staging-deploy", testPom);
 
-    mojo.setProjectName(PROJECT_NAME);
     mojo.setMavenSession(session);
     mojo.setArtifact(artifact);
     mojo.setTag(TAG);
@@ -327,7 +324,7 @@ public class StagingDeployMojoTest
     mockArtifact(artifact);
     mockArtifact(attachedArtifact);
 
-    when(tagGenerator.generate(PROJECT_NAME, VERSION)).thenReturn(GENERATED_TAG);
+    when(tagGenerator.generate(ARTIFACT_ID, VERSION)).thenReturn(GENERATED_TAG);
 
     when(clientFactory.build(any())).thenReturn(client);
 
