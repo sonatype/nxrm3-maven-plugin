@@ -27,7 +27,7 @@ public class TagGeneratorTest
 {
   private static final String HYPHEN_DELIMITER = "-";
 
-  private static final String PROJECT_NAME = "theProjectName";
+  private static final String ARTIFACT_ID = "theArtifactId";
 
   private static final String PROJECT_VERSION = "theProjectVersion";
 
@@ -47,8 +47,8 @@ public class TagGeneratorTest
   public void testGenerate() {
     when(currentTimeSource.get()).thenReturn(CURRENT_TIME);
 
-    String expected = String.join(HYPHEN_DELIMITER, PROJECT_NAME, PROJECT_VERSION, Long.toString(CURRENT_TIME));
+    String expected = String.join(HYPHEN_DELIMITER, ARTIFACT_ID, PROJECT_VERSION, Long.toString(CURRENT_TIME));
 
-    assertThat(tagGenerator.generate(PROJECT_NAME, PROJECT_VERSION), equalTo(expected));
+    assertThat(tagGenerator.generate(ARTIFACT_ID, PROJECT_VERSION), equalTo(expected));
   }
 }
