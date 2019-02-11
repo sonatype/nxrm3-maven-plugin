@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import java.util.Date;
-
 import javax.inject.Singleton;
 
 /**
@@ -24,7 +22,7 @@ import javax.inject.Singleton;
 @Singleton
 public class CurrentTimeSource
 {
-  public Date get() {
-    return new Date();
+  public long get() {
+    return System.currentTimeMillis();
   }
 }

@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import java.text.SimpleDateFormat;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -27,8 +25,6 @@ public class TagGenerator
 {
   private static final String HYPHEN_DELIMITER = "-";
 
-  private static final String TIMESTAMP_PATTERN = "yyyyMMdd'T'HHmmssSSS";
-
   private final CurrentTimeSource currentTimeSource;
 
   @Inject
@@ -37,10 +33,6 @@ public class TagGenerator
   }
 
   public String generate(final String projectName, final String projectVersion) {
-    return String.join(HYPHEN_DELIMITER, projectName, projectVersion, getCurrentTimestamp());
-  }
-
-  private String getCurrentTimestamp() {
-    return new SimpleDateFormat(TIMESTAMP_PATTERN).format(currentTimeSource.get());
+    return String.join(HYPHEN_DELIMITER, projectName, projectVersion, Long.toString(currentTimeSource.get()));
   }
 }
