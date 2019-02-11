@@ -32,7 +32,7 @@ public class TagGenerator
     this.currentTimeSource = currentTimeSource;
   }
 
-  public String generate(final String projectName, final String projectVersion) {
-    return String.join(HYPHEN_DELIMITER, projectName, projectVersion, Long.toString(currentTimeSource.get()));
+  public String generate(final String artifactId, final String projectVersion) {
+    return String.join(HYPHEN_DELIMITER, artifactId, projectVersion, Long.toString(currentTimeSource.get()));
   }
 }
