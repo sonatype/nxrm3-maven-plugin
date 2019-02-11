@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +31,8 @@ public class TagGeneratorTest
 
   private static final String PROJECT_VERSION = "theProjectVersion";
 
+  private static final long CURRENT_TIME = 8239183288L;
+
   @Mock
   private CurrentTimeSource currentTimeSource;
 
@@ -46,14 +45,10 @@ public class TagGeneratorTest
 
   @Test
   public void testGenerate() {
-    when(currentTimeSource.get()).thenReturn(toDate("2007-12-03T10:15:30.378"));
+    when(currentTimeSource.get()).thenReturn(CURRENT_TIME);
 
-    String expected = String.join(HYPHEN_DELIMITER, PROJECT_NAME, PROJECT_VERSION, "20071203T101530378");
+    String expected = String.join(HYPHEN_DELIMITER, PROJECT_NAME, PROJECT_VERSION, Long.toString(CURRENT_TIME));
 
     assertThat(tagGenerator.generate(PROJECT_NAME, PROJECT_VERSION), equalTo(expected));
-  }
-
-  private static Date toDate(final String dateString) {
-    return java.sql.Timestamp.valueOf(LocalDateTime.parse(dateString));
   }
 }
