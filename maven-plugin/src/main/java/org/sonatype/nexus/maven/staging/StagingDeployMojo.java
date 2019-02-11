@@ -66,9 +66,6 @@ public class StagingDeployMojo
   @Inject
   private TagGenerator tagGenerator;
 
-  @Parameter(defaultValue = "${project.name}", readonly = true, required = true)
-  private String projectName;
-
   @Parameter(defaultValue = "${project.artifact}", readonly = true, required = true)
   private Artifact artifact;
 
@@ -104,7 +101,7 @@ public class StagingDeployMojo
     try {
       tag = Optional.ofNullable(tag)
           .filter(IS_NOT_EMPTY)
-          .orElseGet(() -> tagGenerator.generate(projectName, artifact.getBaseVersion()));
+          .orElseGet(() -> tagGenerator.generate(artifact.getArtifactId(), artifact.getBaseVersion()));
 
       maybeCreateTag(client, tag);
       getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
@@ -228,11 +225,6 @@ public class StagingDeployMojo
       throw new MojoFailureException(
           "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
     }
-  }
-
-  @VisibleForTesting
-  void setProjectName(final String projectName) {
-    this.projectName = projectName;
   }
 
   @VisibleForTesting
