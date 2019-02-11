@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
@@ -48,8 +47,6 @@ public class StagingDeployMojo
     extends StagingMojo
 {
   private static final String FORMAT = "maven2";
-
-  private static final Predicate<String> IS_NOT_EMPTY = tag -> !tag.isEmpty();
 
   @Parameter(property = "repository", required = true)
   private String repository;
@@ -99,10 +96,7 @@ public class StagingDeployMojo
     List<Artifact> deployables = prepareDeployables();
 
     try {
-      tag = Optional.ofNullable(tag)
-          .filter(IS_NOT_EMPTY)
-          .orElseGet(() -> tagGenerator.generate(artifact.getArtifactId(), artifact.getBaseVersion()));
-
+      tag = getProvidedOrGeneratedTag();
       maybeCreateTag(client, tag);
       getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
       doUpload(client, deployables, tag);
@@ -113,6 +107,16 @@ public class StagingDeployMojo
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
+  }
+
+  private String getProvidedOrGeneratedTag() {
+    if (tag == null || tag.isEmpty()) {
+      String generatedTag = tagGenerator.generate(artifact.getArtifactId(), artifact.getBaseVersion());
+      getLog().info(String.format("No tag was provided; using generated tag '%s'", generatedTag));
+      return generatedTag;
+    }
+
+    return tag;
   }
 
   private void maybeCreateTag(final RepositoryManagerV3Client client, final String tag)
