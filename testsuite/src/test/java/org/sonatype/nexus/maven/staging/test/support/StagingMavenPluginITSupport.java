@@ -23,6 +23,7 @@ import org.sonatype.sisu.filetasks.FileTaskBuilder;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
@@ -59,19 +60,44 @@ public abstract class StagingMavenPluginITSupport
   protected void createProject(final String repository,
                                final String groupId,
                                final String artifactId,
+                               final String version,
+                               final boolean skip)
+  {
+    final File pom = new File(testDir, "pom.xml");
+    final File rawPom = new File(testDir, "raw-pom-with-skip.xml");
+
+    final Properties properties = getDefaultProperties(repository, groupId, artifactId, version);
+    properties.setProperty("nexus.skipNexusStagingDeployMojo", skip ? "true" : "false");
+
+    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+  }
+
+  protected void createProject(final String repository,
+                               final String groupId,
+                               final String artifactId,
                                final String version)
   {
     final File pom = new File(testDir, "pom.xml");
     final File rawPom = new File(testDir, "raw-pom.xml");
 
+    final Properties properties = getDefaultProperties(repository, groupId, artifactId, version);
+
+    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+  }
+
+  @NotNull
+  private Properties getDefaultProperties(final String repository,
+                                          final String groupId,
+                                          final String artifactId,
+                                          final String version)
+  {
     final Properties properties = new Properties();
     properties.setProperty("nexus.url", "http://localhost:" + getPort());
     properties.setProperty("nexus.repository", repository);
     properties.setProperty("test.project.groupId", groupId);
     properties.setProperty("test.project.artifactId", artifactId);
     properties.setProperty("test.project.version", version);
-
-    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+    return properties;
   }
 
   private void initialiseVerifier() throws Exception {

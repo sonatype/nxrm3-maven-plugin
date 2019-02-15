@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
 
+import org.apache.maven.it.VerificationException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -113,6 +114,49 @@ public class StagingDeployIT
     assertStagingWithDeployGoal(goals, tag);
   }
 
+  @Test
+  public void deployIfSkipNotSet() throws Exception {
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+    goals.add("install");
+    goals.add(STAGING_DEPLOY);
+
+    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+  }
+
+  @Test(expected = AssertionError.class)
+  public void doNothingIfSkipTrue() throws Exception {
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, true);
+
+    List<String> goals = new ArrayList<>();
+    goals.add("install");
+    goals.add(STAGING_DEPLOY);
+
+    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+  }
+
+  @Test
+  public void deployIfSkipFalse() throws Exception {
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, false);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add("install");
+    goals.add(STAGING_DEPLOY);
+
+    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+  }
+
   private void assertStagingWithDeployGoal(final String deployGoal) throws Exception {
     assertStagingWithDeployGoal(deployGoal, randomUUID().toString());
   }
@@ -134,6 +178,14 @@ public class StagingDeployIT
 
     createProject(RELEASE_REPOSITORY, groupId, artifactId, version);
 
+    deployAndVerify(goals, tag, groupId, artifactId, version);
+  }
+
+  private void deployAndVerify(final List<String> goals,
+                               final String tag,
+                               final String groupId,
+                               final String artifactId, final String version) throws VerificationException
+  {
     verifier.setDebug(true);
 
     verifier.addCliOption("-Dtag=" + tag);
