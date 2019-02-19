@@ -153,7 +153,7 @@ public class StagingDeployIT
     
     List<String> goals = new ArrayList<>();
 
-    goals.add("install");
+    goals.add(INSTALL);
     goals.add(STAGING_DEPLOY);
 
     assertStagingWithDeployGoal(goals, randomUUID().toString(), POM_PACKAGING);
