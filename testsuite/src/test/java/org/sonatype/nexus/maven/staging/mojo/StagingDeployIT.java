@@ -13,12 +13,15 @@
 package org.sonatype.nexus.maven.staging.mojo;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.UUID.randomUUID;
@@ -26,6 +29,7 @@ import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 
 public class StagingDeployIT
     extends StagingMavenPluginITSupport
@@ -39,6 +43,13 @@ public class StagingDeployIT
   private static final String DEPLOY = "deploy";
 
   private static final String INSTALL = "install";
+
+  private File propertiesFile;
+
+  @Before
+  public void setup() {
+    propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
+  }
 
   @Test
   public void stagingDeploy() throws Exception {
@@ -124,8 +135,6 @@ public class StagingDeployIT
 
     assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
 
-    File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
-
     assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
 
     forceDelete(propertiesFile);
@@ -133,6 +142,32 @@ public class StagingDeployIT
     assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
 
     assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
+  }
+
+  @Test
+  public void deployWithoutSpecifyingTagUsesGeneratedTag() throws Exception {
+    initialiseVerifier(projectDir);
+
+    String artifactId = randomUUID().toString();
+
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add("install");
+    goals.add(STAGING_DEPLOY);
+
+    verifier.setDebug(true);
+
+    verifier.executeGoals(goals);
+
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(propertiesFile));
+    String generatedTag = properties.getProperty("staging.tag");
+
+    assertThat(generatedTag, startsWith(artifactId + "-" + VERSION + "-"));
+
+    verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, generatedTag);
   }
 
   @Test
