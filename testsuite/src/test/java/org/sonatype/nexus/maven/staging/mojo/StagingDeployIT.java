@@ -38,6 +38,8 @@ public class StagingDeployIT
 
   private static final String DEPLOY = "deploy";
 
+  private static final String INSTALL = "install";
+
   @Test
   public void stagingDeploy() throws Exception {
     assertStagingWithDeployGoal(STAGING_DEPLOY);
@@ -49,15 +51,47 @@ public class StagingDeployIT
   }
 
   @Test
+  public void multiModuleDeploy() throws Exception {
+    initialiseVerifier(multiModuleProjectDir);
+    
+    String tag = randomUUID().toString();
+    
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    String groupId = GROUP_ID;
+    String artifactId = randomUUID().toString();
+    String version = VERSION;
+
+    createProject(multiModuleProjectDir, RELEASE_REPOSITORY, groupId, artifactId, version);
+    createProject(project1Dir, RELEASE_REPOSITORY, groupId, artifactId, version);
+    createProject(project2Dir, RELEASE_REPOSITORY, groupId, artifactId, version);
+
+    verifier.setDebug(true);
+
+    verifier.addCliOption("-Dtag=" + tag);
+
+    verifier.executeGoals(goals);
+
+    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId + "-module1", version, tag);
+    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId + "-module2", version, tag);
+  }
+
+  @Test
   public void failIfOffline() throws Exception {
+    initialiseVerifier(projectDir);
+    
     String artifactId = randomUUID().toString();
     String tag = randomUUID().toString();
 
-    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
 
     List<String> goals = new ArrayList<>();
 
-    goals.add("install");
+    goals.add(INSTALL);
     goals.add(STAGING_DEPLOY);
 
     verifier.setDebug(true);
@@ -90,7 +124,7 @@ public class StagingDeployIT
 
     assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
 
-    File propertiesFile = new File(testDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
+    File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
 
     assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
 
@@ -113,6 +147,18 @@ public class StagingDeployIT
     assertStagingWithDeployGoal(goals, tag);
   }
 
+  @Test
+  public void stagingDeployPomProject() throws Exception {
+    initialiseVerifier(projectDir);
+    
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    assertStagingWithDeployGoal(goals, randomUUID().toString(), POM_PACKAGING);
+  }
+
   private void assertStagingWithDeployGoal(final String deployGoal) throws Exception {
     assertStagingWithDeployGoal(deployGoal, randomUUID().toString());
   }
@@ -120,19 +166,30 @@ public class StagingDeployIT
   private void assertStagingWithDeployGoal(final String deployGoal, final String tag) throws Exception {
     List<String> goals = new ArrayList<>();
 
-    goals.add("install");
+    goals.add(INSTALL);
     goals.add("javadoc:jar");
     goals.add(deployGoal);
     
     assertStagingWithDeployGoal(goals, tag);
   }
 
-  private void assertStagingWithDeployGoal(final List<String> goals, final String tag) throws Exception {
+  private void assertStagingWithDeployGoal(final List<String> goals,
+                                           final String tag) throws Exception
+  {
+    initialiseVerifier(projectDir);
+    
+    assertStagingWithDeployGoal(goals, tag, JAR_PACKAGING);
+  }
+
+  private void assertStagingWithDeployGoal(final List<String> goals,
+                                           final String tag,
+                                           final String packaging) throws Exception
+  {
     String groupId = GROUP_ID;
     String artifactId = randomUUID().toString();
     String version = VERSION;
 
-    createProject(RELEASE_REPOSITORY, groupId, artifactId, version);
+    createProject(projectDir, RELEASE_REPOSITORY, groupId, artifactId, version);
 
     verifier.setDebug(true);
 
