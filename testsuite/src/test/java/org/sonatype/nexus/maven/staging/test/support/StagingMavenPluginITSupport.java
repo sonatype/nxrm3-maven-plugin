@@ -23,7 +23,6 @@ import org.sonatype.sisu.filetasks.FileTaskBuilder;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
@@ -85,7 +84,6 @@ public abstract class StagingMavenPluginITSupport
     fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
   }
 
-  @NotNull
   private Properties getDefaultProperties(final String repository,
                                           final String groupId,
                                           final String artifactId,
