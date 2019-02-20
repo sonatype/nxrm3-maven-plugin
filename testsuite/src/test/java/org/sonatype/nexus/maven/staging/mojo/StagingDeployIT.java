@@ -184,7 +184,8 @@ public class StagingDeployIT
   private void deployAndVerify(final List<String> goals,
                                final String tag,
                                final String groupId,
-                               final String artifactId, final String version) throws VerificationException
+                               final String artifactId,
+                               final String version) throws VerificationException
   {
     verifier.setDebug(true);
 
