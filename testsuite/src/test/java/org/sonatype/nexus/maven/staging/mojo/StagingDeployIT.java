@@ -39,6 +39,8 @@ public class StagingDeployIT
 
   private static final String DEPLOY = "deploy";
 
+  private static final String INSTALL = "install";
+
   @Test
   public void stagingDeploy() throws Exception {
     assertStagingWithDeployGoal(STAGING_DEPLOY);
@@ -58,7 +60,7 @@ public class StagingDeployIT
 
     List<String> goals = new ArrayList<>();
 
-    goals.add("install");
+    goals.add(INSTALL);
     goals.add(STAGING_DEPLOY);
 
     verifier.setDebug(true);
@@ -122,7 +124,7 @@ public class StagingDeployIT
     createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
 
     List<String> goals = new ArrayList<>();
-    goals.add("install");
+    goals.add(INSTALL);
     goals.add(STAGING_DEPLOY);
 
     deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
@@ -136,7 +138,7 @@ public class StagingDeployIT
     createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, true);
 
     List<String> goals = new ArrayList<>();
-    goals.add("install");
+    goals.add(INSTALL);
     goals.add(STAGING_DEPLOY);
 
     deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
@@ -151,7 +153,7 @@ public class StagingDeployIT
 
     List<String> goals = new ArrayList<>();
 
-    goals.add("install");
+    goals.add(INSTALL);
     goals.add(STAGING_DEPLOY);
 
     deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
@@ -164,7 +166,7 @@ public class StagingDeployIT
   private void assertStagingWithDeployGoal(final String deployGoal, final String tag) throws Exception {
     List<String> goals = new ArrayList<>();
 
-    goals.add("install");
+    goals.add(INSTALL);
     goals.add("javadoc:jar");
     goals.add(deployGoal);
     
