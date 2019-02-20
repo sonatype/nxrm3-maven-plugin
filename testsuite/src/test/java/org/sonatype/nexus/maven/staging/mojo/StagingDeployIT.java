@@ -149,8 +149,7 @@ public class StagingDeployIT
 
     verifier.executeGoals(goals);
 
-    Map<String, String> searchQuery = getSearchQuery(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
-    assertThat(componentSearch(searchQuery).items, hasSize(0));
+    verifyNoComponentPresent(artifactId);
   }
 
   @Test
@@ -166,6 +165,51 @@ public class StagingDeployIT
     goals.add(STAGING_DEPLOY);
 
     deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+  }
+
+  @Test
+  public void deployIfCliSkipClear() throws Exception {
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    verifier.addCliOption("-DskipNexusStagingDeployMojo=false");
+
+    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+  }
+
+  @Test
+  public void doNothingIfCliSkipSet() throws Exception {
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    verifier.addCliOption("-DskipNexusStagingDeployMojo=true");
+
+    verifier.setDebug(true);
+
+    verifier.addCliOption("-Dtag=" + tag);
+
+    verifier.executeGoals(goals);
+
+    verifyNoComponentPresent(artifactId);
+  }
+
+  private void verifyNoComponentPresent(final String artifactId) throws Exception {
+    Map<String, String> searchQuery = getSearchQuery(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    assertThat(componentSearch(searchQuery).items, hasSize(0));
   }
 
   private void assertStagingWithDeployGoal(final String deployGoal) throws Exception {
