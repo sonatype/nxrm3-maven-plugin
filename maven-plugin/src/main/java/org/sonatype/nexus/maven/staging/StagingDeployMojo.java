@@ -175,7 +175,10 @@ public class StagingDeployMojo
 
     File file = artifact.getFile();
 
-    if (file != null && file.isFile()) {
+    if (pomProject) {
+      deployables.add(createPomArtifact());
+    }
+    else if (file != null && file.isFile()) {
       deployables.add(artifact);
     }
     else if (!attachedArtifacts.isEmpty() && !pomProject) {

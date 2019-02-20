@@ -285,6 +285,25 @@ public class StagingDeployMojoTest
   }
 
   @Test
+  public void deployPomProject() throws Exception {
+    underTest.setPackaging("pom");
+
+    underTest.execute();
+
+    ArgumentCaptor<Component> componentArgumentCaptor = ArgumentCaptor.forClass(Component.class);
+
+    verify(client).upload(eq(REPOSITORY), componentArgumentCaptor.capture(), eq(TAG));
+
+    Component component = componentArgumentCaptor.getValue();
+
+    assertThat(component.getAssets().size(), is(equalTo(2)));
+
+    Map<String, String> firstAssetAttributes = component.getAssets().iterator().next().getAttributes();
+    assertThat(firstAssetAttributes.get(EXTENSION_KEY), is(equalTo("pom")));
+    assertThat(firstAssetAttributes.size(), is(equalTo(1)));
+  }
+
+  @Test
   public void skipDeploy() throws Exception {
     underTest.setSkip(true);
 
