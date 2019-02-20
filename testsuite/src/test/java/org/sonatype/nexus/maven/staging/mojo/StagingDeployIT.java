@@ -15,6 +15,7 @@ package org.sonatype.nexus.maven.staging.mojo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
 
@@ -26,6 +27,7 @@ import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
 
 public class StagingDeployIT
@@ -130,7 +132,7 @@ public class StagingDeployIT
     deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test
   public void doNothingIfSkipTrue() throws Exception {
     String artifactId = randomUUID().toString();
     String tag = randomUUID().toString();
@@ -141,7 +143,14 @@ public class StagingDeployIT
     goals.add(INSTALL);
     goals.add(STAGING_DEPLOY);
 
-    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+    verifier.setDebug(true);
+
+    verifier.addCliOption("-Dtag=" + tag);
+
+    verifier.executeGoals(goals);
+
+    Map<String, String> searchQuery = getSearchQuery(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    assertThat(componentSearch(searchQuery).items, hasSize(0));
   }
 
   @Test
