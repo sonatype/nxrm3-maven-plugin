@@ -164,10 +164,11 @@ public class StagingDeployIT
 
   @Test
   public void deployIfSkipNotSet() throws Exception {
+    initialiseVerifier(projectDir);
     String artifactId = randomUUID().toString();
     String tag = randomUUID().toString();
 
-    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
 
     List<String> goals = new ArrayList<>();
     goals.add(INSTALL);
@@ -178,10 +179,11 @@ public class StagingDeployIT
 
   @Test
   public void doNothingIfSkipTrue() throws Exception {
+    initialiseVerifier(projectDir);
     String artifactId = randomUUID().toString();
     String tag = randomUUID().toString();
 
-    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, true);
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, true);
 
     List<String> goals = new ArrayList<>();
     goals.add(INSTALL);
@@ -198,10 +200,11 @@ public class StagingDeployIT
 
   @Test
   public void deployIfSkipFalse() throws Exception {
+    initialiseVerifier(projectDir);
     String artifactId = randomUUID().toString();
     String tag = randomUUID().toString();
 
-    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, false);
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, false);
 
     List<String> goals = new ArrayList<>();
 
@@ -213,10 +216,11 @@ public class StagingDeployIT
 
   @Test
   public void deployIfCliSkipClear() throws Exception {
+    initialiseVerifier(projectDir);
     String artifactId = randomUUID().toString();
     String tag = randomUUID().toString();
 
-    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
 
     List<String> goals = new ArrayList<>();
 
@@ -230,10 +234,11 @@ public class StagingDeployIT
 
   @Test
   public void doNothingIfCliSkipSet() throws Exception {
+    initialiseVerifier(projectDir);
     String artifactId = randomUUID().toString();
     String tag = randomUUID().toString();
 
-    createProject(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
 
     List<String> goals = new ArrayList<>();
 
