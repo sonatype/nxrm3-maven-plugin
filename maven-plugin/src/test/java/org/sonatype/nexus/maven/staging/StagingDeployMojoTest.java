@@ -292,6 +292,7 @@ public class StagingDeployMojoTest
 
     verify(artifact, never()).addMetadata(any());
     verify(client, never()).getTag(anyString());
+    verify(client, never()).createTag(any());
     verify(client, never()).upload(any(), any(), any());
   }
 
