@@ -33,6 +33,9 @@ The basic build configuration requires a url (nexusUrl), repository to deploy (r
          
           <!-- Which repository to deploy to -->
           <repository>maven-releases</repository>
+          
+          <!-- Skip the staging deploy mojo -->
+          <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         </configuration>
       </plugin>
 ```

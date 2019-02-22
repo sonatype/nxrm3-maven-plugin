@@ -52,6 +52,9 @@ public class StagingDeployMojo
   @Parameter(property = "tag")
   private String tag;
 
+  @Parameter(property = "skipNexusStagingDeployMojo")
+  private boolean skipNexusStagingDeployMojo;
+
   @Component
   private RepositorySystem repositorySystem;
 
@@ -72,6 +75,15 @@ public class StagingDeployMojo
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
+    if (skipNexusStagingDeployMojo) {
+      getLog().info("Skipping Nexus Staging Deploy Mojo at user's demand.");
+      return;
+    }
+
+    doExecute();
+  }
+
+  private void doExecute() throws MojoFailureException, MojoExecutionException {
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
 
     failIfOffline();
@@ -236,5 +248,10 @@ public class StagingDeployMojo
   @VisibleForTesting
   void setPackaging(final String packaging) {
     this.packaging = packaging;
+  }
+
+  @VisibleForTesting
+  void setSkip(final boolean skip) {
+    this.skipNexusStagingDeployMojo = skip;
   }
 }

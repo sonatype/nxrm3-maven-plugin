@@ -303,6 +303,18 @@ public class StagingDeployMojoTest
     assertThat(firstAssetAttributes.size(), is(equalTo(1)));
   }
 
+  @Test
+  public void skipDeploy() throws Exception {
+    underTest.setSkip(true);
+
+    underTest.execute();
+
+    verify(artifact, never()).addMetadata(any());
+    verify(client, never()).getTag(anyString());
+    verify(client, never()).createTag(any());
+    verify(client, never()).upload(any(), any(), any());
+  }
+
   private StagingDeployMojo lookupMojo() throws Exception {
     File testPom = getPom();
     StagingDeployMojo mojo = (StagingDeployMojo) lookupMojo("staging-deploy", testPom);
@@ -310,6 +322,7 @@ public class StagingDeployMojoTest
     mojo.setMavenSession(session);
     mojo.setArtifact(artifact);
     mojo.setTag(TAG);
+    mojo.setSkip(false);
     mojo.setAttachedArtifacts(ImmutableList.of(attachedArtifact));
     mojo.setClientFactory(clientFactory);
     mojo.setPomFile(testPom);

@@ -85,9 +85,7 @@ public abstract class NxrmITSupport
                                  final String version,
                                  final String... tags)
   {
-    // verify server can retrieve the component
-    Map<String, String> search = SearchBuilder.create().withRepository(repository).withGroup(group).withName(name)
-        .withVersion(version).build();
+    Map<String, String> search = getSearchQuery(repository, group, name, version);
 
     ComponentItem component;
 
@@ -102,7 +100,17 @@ public abstract class NxrmITSupport
     stream(tags).forEach(tag -> assertThat(component.tags, hasItem(tag)));
   }
 
-  ComponentsResponse componentSearch(final Map<String, String> search)
+  protected Map<String, String> getSearchQuery(final String repository,
+                                             final String group,
+                                             final String name,
+                                             final String version)
+  {
+    // verify server can retrieve the component
+    return SearchBuilder.create().withRepository(repository).withGroup(group).withName(name)
+        .withVersion(version).build();
+  }
+
+  protected ComponentsResponse componentSearch(final Map<String, String> search)
       throws Exception
   {
     StringBuilder query = new StringBuilder("/service/rest/v1/search?");
