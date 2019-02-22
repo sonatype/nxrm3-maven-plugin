@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.repository.v3.Asset;
@@ -115,11 +116,13 @@ public class StagingDeployMojoTest
   @Mock
   private RepositoryManagerV3Client client;
 
+  private Path tempDirectory;
+
   private Server server;
 
-  private StagingDeployMojo underTest;
+  private Properties userProperties;
 
-  private Path tempDirectory;
+  private StagingDeployMojo underTest;
 
   @Before
   public void setup() throws Exception {
@@ -187,6 +190,7 @@ public class StagingDeployMojoTest
     underTest.execute();
 
     verify(client).createTag(GENERATED_TAG);
+    assertThat(userProperties.getProperty("tag"), equalTo(GENERATED_TAG));
   }
 
   @Test
@@ -334,9 +338,13 @@ public class StagingDeployMojoTest
     server.setUsername(USERNAME);
     server.setPassword(PASSWORD);
 
+    userProperties = new Properties();
+
     when(session.getExecutionRootDirectory()).thenReturn(tempDirectory.toString());
 
     when(session.getSettings()).thenReturn(settings);
+
+    when(session.getUserProperties()).thenReturn(userProperties);
 
     when(settings.getServer(anyString())).thenReturn(server);
 
