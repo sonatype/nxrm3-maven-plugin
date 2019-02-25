@@ -142,6 +142,11 @@ public abstract class StagingMojo
     saveStagingProperties(properties);
   }
 
+  protected String getTagFromPropertiesFile() {
+    Properties stagingProperties = loadStagingProperties();
+    return stagingProperties.getProperty(TAG_ID);
+  }
+
   protected void saveStagingProperties(final Map<String, String> properties) {
     final Properties stagingProperties = new Properties();
 
@@ -163,6 +168,19 @@ public abstract class StagingMojo
     catch (IOException e) {
       getLog().error(e);
     }
+  }
+
+  protected Properties loadStagingProperties() {
+    final Properties properties = new Properties();
+    try {
+      try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
+        properties.load(inputStream);
+      }
+    }
+    catch (IOException e) {
+      getLog().error(e);
+    }
+    return properties;
   }
 
   /**
