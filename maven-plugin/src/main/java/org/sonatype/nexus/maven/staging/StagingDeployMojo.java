@@ -112,6 +112,7 @@ public class StagingDeployMojo
   private String getProvidedOrGeneratedTag() {
     if (tag == null || tag.isEmpty()) {
       String generatedTag = tagGenerator.generate(artifact.getArtifactId(), artifact.getBaseVersion());
+      getMavenSession().getUserProperties().setProperty("tag", generatedTag);
       getLog().info(String.format("No tag was provided; using generated tag '%s'", generatedTag));
       return generatedTag;
     }
