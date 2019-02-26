@@ -57,8 +57,7 @@ when the plugins deploy goal is activated.
 
 # Example usage
 
-The plugin currently requires that a tag is specified via ```-Dtag``` or as a parameter in the plugin configuration 
-in the pom file.
+The plugin allows a tag to be specified via ```-Dtag``` or as a parameter in the plugin configuration in the pom file.
 
 e.g. ```mvn install nexus-staging:deploy -Dtag=test``` or 
 
@@ -70,6 +69,12 @@ e.g. ```mvn install nexus-staging:deploy -Dtag=test``` or
       <tag>...</tag>
        ...
 ```
+
+If no tag is specified, one will be generated in the format:
+ 
+ ```<artifactId>-<version>-<timestamp>``` 
+
+e.g. ```myproject-1.5.7-1550242817039```
 
 # Mutation testing
 

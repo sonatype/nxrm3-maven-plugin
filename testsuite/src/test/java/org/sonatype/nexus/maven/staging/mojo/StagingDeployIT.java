@@ -13,8 +13,10 @@
 package org.sonatype.nexus.maven.staging.mojo;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Map;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
@@ -29,6 +31,7 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 
 public class StagingDeployIT
     extends StagingMavenPluginITSupport
@@ -125,9 +128,9 @@ public class StagingDeployIT
   public void storeTagInPropertiesForNewAndExistingTag() throws Exception {
     String tag = randomUUID().toString();
 
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
+    File propertiesFile = getPropertiesFile(projectDir);
 
-    File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
+    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
 
     assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
 
@@ -136,6 +139,36 @@ public class StagingDeployIT
     assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
 
     assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
+  }
+
+  @Test
+  public void deployWithoutSpecifyingTagUsesGeneratedTag() throws Exception {
+    initialiseVerifier(multiModuleProjectDir);
+
+    String artifactId = randomUUID().toString();
+
+    createProject(multiModuleProjectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createProject(project1Dir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createProject(project2Dir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    verifier.setDebug(true);
+
+    verifier.executeGoals(goals);
+
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(getPropertiesFile(multiModuleProjectDir)));
+    String generatedTag = properties.getProperty("staging.tag");
+
+    assertThat(generatedTag, startsWith(artifactId + "-" + VERSION + "-"));
+
+    verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, generatedTag);
+    verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId + "-module1", VERSION, generatedTag);
+    verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId + "-module2", VERSION, generatedTag);
   }
 
   @Test
@@ -309,5 +342,9 @@ public class StagingDeployIT
     verifier.executeGoals(goals);
 
     verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+  }
+
+  private File getPropertiesFile(final File projectDir) {
+    return new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
   }
 }

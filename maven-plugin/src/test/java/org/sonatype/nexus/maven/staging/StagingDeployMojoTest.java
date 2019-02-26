@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.repository.v3.Asset;
@@ -64,12 +65,13 @@ import static org.mockito.Mockito.when;
 public class StagingDeployMojoTest
     extends AbstractMojoTestCase
 {
-
   private static final String USERNAME = "username";
 
   private static final String PASSWORD = "password";
 
   private static final String TAG = "tag";
+
+  private static final String GENERATED_TAG = "generatedTag";
 
   private static final String VERSION = "1.0.0";
 
@@ -106,16 +108,21 @@ public class StagingDeployMojoTest
   private Artifact artifact, attachedArtifact;
 
   @Mock
+  private TagGenerator tagGenerator;
+
+  @Mock
   private Nxrm3ClientFactory clientFactory;
 
   @Mock
   private RepositoryManagerV3Client client;
 
+  private Path tempDirectory;
+
   private Server server;
 
-  private StagingDeployMojo underTest;
+  private Properties userProperties;
 
-  private Path tempDirectory;
+  private StagingDeployMojo underTest;
 
   @Before
   public void setup() throws Exception {
@@ -166,13 +173,6 @@ public class StagingDeployMojoTest
     underTest.execute();
   }
 
-  @Test(expected = MojoExecutionException.class)
-  public void failWhenTagNotSet() throws Exception {
-    underTest.setTag(null);
-
-    underTest.execute();
-  }
-
   @Test
   public void createTagWhenSetAndDoesNotExist() throws Exception {
     when(client.getTag(TAG)).thenReturn(Optional.empty());
@@ -180,6 +180,17 @@ public class StagingDeployMojoTest
     underTest.execute();
 
     verify(client).createTag(TAG);
+  }
+
+  @Test
+  public void generateTagWhenTagNotSet() throws Exception {
+    underTest.setTag(null);
+    when(client.getTag(GENERATED_TAG)).thenReturn(Optional.empty());
+
+    underTest.execute();
+
+    verify(client).createTag(GENERATED_TAG);
+    assertThat(userProperties.getProperty("tag"), equalTo(GENERATED_TAG));
   }
 
   @Test
@@ -324,6 +335,7 @@ public class StagingDeployMojoTest
     mojo.setTag(TAG);
     mojo.setSkip(false);
     mojo.setAttachedArtifacts(ImmutableList.of(attachedArtifact));
+    mojo.setTagGenerator(tagGenerator);
     mojo.setClientFactory(clientFactory);
     mojo.setPomFile(testPom);
 
@@ -339,14 +351,20 @@ public class StagingDeployMojoTest
     server.setUsername(USERNAME);
     server.setPassword(PASSWORD);
 
+    userProperties = new Properties();
+
     when(session.getExecutionRootDirectory()).thenReturn(tempDirectory.toString());
 
     when(session.getSettings()).thenReturn(settings);
+
+    when(session.getUserProperties()).thenReturn(userProperties);
 
     when(settings.getServer(anyString())).thenReturn(server);
 
     mockArtifact(artifact);
     mockArtifact(attachedArtifact);
+
+    when(tagGenerator.generate(ARTIFACT_ID, VERSION)).thenReturn(GENERATED_TAG);
 
     when(clientFactory.build(any())).thenReturn(client);
 

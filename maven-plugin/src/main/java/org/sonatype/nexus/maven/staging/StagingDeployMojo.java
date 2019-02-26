@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import com.sonatype.nexus.api.exception.RepositoryManagerException;
 import com.sonatype.nexus.api.repository.v3.DefaultAsset;
 import com.sonatype.nexus.api.repository.v3.DefaultComponent;
@@ -58,6 +60,9 @@ public class StagingDeployMojo
   @Component
   private RepositorySystem repositorySystem;
 
+  @Inject
+  private TagGenerator tagGenerator;
+
   @Parameter(defaultValue = "${project.artifact}", readonly = true, required = true)
   private Artifact artifact;
 
@@ -91,14 +96,10 @@ public class StagingDeployMojo
     List<Artifact> deployables = prepareDeployables();
 
     try {
-      if (tag != null && !tag.isEmpty()) {
-        maybeCreateTag(client, tag);
-        getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
-        doUpload(client, deployables, tag);
-      }
-      else {
-        throw new MojoExecutionException("The parameters 'tag' is required");
-      }
+      tag = getProvidedOrGeneratedTag();
+      maybeCreateTag(client, tag);
+      getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
+      doUpload(client, deployables, tag);
     }
     catch (MojoExecutionException e) {
       throw e;
@@ -106,6 +107,17 @@ public class StagingDeployMojo
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
+  }
+
+  private String getProvidedOrGeneratedTag() {
+    if (tag == null || tag.isEmpty()) {
+      String generatedTag = tagGenerator.generate(artifact.getArtifactId(), artifact.getBaseVersion());
+      getMavenSession().getUserProperties().setProperty("tag", generatedTag);
+      getLog().info(String.format("No tag was provided; using generated tag '%s'", generatedTag));
+      return generatedTag;
+    }
+
+    return tag;
   }
 
   private void maybeCreateTag(final RepositoryManagerV3Client client, final String tag)
@@ -253,5 +265,10 @@ public class StagingDeployMojo
   @VisibleForTesting
   void setSkip(final boolean skip) {
     this.skipNexusStagingDeployMojo = skip;
+  }
+
+  @VisibleForTesting
+  void setTagGenerator(final TagGenerator tagGenerator) {
+    this.tagGenerator = tagGenerator;
   }
 }
