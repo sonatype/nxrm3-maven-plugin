@@ -24,7 +24,7 @@ import com.sonatype.nexus.api.repository.v3.ComponentInfo;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 /**
- * Goal to delete artifacts to NXRM 3.
+ * Goal to delete artifacts from NXRM 3.
  *
  * @since 1.0.0
  */
