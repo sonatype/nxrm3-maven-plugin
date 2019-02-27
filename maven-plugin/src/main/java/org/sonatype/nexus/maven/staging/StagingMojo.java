@@ -203,7 +203,7 @@ public abstract class StagingMojo
     catch (IOException e) {
       throw new MojoExecutionException("Staging properties file not found: " + getStagingPropertiesFile());
     }
-    return (String)properties.get("staging.tag");
+    return properties.getProperty("staging.tag");
   }
 
   @VisibleForTesting
