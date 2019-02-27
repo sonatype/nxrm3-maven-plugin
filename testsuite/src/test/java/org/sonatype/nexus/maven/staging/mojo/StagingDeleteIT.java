@@ -30,77 +30,80 @@ public class StagingDeleteIT
     extends StagingMavenPluginITSupport
 {
   private static final String GROUP_ID = "test.group";
-  
+
   private static final String VERSION = "1.0.0";
 
-  private static final List<String> DEPLOY_GOALS = Arrays.asList(new String[] {"install", "nexus-staging:staging-deploy"});
-  private static final List<String> DELETE_GOALS = Arrays.asList(new String[] {"nexus-staging:delete"});
-  
+  private static final List<String> DEPLOY_GOALS =
+      Arrays.asList(new String[]{"install", "nexus-staging:staging-deploy"});
+
+  private static final List<String> DELETE_GOALS = Arrays.asList(new String[]{"nexus-staging:delete"});
+
   private String artifactId;
+
   private String deployTag;
-  
+
   @Before
   public void setup() throws Exception {
     deployTag = randomUUID().toString();
     artifactId = randomUUID().toString();
     stagingDeployProject();
   }
-  
+
   @Test
   public void testStagingDelete() throws Exception {
     assertStagingWithDeleteGoal(deployTag);
   }
-  
+
   @Test
   public void testStagingDeleteWithDefaultTag() throws Exception {
     assertStagingWithDeleteGoal("");
   }
-  
+
   @Test
   public void failStagingDeleteOnInvalidTag() throws Exception {
     setupProject(false);
 
     verifier.addCliOption("-Dtag=random");
-    
+
     assertStagingErrorWithDeleteGoal("The parameter tag:'random' is not defined in staging properties file");
 
   }
-  
+
   @Test
   public void failStagingDeleteIfOffline() throws Exception {
     setupProject(false);
 
     verifier.addCliOption("-Dtag=" + deployTag);
     verifier.addCliOption("-o");
-    
+
     assertStagingErrorWithDeleteGoal("Goal requires online mode for execution but Maven is currently offline");
 
   }
-  
+
   @Test
   public void failStagingDeleteForMissingPropertiesFile() throws Exception {
 
     File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
 
     forceDelete(propertiesFile);
-    
+
     assertStagingErrorWithDeleteGoal("Staging properties file not found");
 
   }
 
   private void assertStagingWithDeleteGoal(String deleteTag) throws Exception {
-    
+
     setupProject(false);
-    
+
     verifier.addCliOption("-Dtag=" + deleteTag);
 
     verifier.executeGoals(DELETE_GOALS);
 
     verifyComponentNotFound(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, deployTag);
   }
-  
+
   private void assertStagingErrorWithDeleteGoal(String errorMessage) throws Exception {
-    
+
     try {
       verifier.executeGoals(DELETE_GOALS);
       Assert.fail("Expected LifecycleExecutionException");
@@ -109,25 +112,25 @@ public class StagingDeleteIT
       assertThat(e.getMessage(), containsString(errorMessage));
     }
   }
-  
+
   private void stagingDeployProject() throws Exception {
-    
+
     setupProject(true);
-    
+
     verifier.addCliOption("-Dtag=" + deployTag);
-    
+
     verifier.executeGoals(DEPLOY_GOALS);
 
   }
-  
- private void setupProject(boolean autoClean) throws Exception {
-   
+
+  private void setupProject(boolean autoClean) throws Exception {
+
     initialiseVerifier(projectDir);
-    
+
     verifier.setAutoclean(autoClean);
-    
+
     createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
 
   }
- 
+
 }

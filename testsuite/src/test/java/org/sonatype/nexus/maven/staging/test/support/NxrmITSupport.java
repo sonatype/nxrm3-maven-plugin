@@ -111,12 +111,12 @@ public abstract class NxrmITSupport
   {
     try {
       verifyComponent(repository, group, name, version, tags);
-      throw new AssertionError("Component (group: " + group + "; name: " + name + "; version: " + version +
-          ") was found in Nexus Repository Manager repository : " + repository + " after deletion");
+      throw new AssertionError("Component (group: " + group + "; name: " + name + "; version: " + version
+          + ") was found in Nexus Repository Manager repository : " + repository + " after deletion");
     }
     catch (AssertionError e) {
-      assertTrue(e.getMessage().equals("Component (group: " + group + "; name: " + name + "; version: " + version +
-          ") was not found in Nexus Repository Manager repository: " + repository));
+      assertTrue(e.getMessage().equals("Component (group: " + group + "; name: " + name + "; version: " + version
+          + ") was not found in Nexus Repository Manager repository: " + repository));
     }
   }
 

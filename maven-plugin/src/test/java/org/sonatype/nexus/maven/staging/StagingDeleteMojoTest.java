@@ -135,7 +135,7 @@ public class StagingDeleteMojoTest
     when(secDispatcher.decrypt(anyString())).thenThrow(new SecDispatcherException());
 
     underTest.setSecDispatcher(secDispatcher);
-    
+
     createPropertiesFile(TAG, true);
 
     underTest.execute();
@@ -174,18 +174,18 @@ public class StagingDeleteMojoTest
 
     underTest.execute();
   }
-  
+
   @Test(expected = MojoExecutionException.class)
   public void mojoFailureExceptionOnPropertiesFileNotFound() throws Exception {
     underTest.execute();
   }
-  
+
   @Test(expected = MojoExecutionException.class)
   public void mojoFailureExceptionOnTagNotPresentInPropertiesFile() throws Exception {
     createPropertiesFile("random", true);
     underTest.execute();
   }
-  
+
   @Test(expected = MojoExecutionException.class)
   public void mojoFailureExceptionOnTagPropertyNotDefinedInPropertiesFile() throws Exception {
     createPropertiesFile(TAG, false);
@@ -196,7 +196,7 @@ public class StagingDeleteMojoTest
     File stagingPropertiesFile = new File(underTest.getWorkDirectoryRoot(), "staging/staging.properties");
     stagingPropertiesFile.getParentFile().mkdirs();
     final Properties stagingProperties = new Properties();
-    if(addTag) {
+    if (addTag) {
       stagingProperties.put("staging.tag", tag);
     }
     try (OutputStream out = new FileOutputStream(stagingPropertiesFile)) {

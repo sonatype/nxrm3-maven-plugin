@@ -193,7 +193,7 @@ public abstract class StagingMojo
   protected File getStagingPropertiesFile() {
     return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
   }
-  
+
   protected Object readTagFromStagingProperties() {
     final Properties properties = new Properties();
     try {

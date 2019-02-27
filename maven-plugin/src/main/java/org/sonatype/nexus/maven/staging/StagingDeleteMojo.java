@@ -35,10 +35,10 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 public class StagingDeleteMojo
     extends StagingMojo
 {
-  
+
   @Parameter(property = "tag")
   private String tag;
-  
+
   @Parameter(defaultValue = "${settings.offline}", readonly = true, required = true)
   private boolean offline;
 
@@ -46,22 +46,24 @@ public class StagingDeleteMojo
   public void execute() throws MojoExecutionException, MojoFailureException {
     failIfOffline();
 
-    if(!getStagingPropertiesFile().isFile()) {
+    if (!getStagingPropertiesFile().isFile()) {
       throw new MojoExecutionException("Staging properties file not found: " + getStagingPropertiesFile());
     }
-    
+
     Object tagFromStagingProperties = readTagFromStagingProperties();
-    
-    if(tagFromStagingProperties == null) {
+
+    if (tagFromStagingProperties == null) {
       throw new MojoExecutionException("Property 'staging.tag' is not defined in staging properties file");
     }
-    
+
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
     try {
-      if(tag == null || tag.isEmpty() || tagFromStagingProperties.toString().equals(tag)) {
+      if (tag == null || tag.isEmpty() || tagFromStagingProperties.toString().equals(tag)) {
         List<ComponentInfo> deletedComponents = client.delete(tagFromStagingProperties.toString());
-        getLog().info(String.format("Deleted components: %s with tag: %s", deletedComponents, tagFromStagingProperties));
-      }else {
+        getLog()
+            .info(String.format("Deleted components: %s with tag: %s", deletedComponents, tagFromStagingProperties));
+      }
+      else {
         throw new MojoExecutionException("The parameter tag:'" + tag + "' is not defined in staging properties file");
       }
     }
@@ -78,9 +80,7 @@ public class StagingDeleteMojo
    *
    * @throws MojoFailureException if Maven is invoked offline.
    */
-  protected void failIfOffline()
-      throws MojoFailureException
-  {
+  protected void failIfOffline() throws MojoFailureException {
     if (offline) {
       throw new MojoFailureException(
           "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
