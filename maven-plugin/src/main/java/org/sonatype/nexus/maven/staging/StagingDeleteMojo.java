@@ -32,7 +32,6 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 public class StagingDeleteMojo
     extends StagingMojo
 {
-
   @Parameter(property = "tag")
   private String tag;
 
