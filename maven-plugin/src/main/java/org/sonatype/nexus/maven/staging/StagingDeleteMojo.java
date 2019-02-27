@@ -46,7 +46,7 @@ public class StagingDeleteMojo
       throw new MojoExecutionException("Staging properties file not found: " + getStagingPropertiesFile());
     }
 
-    Object tagFromStagingProperties = readTagFromStagingProperties();
+    String tagFromStagingProperties = readTagFromStagingProperties();
 
     if (tagFromStagingProperties == null) {
       throw new MojoExecutionException("Property 'staging.tag' is not defined in staging properties file");
@@ -54,8 +54,8 @@ public class StagingDeleteMojo
 
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
     try {
-      if (tag == null || tag.isEmpty() || tagFromStagingProperties.toString().equals(tag)) {
-        List<ComponentInfo> deletedComponents = client.delete(tagFromStagingProperties.toString());
+      if (tag == null || tag.isEmpty() || tagFromStagingProperties.equals(tag)) {
+        List<ComponentInfo> deletedComponents = client.delete(tagFromStagingProperties);
         getLog()
             .info(String.format("Deleted components: %s with tag: %s", deletedComponents, tagFromStagingProperties));
       }

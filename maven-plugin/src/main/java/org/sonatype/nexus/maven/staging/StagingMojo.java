@@ -194,7 +194,7 @@ public abstract class StagingMojo
     return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
   }
 
-  protected Object readTagFromStagingProperties() {
+  protected String readTagFromStagingProperties() {
     final Properties properties = new Properties();
     try {
       try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
@@ -204,7 +204,7 @@ public abstract class StagingMojo
     catch (IOException e) {
       getLog().error(e);
     }
-    return properties.get("staging.tag");
+    return (String)properties.get("staging.tag");
   }
 
   @VisibleForTesting
@@ -230,4 +230,5 @@ public abstract class StagingMojo
   void setAltStagingDirectory(final File altStagingDirectory) {
     this.altStagingDirectory = altStagingDirectory;
   }
+  
 }
