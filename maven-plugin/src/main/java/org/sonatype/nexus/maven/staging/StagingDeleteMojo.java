@@ -12,11 +12,8 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import java.io.File;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -27,7 +24,7 @@ import com.sonatype.nexus.api.repository.v3.ComponentInfo;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 /**
- * Goal to tag and deploy artifacts to NXRM 3.
+ * Goal to delete artifacts to NXRM 3.
  *
  * @since 1.0.0
  */
