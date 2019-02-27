@@ -137,7 +137,7 @@ public class StagingDeployMojoTest
   public void getWorkingDirectory() throws Exception {
     File workDirectoryRoot = underTest.getWorkDirectoryRoot();
 
-    String expected = tempDirectory + "/target/nexus-staging";
+    String expected = tempDirectory + File.separator + "target" + File.separator + "nexus-staging";
     assertThat(workDirectoryRoot.getAbsolutePath(), is(equalTo(expected)));
   }
 

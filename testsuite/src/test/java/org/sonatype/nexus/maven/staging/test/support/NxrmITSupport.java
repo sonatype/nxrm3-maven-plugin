@@ -38,6 +38,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /*
  * Abstract base class for NXRM3 integration tests. Please note that the test container is started outside of the test
@@ -100,6 +101,23 @@ public abstract class NxrmITSupport
     }
 
     stream(tags).forEach(tag -> assertThat(component.tags, hasItem(tag)));
+  }
+  
+  protected void verifyComponentNotFound(final String repository,
+                                         final String group,
+                                         final String name,
+                                         final String version,
+                                         final String... tags)
+  {
+    try {
+      verifyComponent(repository, group, name, version, tags);
+      throw new AssertionError("Component (group: " + group + "; name: " + name + "; version: " + version +
+          ") was found in Nexus Repository Manager repository : " + repository + " after deletion");
+    }
+    catch (AssertionError e) {
+      assertTrue(e.getMessage().equals("Component (group: " + group + "; name: " + name + "; version: " + version +
+          ") was not found in Nexus Repository Manager repository: " + repository));
+    }
   }
 
   ComponentsResponse componentSearch(final Map<String, String> search)

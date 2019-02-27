@@ -13,8 +13,10 @@
 package org.sonatype.nexus.maven.staging;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
@@ -190,6 +192,19 @@ public abstract class StagingMojo
 
   protected File getStagingPropertiesFile() {
     return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
+  }
+  
+  protected Object readTagFromStagingProperties() {
+    final Properties properties = new Properties();
+    try {
+      try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
+        properties.load(inputStream);
+      }
+    }
+    catch (IOException e) {
+      getLog().error(e);
+    }
+    return properties.get("staging.tag");
   }
 
   @VisibleForTesting
