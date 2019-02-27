@@ -58,7 +58,6 @@ import com.sonatype.nexus.api.repository.v3.Tag;
 public class StagingDeleteMojoTest
     extends AbstractMojoTestCase
 {
-
   private static final String USERNAME = "username";
 
   private static final String PASSWORD = "password";
@@ -145,7 +144,7 @@ public class StagingDeleteMojoTest
     underTest.setTag(null);
 
     underTest.execute();
-    
+
     verify(client).delete(eq(TAG));
   }
 
@@ -155,7 +154,7 @@ public class StagingDeleteMojoTest
     underTest.setTag("");
 
     underTest.execute();
-    
+
     verify(client).delete(eq(TAG));
   }
 
@@ -215,7 +214,7 @@ public class StagingDeleteMojoTest
     createPropertiesFile(TAG, true);
 
     when(settings.getServer(anyString())).thenReturn(null);
-    
+
     underTest.execute();
   }
 
