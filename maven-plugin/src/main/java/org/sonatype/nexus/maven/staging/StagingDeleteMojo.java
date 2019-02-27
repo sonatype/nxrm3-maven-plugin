@@ -28,7 +28,7 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
  *
  * @since 1.0.0
  */
-@Mojo(name = "delete", requiresOnline = true, threadSafe = true)
+@Mojo(name = "delete", requiresOnline = true, threadSafe = true, requiresDirectInvocation=true, requiresProject=false)
 public class StagingDeleteMojo
     extends StagingMojo
 {
