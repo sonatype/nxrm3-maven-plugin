@@ -14,7 +14,6 @@ package org.sonatype.nexus.maven.staging;
 
 import static java.nio.file.Files.createTempDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
-import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -111,6 +110,7 @@ public class StagingDeleteMojoTest
     File workDirectoryRoot = underTest.getWorkDirectoryRoot();
 
     String expected = tempDirectory + File.separator + "target" + File.separator + "nexus-staging";
+
     assertThat(workDirectoryRoot.getAbsolutePath(), is(equalTo(expected)));
   }
 
@@ -136,40 +136,38 @@ public class StagingDeleteMojoTest
 
     underTest.setSecDispatcher(secDispatcher);
 
-    createPropertiesFile(TAG, true);
-
     underTest.execute();
   }
 
-  @Test(expected = MojoExecutionException.class)
-  public void failWhenTagIsNull() throws Exception {
+  public void testDefaultValueWhenTagIsNull() throws Exception {
+    createPropertiesFile(TAG, true);
+
     underTest.setTag(null);
 
     underTest.execute();
+    
+    verify(client).delete(eq(TAG));
   }
 
-  @Test(expected = MojoExecutionException.class)
-  public void failWhenTagIsEmpty() throws Exception {
+  public void testDefaultValueWhenTagIsEmpty() throws Exception {
+    createPropertiesFile(TAG, true);
+
     underTest.setTag("");
 
     underTest.execute();
+    
+    verify(client).delete(eq(TAG));
   }
 
   @Test
   public void testDelete() throws Exception {
-    createPropertiesFile(TAG, true);
-
     underTest.execute();
 
     verify(client).delete(eq(TAG));
-
   }
 
   @Test(expected = MojoFailureException.class)
   public void mojoFailureExceptionOnDeleteFail() throws Exception {
-
-    createPropertiesFile(TAG, true);
-
     doThrow(new RuntimeException()).when(client).delete(anyString());
 
     underTest.execute();
@@ -177,18 +175,26 @@ public class StagingDeleteMojoTest
 
   @Test(expected = MojoExecutionException.class)
   public void mojoFailureExceptionOnPropertiesFileNotFound() throws Exception {
+    underTest.setTag(null);
+
     underTest.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void mojoFailureExceptionOnTagNotPresentInPropertiesFile() throws Exception {
-    createPropertiesFile("random", true);
+    createPropertiesFile("", true);
+
+    underTest.setTag("");
+
     underTest.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void mojoFailureExceptionOnTagPropertyNotDefinedInPropertiesFile() throws Exception {
     createPropertiesFile(TAG, false);
+
+    underTest.setTag("");
+
     underTest.execute();
   }
 
@@ -206,8 +212,10 @@ public class StagingDeleteMojoTest
 
   @Test(expected = IllegalArgumentException.class)
   public void throwIllegalArgumentExceptionWhenIncorrectServerId() throws Exception {
-    when(settings.getServer(anyString())).thenReturn(null);
     createPropertiesFile(TAG, true);
+
+    when(settings.getServer(anyString())).thenReturn(null);
+    
     underTest.execute();
   }
 

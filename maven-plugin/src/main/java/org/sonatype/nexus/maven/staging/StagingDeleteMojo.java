@@ -42,29 +42,18 @@ public class StagingDeleteMojo
   public void execute() throws MojoExecutionException, MojoFailureException {
     failIfOffline();
 
-    if (!getStagingPropertiesFile().isFile()) {
-      throw new MojoExecutionException("Staging properties file not found: " + getStagingPropertiesFile());
-    }
-
-    String tagFromStagingProperties = readTagFromStagingProperties();
-
-    if (tagFromStagingProperties == null) {
-      throw new MojoExecutionException("Property 'staging.tag' is not defined in staging properties file");
+    if (tag == null || tag.isEmpty()) {
+      String tagFromStagingProperties = readTagFromStagingProperties();
+      if (tagFromStagingProperties == null || tagFromStagingProperties.isEmpty()) {
+        throw new MojoExecutionException("Property 'staging.tag' is either not defined or is empty in staging properties file");
+      }
+      tag = tagFromStagingProperties;
     }
 
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
     try {
-      if (tag == null || tag.isEmpty() || tagFromStagingProperties.equals(tag)) {
-        List<ComponentInfo> deletedComponents = client.delete(tagFromStagingProperties);
-        getLog()
-            .info(String.format("Deleted components: %s with tag: %s", deletedComponents, tagFromStagingProperties));
-      }
-      else {
-        throw new MojoExecutionException("The parameter tag:'" + tag + "' is not defined in staging properties file");
-      }
-    }
-    catch (MojoExecutionException e) {
-      throw e;
+      List<ComponentInfo> deletedComponents = client.delete(tag);
+      getLog().info(String.format("Deleted components: %s with tag: %s", deletedComponents, tag));
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);

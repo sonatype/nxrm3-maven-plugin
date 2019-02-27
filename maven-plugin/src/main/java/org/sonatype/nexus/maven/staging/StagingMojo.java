@@ -35,6 +35,7 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -146,10 +147,8 @@ public abstract class StagingMojo
 
     final File stagingPropertiesFile = getStagingPropertiesFile();
 
-    if (!stagingPropertiesFile.getParentFile().isDirectory()) {
-      if (!stagingPropertiesFile.getParentFile().mkdirs()) {
+    if (!(stagingPropertiesFile.getParentFile().isDirectory() || stagingPropertiesFile.getParentFile().mkdirs())) {
         getLog().warn("Unable to create directory for stagings properties file");
-      }
     }
 
     try (OutputStream out = new FileOutputStream(stagingPropertiesFile)) {
@@ -194,7 +193,7 @@ public abstract class StagingMojo
     return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
   }
 
-  protected String readTagFromStagingProperties() {
+  protected String readTagFromStagingProperties() throws MojoExecutionException {
     final Properties properties = new Properties();
     try {
       try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
@@ -202,7 +201,7 @@ public abstract class StagingMojo
       }
     }
     catch (IOException e) {
-      getLog().error(e);
+      throw new MojoExecutionException("Staging properties file not found: " + getStagingPropertiesFile());
     }
     return (String)properties.get("staging.tag");
   }

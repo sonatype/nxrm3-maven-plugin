@@ -50,13 +50,13 @@ public class StagingDeleteIT
   }
 
   @Test
-  public void testStagingDelete() throws Exception {
-    assertStagingWithDeleteGoal(deployTag);
+  public void testStagingDeleteWithDefaultTag() throws Exception {
+    assertStagingWithDeleteGoal("");
   }
 
   @Test
-  public void testStagingDeleteWithDefaultTag() throws Exception {
-    assertStagingWithDeleteGoal("");
+  public void testStagingDelete() throws Exception {
+    assertStagingWithDeleteGoal(deployTag);
   }
 
   @Test
@@ -65,8 +65,7 @@ public class StagingDeleteIT
 
     verifier.addCliOption("-Dtag=random");
 
-    assertStagingErrorWithDeleteGoal("The parameter tag:'random' is not defined in staging properties file");
-
+    assertStagingErrorWithDeleteGoal("Delete components was unsuccessful (404 response from server)");
   }
 
   @Test
@@ -77,22 +76,22 @@ public class StagingDeleteIT
     verifier.addCliOption("-o");
 
     assertStagingErrorWithDeleteGoal("Goal requires online mode for execution but Maven is currently offline");
-
   }
 
   @Test
   public void failStagingDeleteForMissingPropertiesFile() throws Exception {
-
     File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
 
     forceDelete(propertiesFile);
 
-    assertStagingErrorWithDeleteGoal("Staging properties file not found");
+    setupProject(false);
 
+    verifier.addCliOption("-Dtag=" + "");
+
+    assertStagingErrorWithDeleteGoal("Staging properties file not found");
   }
 
   private void assertStagingWithDeleteGoal(String deleteTag) throws Exception {
-
     setupProject(false);
 
     verifier.addCliOption("-Dtag=" + deleteTag);
@@ -103,7 +102,6 @@ public class StagingDeleteIT
   }
 
   private void assertStagingErrorWithDeleteGoal(String errorMessage) throws Exception {
-
     try {
       verifier.executeGoals(DELETE_GOALS);
       Assert.fail("Expected LifecycleExecutionException");
@@ -114,23 +112,19 @@ public class StagingDeleteIT
   }
 
   private void stagingDeployProject() throws Exception {
-
     setupProject(true);
 
     verifier.addCliOption("-Dtag=" + deployTag);
 
     verifier.executeGoals(DEPLOY_GOALS);
-
   }
 
   private void setupProject(boolean autoClean) throws Exception {
-
     initialiseVerifier(projectDir);
 
     verifier.setAutoclean(autoClean);
 
     createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
-
   }
 
 }
