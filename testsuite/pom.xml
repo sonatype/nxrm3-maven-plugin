@@ -128,7 +128,7 @@
     <profile>
       <id>local-nexus3</id>
       <properties>
-        <nexus3.it.port>8081</nexus3.it.port>
+        <nexus3.it.port>8082</nexus3.it.port>
       </properties>
     </profile>
     <profile>

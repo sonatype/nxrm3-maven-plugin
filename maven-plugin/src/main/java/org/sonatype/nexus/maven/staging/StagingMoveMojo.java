@@ -12,43 +12,40 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import java.util.List;
 import java.util.Map;
 
-import com.sonatype.nexus.api.repository.v3.ComponentInfo;
+import com.sonatype.nexus.api.exception.RepositoryManagerException;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 import com.sonatype.nexus.api.repository.v3.SearchBuilder;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.repository.RepositorySystem;
+
+import static java.lang.String.format;
 
 /**
- * Goal to tag and deploy artifacts to NXRM 3.
+ * Goal to move artifacts between repositories in NXRM 3.
  *
  * @since 1.0.0
  */
-@Mojo(name = "move", requiresOnline = true, threadSafe = true)
+@Mojo(name = "move", requiresOnline = true, requiresDirectInvocation=true, requiresProject=false)
 public class StagingMoveMojo
     extends StagingMojo
 {
-  @Parameter(property = "destinationRepository", required = true)
-  private String destinationRepository;
-
   @Parameter(property = "repository", required = true)
   private String repository;
 
   @Parameter(property = "tag")
   private String tag;
 
+  @Parameter(property = "targetRepository", required = true)
+  private String targetRepository;
+
   @Parameter(property = "sourceRepository")
   private String sourceRepository;
-
-  @Component
-  private RepositorySystem repositorySystem;
 
   @Parameter(defaultValue = "${settings.offline}", readonly = true, required = true)
   private boolean offline;
@@ -63,55 +60,51 @@ public class StagingMoveMojo
 
     failIfOffline();
 
+    if (targetRepository == null || targetRepository.isEmpty()) {
+      throw new MojoFailureException("'targetRepository' is required but was not found");
+    }
+
     try {
       tag = determineTagForMoving();
 
-      sourceRepository = determinaSourceRepository();
+      sourceRepository = determineSourceRepository();
 
-      getLog().info(String.format("Performing move of artifacts with tag '%s' from '%s' to '%s'",
-          tag, sourceRepository, destinationRepository));
-      doMove(client, destinationRepository, createSearchCriteria(sourceRepository, tag));
+      getLog().info(format("Moving artifacts with tag '%s' from '%s' to '%s'", tag, sourceRepository, targetRepository));
+
+      client.move(targetRepository, createSearchCriteria(sourceRepository, tag));
     }
-    catch (MojoExecutionException e) {
-      throw e;
+    catch (RepositoryManagerException e) {
+      throw new MojoExecutionException(format("%s.\n\tReason: %s", e.getMessage(), e.getResponseMessage().get()));
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
   }
 
-  private String determinaSourceRepository() {
-    String derivedSourceRepository = null;
-    if (sourceRepository == null) {
-      //grab the repository from the pom file
-      getLog().warn(String.format("No source repository was specified, defaulting to '%s'", "foo"));
-      derivedSourceRepository = repository;
+  @VisibleForTesting
+  String determineSourceRepository() {
+    //TODO probably needa check on the repository here...
+    if (sourceRepository == null || sourceRepository.isEmpty()) {
+      getLog().error(format("No source repository was specified, defaulting to '%s' from pom configuration", repository));
+      sourceRepository = repository;
     }
-    return derivedSourceRepository;
+    return sourceRepository;
   }
 
-  private String determineTagForMoving() throws MojoExecutionException {
-    String derivedTag = null;
-    if (tag == null) {
-      derivedTag = getTagFromPropertiesFile();
-      if (derivedTag == null) {
-        getLog().warn("No 'tag' parameter was found but is required for moving artifacts, exiting now");
+  @VisibleForTesting
+  String determineTagForMoving() throws MojoExecutionException {
+    if (tag == null || tag.isEmpty()) {
+      tag = getTagFromPropertiesFile();
+      if (tag == null) {
+        getLog().error("No 'tag' parameter was found but one is required for moving artifacts");
         throw new MojoExecutionException("The parameter 'tag' is required");
       }
     }
-    return derivedTag;
+    return tag;
   }
 
-  private void doMove(final RepositoryManagerV3Client client,
-                        final String desitnationRepository,
-                        final Map<String, String> search) throws Exception
-  {
-    //TODO figure out error messages for the response
-    List<ComponentInfo> results = client.move(desitnationRepository, search);
-
-  }
-
-  private Map<String, String> createSearchCriteria(final String repository, final String tag) {
+  @VisibleForTesting
+  Map<String, String> createSearchCriteria(final String repository, final String tag) {
     return SearchBuilder.create().withRepository(repository).withTag(tag).build();
   }
 
@@ -127,5 +120,25 @@ public class StagingMoveMojo
       throw new MojoFailureException(
           "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
     }
+  }
+
+  @VisibleForTesting
+  void setOffline(final boolean offline) {
+    this.offline = offline;
+  }
+
+  @VisibleForTesting
+  void setTag(final String tag) {
+    this.tag = tag;
+  }
+
+  @VisibleForTesting
+  void setSourceRepository(final String sourceRepository) {
+    this.sourceRepository = sourceRepository;
+  }
+
+  @VisibleForTesting
+  void setTargetRepository(final String targetRepository) {
+    this.targetRepository = targetRepository;
   }
 }

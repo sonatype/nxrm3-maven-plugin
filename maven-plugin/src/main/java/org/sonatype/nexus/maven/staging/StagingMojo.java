@@ -178,7 +178,7 @@ public abstract class StagingMojo
       }
     }
     catch (IOException e) {
-      getLog().error(e);
+      getLog().error(e.getMessage());
     }
     return properties;
   }
