@@ -81,7 +81,7 @@ public class StagingDeployMojo
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     if (skipNexusStagingDeployMojo) {
-      getLog().info("Skipping Nexus Staging Deploy Mojo at user's demand.");
+      getLog().info("Skipping NXRM Staging Deploy Mojo at user's demand.");
       return;
     }
 
