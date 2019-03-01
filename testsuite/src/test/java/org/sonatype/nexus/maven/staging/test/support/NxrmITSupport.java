@@ -96,8 +96,9 @@ public abstract class NxrmITSupport
       component = waitForComponentWithTags(search, tags);
     }
     catch (Exception e) {
-      throw new AssertionError("Component (group: " + group + "; name: " + name + "; version: " + version +
-          ") was not found in Nexus Repository Manager repository: " + repository, e);
+      throw new AssertionError(String.format(
+          "Component (group: %s; name: %s; version: %s) was not found in Nexus Repository Manager repository : %s",
+          group, name, version, repository), e);
     }
 
     stream(tags).forEach(tag -> assertThat(component.tags, hasItem(tag)));
@@ -111,12 +112,15 @@ public abstract class NxrmITSupport
   {
     try {
       verifyComponent(repository, group, name, version, tags);
-      throw new AssertionError("Component (group: " + group + "; name: " + name + "; version: " + version
-          + ") was found in Nexus Repository Manager repository : " + repository + " after deletion");
+      throw new AssertionError(String.format(
+          "Component (group: %s; name: %s; version: %s) was found in Nexus Repository Manager repository : %s after deletion",
+          group, name, version, repository));
     }
     catch (AssertionError e) {
-      assertTrue(e.getMessage().equals("Component (group: " + group + "; name: " + name + "; version: " + version
-          + ") was not found in Nexus Repository Manager repository: " + repository));
+      assertTrue(e.getMessage()
+          .equals(String.format(
+              "Component (group: %s; name: %s; version: %s) was not found in Nexus Repository Manager repository : %s",
+              group, name, version, repository)));
     }
   }
 
