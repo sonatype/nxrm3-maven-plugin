@@ -199,10 +199,8 @@ public abstract class StagingMojo
 
   protected String readTagFromStagingProperties() throws MojoExecutionException {
     final Properties properties = new Properties();
-    try {
-      try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
-        properties.load(inputStream);
-      }
+    try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
+      properties.load(inputStream);
     }
     catch (IOException e) {
       throw new MojoExecutionException("Staging properties file not found: " + getStagingPropertiesFile());
