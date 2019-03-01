@@ -74,9 +74,6 @@ public class StagingDeleteMojoTest
   private SecDispatcher secDispatcher;
 
   @Mock
-  private Artifact artifact, attachedArtifact;
-
-  @Mock
   private Nxrm3ClientFactory clientFactory;
 
   @Mock
