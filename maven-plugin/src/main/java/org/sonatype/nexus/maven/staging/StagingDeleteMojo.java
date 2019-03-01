@@ -35,9 +35,6 @@ public class StagingDeleteMojo
   @Parameter(property = "tag")
   private String tag;
 
-  @Parameter(defaultValue = "${settings.offline}", readonly = true, required = true)
-  private boolean offline;
-
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     failIfOffline();
@@ -58,23 +55,6 @@ public class StagingDeleteMojo
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
-  }
-
-  /**
-   * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
-   *
-   * @throws MojoFailureException if Maven is invoked offline.
-   */
-  protected void failIfOffline() throws MojoFailureException {
-    if (offline) {
-      throw new MojoFailureException(
-          "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
-    }
-  }
-
-  @VisibleForTesting
-  void setOffline(final boolean offline) {
-    this.offline = offline;
   }
 
   @VisibleForTesting
