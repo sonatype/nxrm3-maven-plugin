@@ -50,7 +50,8 @@ public class StagingDeleteMojo
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
     try {
       List<ComponentInfo> deletedComponents = client.delete(tag);
-      getLog().info(String.format("Deleted components: %s with tag: %s", deletedComponents, tag));
+      getLog().info(String.format("No. of components deleted: %s with tag: %s", deletedComponents.size(), tag));
+      getLog().debug(String.format("Deleted components: %s with tag: %s", deletedComponents, tag));
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
