@@ -224,7 +224,7 @@ public class StagingDeployMojo
   }
 
   private void maybeWarnAboutDeferredStagingMode() {
-    if (stagingMode != null && stagingMode.equals("deferred")) {
+    if ("deferred".equals(stagingMode)) {
       getLog().warn("The stagingMode property no longer supports 'deferred' and will be ignored.");
     }
   }
