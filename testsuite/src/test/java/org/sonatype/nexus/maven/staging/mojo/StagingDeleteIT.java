@@ -92,7 +92,7 @@ public class StagingDeleteIT
 
     verifier.addCliOption("-Dtag=" + "");
 
-    assertStagingErrorWithDeleteGoal("Staging properties file not found");
+    assertStagingErrorWithDeleteGoal("Encountered an error while accessing 'staging.tag' property from staging properties file");
   }
 
   private void assertStagingWithDeleteGoal(String deleteTag) throws Exception {
