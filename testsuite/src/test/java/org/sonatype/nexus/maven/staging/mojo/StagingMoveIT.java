@@ -13,9 +13,12 @@
 package org.sonatype.nexus.maven.staging.mojo;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
 
@@ -23,10 +26,12 @@ import org.apache.maven.it.VerificationException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static java.util.UUID.randomUUID;
-import static org.apache.commons.io.FileUtils.forceDelete;
-import static org.apache.commons.io.FileUtils.readFileToString;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
 
@@ -46,17 +51,16 @@ public class StagingMoveIT
   @Test
   public void failIfOffline() throws Exception {
     String tag = randomUUID().toString();
+    String artifactId = randomUUID().toString();
 
     initialiseVerifier(projectDir);
 
-    deployAndTag(tag);
+    assertStagingWithDeployGoal(STAGING_DEPLOY, tag, artifactId);
 
     List<String> goals = new ArrayList<>();
-
     goals.add(STAGING_MOVE);
 
     verifier.setDebug(true);
-
     verifier.addCliOption("-Dtag=" + tag);
     verifier.addCliOption("-o");
 
@@ -70,134 +74,219 @@ public class StagingMoveIT
     }
   }
 
-  //Need to do these with and without the property in the pom.xml
-  //    verifier.addCliOption("-Dtag=" + tag);
+  @Test
+  public void moveUsingUserDefinedMoveProperties() throws Exception {
+    String tag = randomUUID().toString();
+    String artifactId = randomUUID().toString();
+
+    prepareForMove(tag, artifactId);
+
+    List<String> goals = new ArrayList<>();
+    goals.add(STAGING_MOVE);
+
+    verifier.setDebug(true);
+    verifier.addCliOption("-Dtag=" + tag);
+    verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
+    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+
+    verifier.executeGoals(goals);
+
+    verifyNoComponentPresent(artifactId);
+
+    verifyComponent(testName.getMethodName(), GROUP_ID, artifactId, VERSION, tag);
+  }
 
   @Test
-  public void moveUsingTagFromPropertiesFile() throws Exception {
+  public void moveForMultiModuleUsingUserDefinedMoveProperties() throws Exception {
+    initialiseVerifier(multiModuleProjectDir);
+
     String tag = randomUUID().toString();
-
-    initialiseVerifier(projectDir);
-
-    deployAndTag(tag);
 
     List<String> goals = new ArrayList<>();
 
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    String groupId = GROUP_ID;
+    String artifactId = randomUUID().toString();
+    String version = VERSION;
+
+    createProject(multiModuleProjectDir, RELEASE_REPOSITORY, groupId, artifactId, version);
+    createProject(project1Dir, RELEASE_REPOSITORY, groupId, artifactId, version);
+    createProject(project2Dir, RELEASE_REPOSITORY, groupId, artifactId, version);
+
+    verifier.setDebug(true);
+    verifier.addCliOption("-Dtag=" + tag);
+    verifier.executeGoals(goals);
+
+    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId + "-module1", version, tag);
+    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId + "-module2", version, tag);
+
+    //perform move
+    createTargetRepo(testName.getMethodName());
+
+    goals = new ArrayList<>();
+    goals.add(STAGING_MOVE);
+
+    verifier.addCliOption("-Dtag=" + tag);
+    verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
+    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.executeGoals(goals);
+
+    verifyComponent(testName.getMethodName(), groupId, artifactId, version, tag);
+    verifyComponent(testName.getMethodName(), groupId, artifactId + "-module1", version, tag);
+    verifyComponent(testName.getMethodName(), groupId, artifactId + "-module2", version, tag);
+  }
+
+  @Test
+  public void moveUsingStagingPropertiesFileProvidedTag() throws Exception {
+    String artifactId = randomUUID().toString();
+
+    prepareForMove(randomUUID().toString(), artifactId);
+
+    Properties properties = loadStagingProperties();
+    String tag = properties.getProperty("staging.tag");
+    assertThat(tag, is(notNullValue()));
+
+    List<String> goals = new ArrayList<>();
+    goals.add(STAGING_MOVE);
+
+    verifier.setDebug(true);
+    verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
+    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.executeGoals(goals);
+
+    verifyNoComponentPresent(artifactId);
+
+    verifyComponent(testName.getMethodName(), GROUP_ID, artifactId, VERSION, tag);
+  }
+
+  @Test
+  public void moveUsingPomConfiguration() throws Exception {
+    String targetRepository = "maven-test-hosted";
+    String tag = randomUUID().toString();
+    String artifactId = randomUUID().toString();
+
+    maybeAddRepoScript();
+
+    //Perform initial deploy and move using default and user defined properties
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createTargetRepo(testName.getMethodName());
+    assertStagingWithDeployGoalPomProperties(STAGING_DEPLOY, artifactId, tag);
+
+    List<String> goals = new ArrayList<>();
+    goals.add(STAGING_MOVE);
+
+    verifier.addCliOption("-Dtag=" + tag);
+    verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
+    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.executeGoals(goals);
+
+    verifyNoComponentPresent(artifactId);
+    verifyComponent(testName.getMethodName(), GROUP_ID, artifactId, VERSION, tag);
+
+
+    //Perform a move based on properties in the pom
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, testName.getMethodName(), targetRepository);
+    createTargetRepo(targetRepository);
+
+    goals.clear();
+    goals.add(STAGING_MOVE);
+
+    verifier.setDebug(true);
+    verifier.addCliOption("-Dtag=" + tag);
+    verifier.executeGoals(goals);
+
+    verifyNoComponentPresent(artifactId);
+    verifyComponent(targetRepository, GROUP_ID, artifactId, VERSION, tag);
+  }
+
+  @Test
+  public void moveUsingDefaultSourceRepositoryFromPom() throws Exception {
+    String tag = randomUUID().toString();
+    String artifactId = randomUUID().toString();
+
+    prepareForMove(tag, artifactId);
+
+    List<String> goals = new ArrayList<>();
     goals.add(STAGING_MOVE);
 
     verifier.setDebug(true);
 
     verifier.addCliOption("-Dtag=" + tag);
-    verifier.addCliOption("-DsourceRepository="+);
-    verifier.addCliOption("-DtargetRepository="+);
+    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.executeGoals(goals);
 
-    //now attempt to move using the tag in the properties file
-    //specify the targetRepository
-    //specify the sourceRepository
+    verifyNoComponentPresent(artifactId);
+
+    verifyComponent(testName.getMethodName(), GROUP_ID, artifactId, VERSION, tag);
   }
 
   @Test
-  public void moveUsingUserDefinedTag() throws Exception {
-    String tag = randomUUID().toString();
+  public void moveErrorWhenTagNotFound() throws Exception {
+    String artifactId = randomUUID().toString();
 
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
+    prepareForMove(randomUUID().toString(), artifactId);
 
-    //now attempt to move using the tag in the properties file
-    //specify the targetRepository
-    //specify the sourceRepository
-    //
-  }
-
-  @Test
-  public void attemptMoveWithoutTargetRepository() throws Exception {
-    String tag = randomUUID().toString();
-
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
-
-    //without the targetRepository
-    //specify the sourceRepository
-    //specify the tag
-  }
-
-  @Test
-  public void attemptMoveWithTargetRepository() throws Exception {
-    String tag = randomUUID().toString();
-
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
-
-    //specify the targetRepository
-    //specify the sourceRepository
-    //specify the tag
-  }
-
-  @Test
-  public void attemptMoveWithoutSourceRepository() throws Exception {
-    String tag = randomUUID().toString();
-
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
-
-    //specify the targetRepository
-    //without the sourceRepository should use repository from pom
-    //specify the tag
-  }
-
-  @Test
-  public void attemptMoveWithSourceRepository() throws Exception {
-    String tag = randomUUID().toString();
-
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
-
-    //specify the targetRepository
-    //specifying the sourceRepository
-    //specify the tag
-  }
-
-  @Test
-  public void storeTagInPropertiesForNewAndExistingTag() throws Exception {
-    String tag = randomUUID().toString();
-
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
-
-    File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
-
-    assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
-
-    forceDelete(propertiesFile);
-
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
-
-    assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
-  }
-
-  private void verifyNoComponentPresent(final String artifactId) throws Exception {
-    Map<String, String> searchQuery = getSearchQuery(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
-    assertThat(componentSearch(searchQuery).items, hasSize(0));
-  }
-
-  private void assertStagingWithDeployGoal(final String deployGoal, final String tag) throws Exception {
     List<String> goals = new ArrayList<>();
+    goals.add(STAGING_MOVE);
 
+    try {
+      verifier.addCliOption("-Dtag=" + "bogusTag");
+      verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
+      verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+      verifier.executeGoals(goals);
+      Assert.fail("Expected LifecycleExecutionException");
+    }
+    catch (Exception e) {
+      assertThat(e.getMessage(), containsString("Reason: No components found"));
+    }
+  }
+
+  @Test
+  public void moveErrorWhenIncompatibleSourceAndTargetRepository() throws Exception {
+    String tag = randomUUID().toString();
+    String artifactId = randomUUID().toString();
+
+    prepareForMove(tag, artifactId);
+
+    List<String> goals = new ArrayList<>();
+    goals.add(STAGING_MOVE);
+
+    try {
+      verifier.addCliOption("-Dtag=" + tag);
+      verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
+      verifier.addCliOption("-DtargetRepository=" + "nuget-hosted");
+      verifier.executeGoals(goals);
+
+      Assert.fail("Expected LifecycleExecutionException");
+    }
+    catch (Exception e) {
+      assertThat(e.getMessage(), containsString("Reason: Source and destination repository formats do not match"));
+    }
+  }
+
+  private void prepareForMove(final String tag, final String artifactId) throws Exception  {
+    maybeAddRepoScript();
+
+    assertStagingWithDeployGoal(STAGING_DEPLOY, artifactId, tag);
+
+    createTargetRepo(testName.getMethodName());
+  }
+
+  private void assertStagingWithDeployGoal(final String deployGoal,
+                                           final String artifactId,
+                                           final String tag) throws Exception
+  {
+    List<String> goals = new ArrayList<>();
     goals.add(INSTALL);
     goals.add("javadoc:jar");
     goals.add(deployGoal);
 
-    assertStagingWithDeployGoal(goals, tag);
-  }
-
-  private void assertStagingWithDeployGoal(final List<String> goals,
-                                           final String tag) throws Exception
-  {
     initialiseVerifier(projectDir);
 
-    assertStagingWithDeployGoal(goals, tag, JAR_PACKAGING);
-  }
-
-  private void assertStagingWithDeployGoal(final List<String> goals,
-                                           final String tag,
-                                           final String packaging) throws Exception
-  {
     String groupId = GROUP_ID;
-    String artifactId = randomUUID().toString();
     String version = VERSION;
 
     createProject(projectDir, RELEASE_REPOSITORY, groupId, artifactId, version);
@@ -205,18 +294,21 @@ public class StagingMoveIT
     deployAndVerify(goals, tag, groupId, artifactId, version);
   }
 
-  private void deployAndTag(final String tag) throws Exception {
-    initialiseVerifier(projectDir);
-    String artifactId = randomUUID().toString();
-
-    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
-
+  private void assertStagingWithDeployGoalPomProperties(final String deployGoal,
+                                                        final String artifactId,
+                                                        final String tag) throws Exception
+  {
     List<String> goals = new ArrayList<>();
-
     goals.add(INSTALL);
-    goals.add(STAGING_DEPLOY);
+    goals.add("javadoc:jar");
+    goals.add(deployGoal);
 
-    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+    initialiseVerifier(projectDir);
+
+    String groupId = GROUP_ID;
+    String version = VERSION;
+
+    deployAndVerify(goals, tag, groupId, artifactId, version);
   }
 
   private void deployAndVerify(final List<String> goals,
@@ -226,11 +318,23 @@ public class StagingMoveIT
                                final String version) throws VerificationException
   {
     verifier.setDebug(true);
-
     verifier.addCliOption("-Dtag=" + tag);
-
     verifier.executeGoals(goals);
 
     verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+  }
+
+  private void verifyNoComponentPresent(final String artifactId) throws Exception {
+    Map<String, String> searchQuery = getSearchQuery(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    await().atMost(10, SECONDS).until(() -> componentSearch(searchQuery).items, hasSize(0));
+  }
+
+  private Properties loadStagingProperties() throws Exception {
+    File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
+    final Properties properties = new Properties();
+    try (InputStream inputStream = new FileInputStream(propertiesFile)) {
+      properties.load(inputStream);
+    }
+    return properties;
   }
 }

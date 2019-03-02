@@ -20,6 +20,7 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.settings.Server;
@@ -46,7 +47,6 @@ import static org.mockito.Mockito.when;
 public class StagingMoveMojoTest
     extends AbstractMojoTestCase
 {
-
   private static final String USERNAME = "username";
 
   private static final String PASSWORD = "password";
@@ -110,14 +110,15 @@ public class StagingMoveMojoTest
   }
 
   @Test
-  public void testUseRepositoryWhenSourceRepositoryNotProvided() throws Exception {
+  public void testUseDefaultRepositoryWhenSourceRepositoryNotProvided() throws Exception {
     underTest.setSourceRepository(null);
 
     assertThat(underTest.determineSourceRepository(), equalTo(DEFAULT_REPOSITORY));
   }
 
-  @Test(expected = MojoFailureException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testFailWhenTagIsNull() throws Exception {
+    //No tag is defined by the user and no staging.properties file exists
     underTest.setTag(null);
 
     underTest.execute();
@@ -125,14 +126,16 @@ public class StagingMoveMojoTest
 
   @Test
   public void testGetTagFromPropertiesFileWhenNotProvided() throws Exception {
-    setupPropertiesFile("staging.tag="+TAG);
+    //No tag is defined by the user but the tag is in the staging.properties
+    setupPropertiesFile("staging.tag=" + TAG);
     underTest.setTag(null);
 
     assertThat(underTest.determineTagForMoving(), equalTo(TAG));
   }
 
-  @Test(expected = MojoFailureException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testFailWhenTagIsNotFound() throws Exception {
+    //No tag is defined by the user and no tag is in the staging.properties
     setupPropertiesFile(EMPTY);
     underTest.setTag(null);
 

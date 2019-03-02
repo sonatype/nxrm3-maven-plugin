@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 
 import com.sonatype.nexus.api.common.Authentication;
@@ -142,9 +143,9 @@ public abstract class StagingMojo
     saveStagingProperties(properties);
   }
 
-  protected String getTagFromPropertiesFile() {
+  protected Optional<String> getTagFromPropertiesFile() {
     Properties stagingProperties = loadStagingProperties();
-    return stagingProperties.getProperty(TAG_ID);
+    return Optional.ofNullable(stagingProperties.getProperty(TAG_ID));
   }
 
   protected void saveStagingProperties(final Map<String, String> properties) {

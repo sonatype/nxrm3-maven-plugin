@@ -73,8 +73,11 @@ public class StagingMoveMojo
 
       client.move(targetRepository, createSearchCriteria(sourceRepository, tag));
     }
+    catch (MojoExecutionException e) {
+      throw e;
+    }
     catch (RepositoryManagerException e) {
-      throw new MojoExecutionException(format("%s.\n\tReason: %s", e.getMessage(), e.getResponseMessage().get()));
+      throw new MojoExecutionException(format("%s.\nReason: %s", e.getMessage(), e.getResponseMessage().get()));
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
@@ -83,9 +86,8 @@ public class StagingMoveMojo
 
   @VisibleForTesting
   String determineSourceRepository() {
-    //TODO probably needa check on the repository here...
     if (sourceRepository == null || sourceRepository.isEmpty()) {
-      getLog().error(format("No source repository was specified, defaulting to '%s' from pom configuration", repository));
+      getLog().error(format("No source repository was specified, defaulting to '%s'", repository));
       sourceRepository = repository;
     }
     return sourceRepository;
@@ -94,11 +96,7 @@ public class StagingMoveMojo
   @VisibleForTesting
   String determineTagForMoving() throws MojoExecutionException {
     if (tag == null || tag.isEmpty()) {
-      tag = getTagFromPropertiesFile();
-      if (tag == null) {
-        getLog().error("No 'tag' parameter was found but one is required for moving artifacts");
-        throw new MojoExecutionException("The parameter 'tag' is required");
-      }
+      tag = getTagFromPropertiesFile().orElseThrow(() -> new MojoExecutionException("The parameter 'tag' is required"));
     }
     return tag;
   }
