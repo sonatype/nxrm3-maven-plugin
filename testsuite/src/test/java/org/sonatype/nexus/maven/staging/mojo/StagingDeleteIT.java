@@ -49,6 +49,10 @@ public class StagingDeleteIT
     stagingDeployProject();
   }
 
+  /**
+   * When no tag or empty tag is provided, a default value is read from the properties file
+   * @throws Exception
+   */
   @Test
   public void testStagingDeleteWithDefaultTag() throws Exception {
     assertStagingWithDeleteGoal("");
