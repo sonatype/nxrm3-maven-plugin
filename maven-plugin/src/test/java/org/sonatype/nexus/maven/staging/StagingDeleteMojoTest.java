@@ -134,7 +134,8 @@ public class StagingDeleteMojoTest
 
     underTest.execute();
   }
-
+  
+  @Test
   public void testDefaultValueWhenTagIsNull() throws Exception {
     createPropertiesFile(TAG, true);
 
@@ -144,7 +145,8 @@ public class StagingDeleteMojoTest
 
     verify(client).delete(eq(TAG));
   }
-
+  
+  @Test
   public void testDefaultValueWhenTagIsEmpty() throws Exception {
     createPropertiesFile(TAG, true);
 
@@ -194,18 +196,6 @@ public class StagingDeleteMojoTest
     underTest.execute();
   }
 
-  private void createPropertiesFile(String tag, boolean addTag) throws FileNotFoundException, IOException {
-    File stagingPropertiesFile = new File(underTest.getWorkDirectoryRoot(), "staging/staging.properties");
-    stagingPropertiesFile.getParentFile().mkdirs();
-    final Properties stagingProperties = new Properties();
-    if (addTag) {
-      stagingProperties.put("staging.tag", tag);
-    }
-    try (OutputStream out = new FileOutputStream(stagingPropertiesFile)) {
-      stagingProperties.store(out, "NXRM3 Maven staging plugin");
-    }
-  }
-
   @Test(expected = IllegalArgumentException.class)
   public void throwIllegalArgumentExceptionWhenIncorrectServerId() throws Exception {
     createPropertiesFile(TAG, true);
@@ -220,6 +210,18 @@ public class StagingDeleteMojoTest
     ServerConfig config = underTest.getServerConfiguration(session);
 
     assertThat(config, is(notNullValue()));
+  }
+  
+  private void createPropertiesFile(String tag, boolean addTag) throws IOException {
+    File stagingPropertiesFile = new File(underTest.getWorkDirectoryRoot(), "staging/staging.properties");
+    stagingPropertiesFile.getParentFile().mkdirs();
+    final Properties stagingProperties = new Properties();
+    if (addTag) {
+      stagingProperties.put("staging.tag", tag);
+    }
+    try (OutputStream out = new FileOutputStream(stagingPropertiesFile)) {
+      stagingProperties.store(out, "NXRM3 Maven staging plugin");
+    }
   }
 
   private StagingDeleteMojo lookupMojo() throws Exception {
