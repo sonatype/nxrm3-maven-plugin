@@ -186,67 +186,6 @@ public abstract class NxrmITSupport
     }
   }
 
-  //protected void createRepository(final String scriptName, final String repositoryName) throws Exception {
-  //  HttpClient client = buildHttpClient();
-  //
-  //  HttpPost createScriptPost = new HttpPost((nexusItUri.resolve(SCRIPTS_ENDPOINT)));
-  //  createScriptPost.setHeader("Content-Type", "application/json");
-  //  createScriptPost.setHeader("Accept", "application/json");
-  //  createScriptPost.setEntity(getScriptCreateEntity(scriptName, repositoryName));
-  //
-  //  verifyResponse(client.execute(createScriptPost, getHttpContext()), SC_NO_CONTENT);
-  //
-  //  HttpPost executeScript = new HttpPost((nexusItUri.resolve(String.format(SCRIPTS_ENDPOINT + "/%s/run", scriptName))));
-  //  executeScript.setHeader("Content-Type", "text/plain");
-  //  verifyResponse(client.execute(executeScript, getHttpContext()), SC_OK);
-  //}
-  //
-  //protected void cleanupRepositoryAndScript(final String scriptName) throws Exception {
-  //  HttpClient client = buildHttpClient();
-  //  HttpDelete delete = new HttpDelete((nexusItUri.resolve(String.format(SCRIPTS_ENDPOINT + "/%s", scriptName))));
-  //  verifyResponse(client.execute(delete, getHttpContext()), SC_NO_CONTENT);
-  //}
-  //
-  //private void verifyResponse(final HttpResponse response, final int code) {
-  //  assertThat(response.getStatusLine().getStatusCode(), equalTo(code));
-  //}
-  //
-  //private StringEntity getScriptCreateEntity(final String scriptName, final String repository) {
-  //  return new StringEntity(
-  //      String.format(
-  //          "{\"name\": \"%s\", \"type\": \"groovy\", \"content\": \"repository.createMavenHosted('%s')\"};",
-  //          scriptName,
-  //          repository),
-  //      "UTF-8");
-  //}
-  //
-  //private HttpContext getHttpContext() {
-  //  AuthCache authCache = new BasicAuthCache();
-  //  BasicScheme basicAuth = new BasicScheme();
-  //  authCache.put(new HttpHost(nexusItUri.getHost(), nexusItUri.getPort(), nexusItUri.getScheme()), basicAuth);
-  //
-  //  HttpClientContext context = HttpClientContext.create();
-  //  context.setAuthCache(authCache);
-  //  return context;
-  //}
-  //
-  //private HttpClient buildHttpClient() {
-  //  HttpClientBuilder httpClientBuilder = HttpClients.custom();
-  //
-  //  BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-  //
-  //  addCredentialsToProviderWithConfig(credentialsProvider);
-  //
-  //  httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-  //  return httpClientBuilder.build();
-  //}
-  //
-  //private void addCredentialsToProviderWithConfig(final BasicCredentialsProvider credentialsProvider) {
-  //  UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin123");
-  //  AuthScope authscope = new AuthScope(nexusItUri.getHost(), new Integer(getPort()));
-  //  credentialsProvider.setCredentials(authscope, credentials);
-  //}
-
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class ComponentsResponse
   {
