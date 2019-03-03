@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +48,11 @@ public class StagingDeleteIT
     deployTag = randomUUID().toString();
     artifactId = randomUUID().toString();
     stagingDeployProject();
+  }
+  
+  @After
+  public void tearDown() throws Exception {
+   verifier.deleteArtifacts(GROUP_ID, artifactId, VERSION);
   }
 
   /**
