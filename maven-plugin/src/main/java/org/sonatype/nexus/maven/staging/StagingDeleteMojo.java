@@ -51,7 +51,9 @@ public class StagingDeleteMojo
     try {
       List<ComponentInfo> deletedComponents = client.delete(tag);
       getLog().info(String.format("'%d' components deleted with tag '%s' ", deletedComponents.size(), tag));
-      getLog().debug(String.format("Deleted components: %s with tag: %s", deletedComponents, tag));
+      if (getLog().isDebugEnabled()) {
+        getLog().debug(String.format("Deleted components: %s with tag: %s", deletedComponents, tag));
+      }
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
