@@ -88,7 +88,7 @@ public class StagingDeployMojo
       return;
     }
 
-    maybeWarnAboutDeferredStagingMode();
+    maybeWarnAboutDeprecatedStagingModeProperty();
 
     doExecute();
   }
@@ -223,9 +223,9 @@ public class StagingDeployMojo
     return pomArtifact;
   }
 
-  private void maybeWarnAboutDeferredStagingMode() {
-    if ("deferred".equals(stagingMode)) {
-      getLog().warn("The stagingMode property no longer supports 'deferred' and will be ignored.");
+  private void maybeWarnAboutDeprecatedStagingModeProperty() {
+    if (stagingMode != null && !stagingMode.isEmpty()) {
+      getLog().warn("The stagingMode property is no longer supported and will be ignored");
     }
   }
 
