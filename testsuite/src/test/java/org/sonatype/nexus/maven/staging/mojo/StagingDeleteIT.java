@@ -69,7 +69,7 @@ public class StagingDeleteIT
   }
 
   @Test
-  public void failStagingDeleteOnInvalidTag() throws Exception {
+  public void failStagingDeleteOnNonExistentTag() throws Exception {
     setupProject(false);
 
     verifier.addCliOption("-Dtag=random");
