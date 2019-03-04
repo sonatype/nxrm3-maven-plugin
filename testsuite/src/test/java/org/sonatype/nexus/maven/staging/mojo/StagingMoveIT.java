@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.maven.it.VerificationException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,6 +48,8 @@ public class StagingMoveIT
   private static final String STAGING_MOVE = "nexus-staging:move";
 
   private static final String INSTALL = "install";
+
+  private static final List<String> MOVE_GOALS = ImmutableList.of("nexus-staging:move");
 
   @Test
   public void failIfOffline() throws Exception {
@@ -81,15 +84,12 @@ public class StagingMoveIT
 
     prepareForMove(tag, artifactId);
 
-    List<String> goals = new ArrayList<>();
-    goals.add(STAGING_MOVE);
-
     verifier.setDebug(true);
     verifier.addCliOption("-Dtag=" + tag);
     verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
     verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
 
-    verifier.executeGoals(goals);
+    verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
 
@@ -126,13 +126,10 @@ public class StagingMoveIT
     //perform move
     createTargetRepo(testName.getMethodName());
 
-    goals = new ArrayList<>();
-    goals.add(STAGING_MOVE);
-
     verifier.addCliOption("-Dtag=" + tag);
     verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
     verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
-    verifier.executeGoals(goals);
+    verifier.executeGoals(MOVE_GOALS);
 
     verifyComponent(testName.getMethodName(), groupId, artifactId, version, tag);
     verifyComponent(testName.getMethodName(), groupId, artifactId + "-module1", version, tag);
@@ -149,13 +146,10 @@ public class StagingMoveIT
     String tag = properties.getProperty("staging.tag");
     assertThat(tag, is(notNullValue()));
 
-    List<String> goals = new ArrayList<>();
-    goals.add(STAGING_MOVE);
-
     verifier.setDebug(true);
     verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
     verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
-    verifier.executeGoals(goals);
+    verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
 
@@ -175,13 +169,10 @@ public class StagingMoveIT
     createTargetRepo(testName.getMethodName());
     assertStagingWithDeployGoalPomProperties(STAGING_DEPLOY, artifactId, tag);
 
-    List<String> goals = new ArrayList<>();
-    goals.add(STAGING_MOVE);
-
     verifier.addCliOption("-Dtag=" + tag);
     verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
     verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
-    verifier.executeGoals(goals);
+    verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
     verifyComponent(testName.getMethodName(), GROUP_ID, artifactId, VERSION, tag);
@@ -191,12 +182,9 @@ public class StagingMoveIT
     createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, testName.getMethodName(), targetRepository);
     createTargetRepo(targetRepository);
 
-    goals.clear();
-    goals.add(STAGING_MOVE);
-
     verifier.setDebug(true);
     verifier.addCliOption("-Dtag=" + tag);
-    verifier.executeGoals(goals);
+    verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
     verifyComponent(targetRepository, GROUP_ID, artifactId, VERSION, tag);
@@ -209,14 +197,11 @@ public class StagingMoveIT
 
     prepareForMove(tag, artifactId);
 
-    List<String> goals = new ArrayList<>();
-    goals.add(STAGING_MOVE);
-
     verifier.setDebug(true);
 
     verifier.addCliOption("-Dtag=" + tag);
     verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
-    verifier.executeGoals(goals);
+    verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
 
@@ -229,14 +214,11 @@ public class StagingMoveIT
 
     prepareForMove(randomUUID().toString(), artifactId);
 
-    List<String> goals = new ArrayList<>();
-    goals.add(STAGING_MOVE);
-
     try {
       verifier.addCliOption("-Dtag=" + "bogusTag");
       verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
       verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
-      verifier.executeGoals(goals);
+      verifier.executeGoals(MOVE_GOALS);
       Assert.fail("Expected LifecycleExecutionException");
     }
     catch (Exception e) {
@@ -251,14 +233,11 @@ public class StagingMoveIT
 
     prepareForMove(tag, artifactId);
 
-    List<String> goals = new ArrayList<>();
-    goals.add(STAGING_MOVE);
-
     try {
       verifier.addCliOption("-Dtag=" + tag);
       verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
       verifier.addCliOption("-DtargetRepository=" + "nuget-hosted");
-      verifier.executeGoals(goals);
+      verifier.executeGoals(MOVE_GOALS);
 
       Assert.fail("Expected LifecycleExecutionException");
     }
