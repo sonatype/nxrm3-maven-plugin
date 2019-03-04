@@ -113,7 +113,7 @@ public class StagingMoveMojoTest
   public void testUseDefaultRepositoryWhenSourceRepositoryNotProvided() throws Exception {
     underTest.setSourceRepository(null);
 
-    assertThat(underTest.determineSourceRepository(), equalTo(DEFAULT_REPOSITORY));
+    assertThat(underTest.getSourceRepository(), equalTo(DEFAULT_REPOSITORY));
   }
 
   @Test(expected = MojoExecutionException.class)
@@ -130,7 +130,7 @@ public class StagingMoveMojoTest
     setupPropertiesFile("staging.tag=" + TAG);
     underTest.setTag(null);
 
-    assertThat(underTest.determineTagForMoving(), equalTo(TAG));
+    assertThat(underTest.getTagForMoving(), equalTo(TAG));
   }
 
   @Test(expected = MojoExecutionException.class)

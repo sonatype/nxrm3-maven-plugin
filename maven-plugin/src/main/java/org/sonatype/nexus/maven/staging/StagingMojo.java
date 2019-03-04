@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import com.sonatype.nexus.api.common.Authentication;
 import com.sonatype.nexus.api.common.ServerConfig;
+import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 import org.sonatype.maven.mojo.execution.MojoExecution;
 import org.sonatype.maven.mojo.settings.MavenSettings;
@@ -36,7 +37,6 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -80,7 +80,7 @@ public abstract class StagingMojo
 
   @Parameter(defaultValue = "${plugin.artifactId}", readonly = true, required = true)
   private String pluginArtifactId;
-  
+
   @Parameter(defaultValue = "${settings.offline}", readonly = true, required = true)
   private boolean offline;
 
@@ -200,6 +200,13 @@ public abstract class StagingMojo
     return new File(getWorkDirectoryRoot(), "staging");
   }
 
+  /**
+   * Returns an instance of the {@link RepositoryManagerV3Client}
+   */
+  protected RepositoryManagerV3Client getRepositoryManagerV3Client() {
+    return getClientFactory().build(getServerConfiguration(getMavenSession()));
+  }
+
   protected String getNexusUrl() {
     return nexusUrl;
   }
@@ -227,7 +234,7 @@ public abstract class StagingMojo
     }
     return properties.getProperty("staging.tag");
   }
-  
+
   /**
    * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
    *
@@ -239,7 +246,24 @@ public abstract class StagingMojo
           "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
     }
   }
-  
+
+  protected Optional<String> getTagFromPropertiesFile() {
+    Properties stagingProperties = loadStagingProperties();
+    return Optional.ofNullable(stagingProperties.getProperty(TAG_ID));
+  }
+
+  /**
+   * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
+   *
+   * @throws MojoFailureException if Maven is invoked offline.
+   */
+  protected void failIfOffline() throws MojoFailureException {
+    if (offline) {
+      throw new MojoFailureException(
+          "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
+    }
+  }
+
   @VisibleForTesting
   void setMavenSession(final MavenSession session) {
     this.mavenSession = session;
@@ -268,5 +292,5 @@ public abstract class StagingMojo
   void setOffline(final boolean offline) {
     this.offline = offline;
   }
-  
+
 }

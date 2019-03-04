@@ -47,16 +47,9 @@ public class StagingMoveMojo
   @Parameter(property = "sourceRepository")
   private String sourceRepository;
 
-  @Parameter(defaultValue = "${settings.offline}", readonly = true, required = true)
-  private boolean offline;
-
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-    doExecute();
-  }
-
-  private void doExecute() throws MojoFailureException, MojoExecutionException {
-    RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
+    RepositoryManagerV3Client client = getRepositoryManagerV3Client();
 
     failIfOffline();
 
@@ -65,9 +58,9 @@ public class StagingMoveMojo
     }
 
     try {
-      tag = determineTagForMoving();
+      tag = getTagForMoving();
 
-      sourceRepository = determineSourceRepository();
+      sourceRepository = getSourceRepository();
 
       getLog().info(format("Moving artifacts with tag '%s' from '%s' to '%s'", tag, sourceRepository, targetRepository));
 
@@ -77,7 +70,7 @@ public class StagingMoveMojo
       throw e;
     }
     catch (RepositoryManagerException e) {
-      throw new MojoExecutionException(format("%s.\nReason: %s", e.getMessage(), e.getResponseMessage().get()));
+      throw new MojoExecutionException(format("%s. Reason: %s", e.getMessage(), e.getResponseMessage().get()));
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
@@ -85,7 +78,7 @@ public class StagingMoveMojo
   }
 
   @VisibleForTesting
-  String determineSourceRepository() {
+  String getSourceRepository() {
     if (sourceRepository == null || sourceRepository.isEmpty()) {
       getLog().error(format("No source repository was specified, defaulting to '%s'", repository));
       sourceRepository = repository;
@@ -94,7 +87,7 @@ public class StagingMoveMojo
   }
 
   @VisibleForTesting
-  String determineTagForMoving() throws MojoExecutionException {
+  String getTagForMoving() throws MojoExecutionException {
     if (tag == null || tag.isEmpty()) {
       tag = getTagFromPropertiesFile().orElseThrow(() -> new MojoExecutionException("The parameter 'tag' is required"));
     }
@@ -104,25 +97,6 @@ public class StagingMoveMojo
   @VisibleForTesting
   Map<String, String> createSearchCriteria(final String repository, final String tag) {
     return SearchBuilder.create().withRepository(repository).withTag(tag).build();
-  }
-
-  /**
-   * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
-   *
-   * @throws MojoFailureException if Maven is invoked offline.
-   */
-  protected void failIfOffline()
-      throws MojoFailureException
-  {
-    if (offline) {
-      throw new MojoFailureException(
-          "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
-    }
-  }
-
-  @VisibleForTesting
-  void setOffline(final boolean offline) {
-    this.offline = offline;
   }
 
   @VisibleForTesting
