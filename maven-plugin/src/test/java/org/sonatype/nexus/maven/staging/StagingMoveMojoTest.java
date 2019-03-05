@@ -74,9 +74,9 @@ public class StagingMoveMojoTest
 
   private Server server;
 
-  private StagingMoveMojo underTest;
-
   private Path tempDirectory;
+
+  private StagingMoveMojo underTest;
 
   @Before
   public void setup() throws Exception {

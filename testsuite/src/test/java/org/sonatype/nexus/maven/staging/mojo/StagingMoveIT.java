@@ -35,6 +35,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.fail;
 
 public class StagingMoveIT
     extends StagingMavenPluginITSupport
@@ -69,7 +70,7 @@ public class StagingMoveIT
 
     try {
       verifier.executeGoals(goals);
-      Assert.fail("Expected LifecycleExecutionException");
+      fail("Expected LifecycleExecutionException");
     }
     catch (Exception e) {
       assertThat(e.getMessage(),
@@ -219,7 +220,7 @@ public class StagingMoveIT
       verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
       verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
       verifier.executeGoals(MOVE_GOALS);
-      Assert.fail("Expected LifecycleExecutionException");
+      fail("Expected LifecycleExecutionException");
     }
     catch (Exception e) {
       assertThat(e.getMessage(), containsString("Reason: No components found"));
@@ -239,7 +240,7 @@ public class StagingMoveIT
       verifier.addCliOption("-DtargetRepository=" + "nuget-hosted");
       verifier.executeGoals(MOVE_GOALS);
 
-      Assert.fail("Expected LifecycleExecutionException");
+      fail("Expected LifecycleExecutionException");
     }
     catch (Exception e) {
       assertThat(e.getMessage(), containsString("Reason: Source and destination repository formats do not match"));

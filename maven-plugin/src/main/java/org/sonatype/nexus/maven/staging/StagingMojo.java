@@ -172,11 +172,9 @@ public abstract class StagingMojo
   }
 
   protected Properties loadStagingProperties() {
-    final Properties properties = new Properties();
-    try {
-      try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
+    Properties properties = new Properties();
+    try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
         properties.load(inputStream);
-      }
     }
     catch (IOException e) {
       getLog().error(e.getMessage());

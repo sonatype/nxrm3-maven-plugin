@@ -80,7 +80,7 @@ public class StagingMoveMojo
   @VisibleForTesting
   String getSourceRepository() {
     if (sourceRepository == null || sourceRepository.isEmpty()) {
-      getLog().warn(format("No source repository was specified, defaulting to '%s'", repository));
+      getLog().info(format("No source repository was specified, defaulting to '%s'", repository));
       sourceRepository = repository;
     }
     return sourceRepository;
