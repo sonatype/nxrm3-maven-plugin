@@ -24,7 +24,6 @@ import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport
 
 import com.google.common.collect.ImmutableList;
 import org.apache.maven.it.VerificationException;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static com.jayway.awaitility.Awaitility.await;
