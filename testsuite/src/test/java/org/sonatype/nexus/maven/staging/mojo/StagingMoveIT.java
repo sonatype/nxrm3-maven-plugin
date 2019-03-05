@@ -296,7 +296,6 @@ public class StagingMoveIT
                                final String artifactId,
                                final String version) throws VerificationException
   {
-    verifier.setDebug(true);
     verifier.addCliOption("-Dtag=" + tag);
     verifier.executeGoals(goals);
 

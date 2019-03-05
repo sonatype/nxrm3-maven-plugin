@@ -48,7 +48,7 @@ public class StagingMoveMojo
   private String sourceRepository;
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  public void execute() throws MojoFailureException {
     RepositoryManagerV3Client client = getRepositoryManagerV3Client();
 
     failIfOffline();
@@ -66,21 +66,21 @@ public class StagingMoveMojo
 
       client.move(targetRepository, createSearchCriteria(sourceRepository, tag));
     }
-    catch (MojoExecutionException e) {
-      throw e;
-    }
     catch (RepositoryManagerException e) {
-      throw new MojoExecutionException(format("%s. Reason: %s", e.getMessage(), e.getResponseMessage().get()));
+      String reason = format("%s. Reason: %s", e.getMessage(), e.getResponseMessage().isPresent() ?
+          e.getResponseMessage().get() : e.getCause().getMessage());
+
+      throw new MojoFailureException(reason, e);
     }
-    catch (Exception ex) {
-      throw new MojoFailureException(ex.getMessage(), ex);
+    catch (Exception e) {
+      throw new MojoFailureException(e.getMessage(), e);
     }
   }
 
   @VisibleForTesting
   String getSourceRepository() {
     if (sourceRepository == null || sourceRepository.isEmpty()) {
-      getLog().error(format("No source repository was specified, defaulting to '%s'", repository));
+      getLog().warn(format("No source repository was specified, defaulting to '%s'", repository));
       sourceRepository = repository;
     }
     return sourceRepository;

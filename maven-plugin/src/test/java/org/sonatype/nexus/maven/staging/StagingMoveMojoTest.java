@@ -20,7 +20,6 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.settings.Server;
@@ -116,7 +115,7 @@ public class StagingMoveMojoTest
     assertThat(underTest.getSourceRepository(), equalTo(DEFAULT_REPOSITORY));
   }
 
-  @Test(expected = MojoExecutionException.class)
+  @Test(expected = MojoFailureException.class)
   public void testFailWhenTagIsNull() throws Exception {
     //No tag is defined by the user and no staging.properties file exists
     underTest.setTag(null);
@@ -133,7 +132,7 @@ public class StagingMoveMojoTest
     assertThat(underTest.getTagForMoving(), equalTo(TAG));
   }
 
-  @Test(expected = MojoExecutionException.class)
+  @Test(expected = MojoFailureException.class)
   public void testFailWhenTagIsNotFound() throws Exception {
     //No tag is defined by the user and no tag is in the staging.properties
     setupPropertiesFile(EMPTY);
