@@ -54,7 +54,7 @@ public class StagingMoveMojoTest
 
   private static final String SOURCE_REPOSITORY = "maven-test";
 
-  private static final String TARGET_REPOSITORY = "maven-releases";
+  private static final String DESTINATION_REPOSITORY = "maven-releases";
 
   private static final String EMPTY = "";
 
@@ -102,8 +102,8 @@ public class StagingMoveMojoTest
   }
 
   @Test(expected = MojoFailureException.class)
-  public void testFailureWhenTargetRepositoryIsNull() throws Exception {
-    underTest.setTargetRepository(null);
+  public void testFailureWhenDestinationRepositoryIsNull() throws Exception {
+    underTest.setDestinationRepository(null);
 
     underTest.execute();
   }
@@ -152,7 +152,7 @@ public class StagingMoveMojoTest
     underTest.execute();
 
     Map<String, String> searchCriteria = ImmutableMap.of("repository", SOURCE_REPOSITORY, "tag", TAG);
-    verify(client).move(eq(TARGET_REPOSITORY), eq(searchCriteria));
+    verify(client).move(eq(DESTINATION_REPOSITORY), eq(searchCriteria));
   }
 
   private StagingMoveMojo lookupMojo() throws Exception {
@@ -162,7 +162,7 @@ public class StagingMoveMojoTest
     mojo.setMavenSession(session);
     mojo.setTag(TAG);
     mojo.setSourceRepository(SOURCE_REPOSITORY);
-    mojo.setTargetRepository(TARGET_REPOSITORY);
+    mojo.setDestinationRepository(DESTINATION_REPOSITORY);
     mojo.setClientFactory(clientFactory);
     return mojo;
   }

@@ -87,7 +87,7 @@ public class StagingMoveIT
     verifier.setDebug(true);
     verifier.addCliOption("-Dtag=" + tag);
     verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
-    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.addCliOption("-DdestinationRepository=" + testName.getMethodName());
 
     verifier.executeGoals(MOVE_GOALS);
 
@@ -128,7 +128,7 @@ public class StagingMoveIT
 
     verifier.addCliOption("-Dtag=" + tag);
     verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
-    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.addCliOption("-DdestinationRepository=" + testName.getMethodName());
     verifier.executeGoals(MOVE_GOALS);
 
     verifyComponent(testName.getMethodName(), groupId, artifactId, version, tag);
@@ -148,7 +148,7 @@ public class StagingMoveIT
 
     verifier.setDebug(true);
     verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
-    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.addCliOption("-DdestinationRepository=" + testName.getMethodName());
     verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
@@ -158,7 +158,7 @@ public class StagingMoveIT
 
   @Test
   public void moveUsingPomConfiguration() throws Exception {
-    String targetRepository = "maven-test-hosted";
+    String destinationRepository = "maven-test-hosted";
     String tag = randomUUID().toString();
     String artifactId = randomUUID().toString();
 
@@ -171,7 +171,7 @@ public class StagingMoveIT
 
     verifier.addCliOption("-Dtag=" + tag);
     verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
-    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.addCliOption("-DdestinationRepository=" + testName.getMethodName());
     verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
@@ -179,15 +179,16 @@ public class StagingMoveIT
 
 
     //Perform a move based on properties in the pom
-    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, testName.getMethodName(), targetRepository);
-    createTargetRepo(targetRepository);
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, testName.getMethodName(),
+        destinationRepository);
+    createTargetRepo(destinationRepository);
 
     verifier.setDebug(true);
     verifier.addCliOption("-Dtag=" + tag);
     verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
-    verifyComponent(targetRepository, GROUP_ID, artifactId, VERSION, tag);
+    verifyComponent(destinationRepository, GROUP_ID, artifactId, VERSION, tag);
   }
 
   @Test
@@ -200,7 +201,7 @@ public class StagingMoveIT
     verifier.setDebug(true);
 
     verifier.addCliOption("-Dtag=" + tag);
-    verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+    verifier.addCliOption("-DdestinationRepository=" + testName.getMethodName());
     verifier.executeGoals(MOVE_GOALS);
 
     verifyNoComponentPresent(artifactId);
@@ -217,7 +218,7 @@ public class StagingMoveIT
     try {
       verifier.addCliOption("-Dtag=" + "bogusTag");
       verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
-      verifier.addCliOption("-DtargetRepository=" + testName.getMethodName());
+      verifier.addCliOption("-DdestinationRepository=" + testName.getMethodName());
       verifier.executeGoals(MOVE_GOALS);
       fail("Expected LifecycleExecutionException");
     }
@@ -236,7 +237,7 @@ public class StagingMoveIT
     try {
       verifier.addCliOption("-Dtag=" + tag);
       verifier.addCliOption("-DsourceRepository=" + RELEASE_REPOSITORY);
-      verifier.addCliOption("-DtargetRepository=" + "nuget-hosted");
+      verifier.addCliOption("-DdestinationRepository=" + "nuget-hosted");
       verifier.executeGoals(MOVE_GOALS);
 
       fail("Expected LifecycleExecutionException");

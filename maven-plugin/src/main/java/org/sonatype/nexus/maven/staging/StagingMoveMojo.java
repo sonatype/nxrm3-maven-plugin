@@ -41,8 +41,8 @@ public class StagingMoveMojo
   @Parameter(property = "tag")
   private String tag;
 
-  @Parameter(property = "targetRepository", required = true)
-  private String targetRepository;
+  @Parameter(property = "destinationRepository", required = true)
+  private String destinationRepository;
 
   @Parameter(property = "sourceRepository")
   private String sourceRepository;
@@ -53,8 +53,8 @@ public class StagingMoveMojo
 
     failIfOffline();
 
-    if (targetRepository == null || targetRepository.isEmpty()) {
-      throw new MojoFailureException("'targetRepository' is required but was not found");
+    if (destinationRepository == null || destinationRepository.isEmpty()) {
+      throw new MojoFailureException("'destinationRepository' is required but was not found");
     }
 
     try {
@@ -62,9 +62,10 @@ public class StagingMoveMojo
 
       sourceRepository = getSourceRepository();
 
-      getLog().info(format("Moving artifacts with tag '%s' from '%s' to '%s'", tag, sourceRepository, targetRepository));
+      getLog().info(format("Moving artifacts with tag '%s' from '%s' to '%s'", tag, sourceRepository,
+          destinationRepository));
 
-      client.move(targetRepository, createSearchCriteria(sourceRepository, tag));
+      client.move(destinationRepository, createSearchCriteria(sourceRepository, tag));
     }
     catch (RepositoryManagerException e) {
       String reason = format("%s. Reason: %s", e.getMessage(), e.getResponseMessage().isPresent() ?
@@ -110,7 +111,7 @@ public class StagingMoveMojo
   }
 
   @VisibleForTesting
-  void setTargetRepository(final String targetRepository) {
-    this.targetRepository = targetRepository;
+  void setDestinationRepository(final String destinationRepository) {
+    this.destinationRepository = destinationRepository;
   }
 }

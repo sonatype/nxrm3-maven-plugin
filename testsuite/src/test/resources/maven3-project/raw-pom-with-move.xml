@@ -88,7 +88,7 @@
           <!-- Which repository to deploy to -->
           <repository>${nexus.repository}</repository>
 
-          <targetRepository>${nexus.targetRepository}</targetRepository>
+          <destinationRepository>${nexus.destinationRepository}</destinationRepository>
 
           <sourceRepository>${nexus.sourceRepository}</sourceRepository>
 
