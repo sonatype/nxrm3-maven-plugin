@@ -57,6 +57,9 @@ public class StagingDeployMojo
   @Parameter(property = "skipNexusStagingDeployMojo")
   private boolean skipNexusStagingDeployMojo;
 
+  @Parameter(property = "stagingMode")
+  private String stagingMode;
+
   @Component
   private RepositorySystem repositorySystem;
 
@@ -84,6 +87,8 @@ public class StagingDeployMojo
       getLog().info("Skipping NXRM Staging Deploy Mojo at user's demand.");
       return;
     }
+
+    maybeWarnAboutDeprecatedStagingModeProperty();
 
     doExecute();
   }
@@ -216,6 +221,12 @@ public class StagingDeployMojo
     pomArtifact.setFile(pomFile);
 
     return pomArtifact;
+  }
+
+  private void maybeWarnAboutDeprecatedStagingModeProperty() {
+    if (stagingMode != null && !stagingMode.isEmpty()) {
+      getLog().warn("The stagingMode property is no longer supported and will be ignored");
+    }
   }
 
   /**
