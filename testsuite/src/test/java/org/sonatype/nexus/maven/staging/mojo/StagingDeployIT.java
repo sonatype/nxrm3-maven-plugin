@@ -13,11 +13,15 @@
 package org.sonatype.nexus.maven.staging.mojo;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.Map;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
 
+import org.apache.maven.it.VerificationException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,7 +29,9 @@ import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 
 public class StagingDeployIT
     extends StagingMavenPluginITSupport
@@ -53,9 +59,9 @@ public class StagingDeployIT
   @Test
   public void multiModuleDeploy() throws Exception {
     initialiseVerifier(multiModuleProjectDir);
-    
+
     String tag = randomUUID().toString();
-    
+
     List<String> goals = new ArrayList<>();
 
     goals.add(INSTALL);
@@ -83,7 +89,7 @@ public class StagingDeployIT
   @Test
   public void failIfOffline() throws Exception {
     initialiseVerifier(projectDir);
-    
+
     String artifactId = randomUUID().toString();
     String tag = randomUUID().toString();
 
@@ -122,9 +128,9 @@ public class StagingDeployIT
   public void storeTagInPropertiesForNewAndExistingTag() throws Exception {
     String tag = randomUUID().toString();
 
-    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
+    File propertiesFile = getPropertiesFile(projectDir);
 
-    File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
+    assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
 
     assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
 
@@ -133,6 +139,36 @@ public class StagingDeployIT
     assertStagingWithDeployGoal(STAGING_DEPLOY, tag);
 
     assertThat(readFileToString(propertiesFile), containsString("staging.tag=" + tag));
+  }
+
+  @Test
+  public void deployWithoutSpecifyingTagUsesGeneratedTag() throws Exception {
+    initialiseVerifier(multiModuleProjectDir);
+
+    String artifactId = randomUUID().toString();
+
+    createProject(multiModuleProjectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createProject(project1Dir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    createProject(project2Dir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    verifier.setDebug(true);
+
+    verifier.executeGoals(goals);
+
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(getPropertiesFile(multiModuleProjectDir)));
+    String generatedTag = properties.getProperty("staging.tag");
+
+    assertThat(generatedTag, startsWith(artifactId + "-" + VERSION + "-"));
+
+    verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, generatedTag);
+    verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId + "-module1", VERSION, generatedTag);
+    verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId + "-module2", VERSION, generatedTag);
   }
 
   @Test
@@ -150,13 +186,112 @@ public class StagingDeployIT
   @Test
   public void stagingDeployPomProject() throws Exception {
     initialiseVerifier(projectDir);
-    
+
     List<String> goals = new ArrayList<>();
 
     goals.add(INSTALL);
     goals.add(STAGING_DEPLOY);
 
     assertStagingWithDeployGoal(goals, randomUUID().toString(), POM_PACKAGING);
+  }
+
+  @Test
+  public void deployIfSkipNotSet() throws Exception {
+    initialiseVerifier(projectDir);
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+  }
+
+  @Test
+  public void doNothingIfSkipTrue() throws Exception {
+    initialiseVerifier(projectDir);
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, true);
+
+    List<String> goals = new ArrayList<>();
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    verifier.setDebug(true);
+
+    verifier.addCliOption("-Dtag=" + tag);
+
+    verifier.executeGoals(goals);
+
+    verifyNoComponentPresent(artifactId);
+  }
+
+  @Test
+  public void deployIfSkipFalse() throws Exception {
+    initialiseVerifier(projectDir);
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, false);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+  }
+
+  @Test
+  public void deployIfCliSkipClear() throws Exception {
+    initialiseVerifier(projectDir);
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    verifier.addCliOption("-DskipNexusStagingDeployMojo=false");
+
+    deployAndVerify(goals, tag, GROUP_ID, artifactId, VERSION);
+  }
+
+  @Test
+  public void doNothingIfCliSkipSet() throws Exception {
+    initialiseVerifier(projectDir);
+    String artifactId = randomUUID().toString();
+    String tag = randomUUID().toString();
+
+    createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
+    List<String> goals = new ArrayList<>();
+
+    goals.add(INSTALL);
+    goals.add(STAGING_DEPLOY);
+
+    verifier.addCliOption("-DskipNexusStagingDeployMojo=true");
+
+    verifier.setDebug(true);
+
+    verifier.addCliOption("-Dtag=" + tag);
+
+    verifier.executeGoals(goals);
+
+    verifyNoComponentPresent(artifactId);
+  }
+
+  private void verifyNoComponentPresent(final String artifactId) throws Exception {
+    Map<String, String> searchQuery = getSearchQuery(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+    assertThat(componentSearch(searchQuery).items, hasSize(0));
   }
 
   private void assertStagingWithDeployGoal(final String deployGoal) throws Exception {
@@ -177,7 +312,7 @@ public class StagingDeployIT
                                            final String tag) throws Exception
   {
     initialiseVerifier(projectDir);
-    
+
     assertStagingWithDeployGoal(goals, tag, JAR_PACKAGING);
   }
 
@@ -191,6 +326,15 @@ public class StagingDeployIT
 
     createProject(projectDir, RELEASE_REPOSITORY, groupId, artifactId, version);
 
+    deployAndVerify(goals, tag, groupId, artifactId, version);
+  }
+
+  private void deployAndVerify(final List<String> goals,
+                               final String tag,
+                               final String groupId,
+                               final String artifactId,
+                               final String version) throws VerificationException
+  {
     verifier.setDebug(true);
 
     verifier.addCliOption("-Dtag=" + tag);
@@ -198,5 +342,9 @@ public class StagingDeployIT
     verifier.executeGoals(goals);
 
     verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+  }
+
+  private File getPropertiesFile(final File projectDir) {
+    return new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
   }
 }

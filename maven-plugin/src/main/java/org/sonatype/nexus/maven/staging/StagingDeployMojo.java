@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import com.sonatype.nexus.api.exception.RepositoryManagerException;
 import com.sonatype.nexus.api.repository.v3.DefaultAsset;
 import com.sonatype.nexus.api.repository.v3.DefaultComponent;
@@ -52,8 +54,17 @@ public class StagingDeployMojo
   @Parameter(property = "tag")
   private String tag;
 
+  @Parameter(property = "skipNexusStagingDeployMojo")
+  private boolean skipNexusStagingDeployMojo;
+
+  @Parameter(property = "stagingMode")
+  private String stagingMode;
+
   @Component
   private RepositorySystem repositorySystem;
+
+  @Inject
+  private TagGenerator tagGenerator;
 
   @Parameter(defaultValue = "${project.artifact}", readonly = true, required = true)
   private Artifact artifact;
@@ -69,6 +80,17 @@ public class StagingDeployMojo
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
+    if (skipNexusStagingDeployMojo) {
+      getLog().info("Skipping NXRM Staging Deploy Mojo at user's demand.");
+      return;
+    }
+
+    maybeWarnAboutDeprecatedStagingModeProperty();
+
+    doExecute();
+  }
+
+  private void doExecute() throws MojoFailureException, MojoExecutionException {
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
 
     failIfOffline();
@@ -76,14 +98,10 @@ public class StagingDeployMojo
     List<Artifact> deployables = prepareDeployables();
 
     try {
-      if (tag != null && !tag.isEmpty()) {
-        maybeCreateTag(client, tag);
-        getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
-        doUpload(client, deployables, tag);
-      }
-      else {
-        throw new MojoExecutionException("The parameters 'tag' is required");
-      }
+      tag = getProvidedOrGeneratedTag();
+      maybeCreateTag(client, tag);
+      getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
+      doUpload(client, deployables, tag);
     }
     catch (MojoExecutionException e) {
       throw e;
@@ -91,6 +109,17 @@ public class StagingDeployMojo
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
+  }
+
+  private String getProvidedOrGeneratedTag() {
+    if (tag == null || tag.isEmpty()) {
+      String generatedTag = tagGenerator.generate(artifact.getArtifactId(), artifact.getBaseVersion());
+      getMavenSession().getUserProperties().setProperty("tag", generatedTag);
+      getLog().info(String.format("No tag was provided; using generated tag '%s'", generatedTag));
+      return generatedTag;
+    }
+
+    return tag;
   }
 
   private void maybeCreateTag(final RepositoryManagerV3Client client, final String tag)
@@ -191,6 +220,12 @@ public class StagingDeployMojo
     return pomArtifact;
   }
 
+  private void maybeWarnAboutDeprecatedStagingModeProperty() {
+    if (stagingMode != null && !stagingMode.isEmpty()) {
+      getLog().warn("The stagingMode property is no longer supported and will be ignored");
+    }
+  }
+  
   @VisibleForTesting
   void setArtifact(final Artifact artifact) {
     this.artifact = artifact;
@@ -214,5 +249,15 @@ public class StagingDeployMojo
   @VisibleForTesting
   void setPackaging(final String packaging) {
     this.packaging = packaging;
+  }
+
+  @VisibleForTesting
+  void setSkip(final boolean skip) {
+    this.skipNexusStagingDeployMojo = skip;
+  }
+
+  @VisibleForTesting
+  void setTagGenerator(final TagGenerator tagGenerator) {
+    this.tagGenerator = tagGenerator;
   }
 }

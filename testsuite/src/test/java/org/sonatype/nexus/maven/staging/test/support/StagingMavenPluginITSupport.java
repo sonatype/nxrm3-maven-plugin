@@ -92,6 +92,33 @@ public abstract class StagingMavenPluginITSupport
     final File pom = new File(dir, "pom.xml");
     final File rawPom = new File(dir, "raw-pom.xml");
 
+    final Properties properties = getDefaultProperties(repository, groupId, artifactId, version, packaging);
+
+    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+  }
+
+  protected void createProject(final File dir,
+                               final String repository,
+                               final String groupId,
+                               final String artifactId,
+                               final String version,
+                               final boolean skip)
+  {
+    final File pom = new File(dir, "pom.xml");
+    final File rawPom = new File(dir, "raw-pom-with-skip.xml");
+
+    final Properties properties = getDefaultProperties(repository, groupId, artifactId, version, JAR_PACKAGING);
+    properties.setProperty("nexus.skipNexusStagingDeployMojo", skip ? "true" : "false");
+
+    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+  }
+
+  private Properties getDefaultProperties(final String repository,
+                                          final String groupId,
+                                          final String artifactId,
+                                          final String version,
+                                          final String packaging)
+  {
     final Properties properties = new Properties();
     properties.setProperty("nexus.url", "http://localhost:" + getPort());
     properties.setProperty("nexus.repository", repository);
@@ -99,8 +126,7 @@ public abstract class StagingMavenPluginITSupport
     properties.setProperty("test.project.artifactId", artifactId);
     properties.setProperty("test.project.version", version);
     properties.setProperty("test.project.packaging", packaging);
-
-    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+    return properties;
   }
 
   protected void initialiseVerifier(final File projectRoot) throws Exception {
