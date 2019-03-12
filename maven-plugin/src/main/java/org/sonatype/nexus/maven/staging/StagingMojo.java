@@ -202,7 +202,7 @@ public abstract class StagingMojo
     try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
       properties.load(inputStream);
     }
-    catch (IOException e) {
+    catch (IOException e) { //NOSONAR
       getLog().error(e.getMessage());
       throw new MojoExecutionException("Encountered an error while accessing 'staging.tag' property from staging properties file: " + getStagingPropertiesFile());
     }
