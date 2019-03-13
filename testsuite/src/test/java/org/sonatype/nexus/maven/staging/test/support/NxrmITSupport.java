@@ -102,26 +102,6 @@ public abstract class NxrmITSupport
     stream(tags).forEach(tag -> assertThat(component.tags, hasItem(tag)));
   }
   
-  protected void verifyComponentNotFound(final String repository,
-                                         final String group,
-                                         final String name,
-                                         final String version,
-                                         final String... tags)
-  {
-    try {
-      verifyComponent(repository, group, name, version, tags);
-      throw new AssertionError(String.format(
-          "Component (group: %s; name: %s; version: %s) was found in Nexus Repository Manager repository : %s after deletion",
-          group, name, version, repository));
-    }
-    catch (AssertionError e) {
-      assertTrue(e.getMessage()
-          .equals(String.format(
-              "Component (group: %s; name: %s; version: %s) was not found in Nexus Repository Manager repository : %s",
-              group, name, version, repository)));
-    }
-  }
-
   protected Map<String, String> getSearchQuery(final String repository,
                                              final String group,
                                              final String name,

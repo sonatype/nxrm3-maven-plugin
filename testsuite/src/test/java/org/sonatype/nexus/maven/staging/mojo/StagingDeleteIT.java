@@ -68,14 +68,18 @@ public class StagingDeleteIT
    */
   @Test
   public void testStagingDeleteWithDefaultTag() throws Exception {
-    assertStagingWithDeleteGoal("");
+    testStagingDeleteWithTag("");
   }
 
   @Test
   public void testStagingDelete() throws Exception {
+    testStagingDeleteWithTag(deployTag);
+  }
+  
+  private void testStagingDeleteWithTag(String tag) throws Exception {
     setupProject(false);
 
-    verifier.addCliOption("-Dtag=" + deployTag);
+    verifier.addCliOption("-Dtag=" + tag);
 
     verifier.executeGoals(DELETE_GOALS);
 
@@ -120,16 +124,6 @@ public class StagingDeleteIT
     verifier.addCliOption("-Dtag=" + "");
 
     assertStagingErrorWithDeleteGoal("Encountered an error while accessing 'staging.tag' property from staging properties file");
-  }
-
-  private void assertStagingWithDeleteGoal(String deleteTag) throws Exception {
-    setupProject(false);
-
-    verifier.addCliOption("-Dtag=" + deleteTag);
-
-    verifier.executeGoals(DELETE_GOALS);
-
-    verifyComponentNotFound(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, deployTag);
   }
 
   private void assertStagingErrorWithDeleteGoal(String errorMessage) throws Exception {
