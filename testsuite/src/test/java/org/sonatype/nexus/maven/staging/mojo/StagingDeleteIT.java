@@ -82,12 +82,11 @@ public class StagingDeleteIT
     Map<String, String> search = getSearchQuery(RELEASE_REPOSITORY, GROUP_ID, artifactId, artifactId);
     try {
       await().atMost(10, SECONDS).until(() -> componentSearch(search).items, hasSize(0));
-
     }
     catch (Exception e) {
       throw new AssertionError(String.format(
-          "Component (group: %s; name: %s; version: %s) was  found in Nexus Repository Manager repository : %s",
-          GROUP_ID, artifactId, VERSION, RELEASE_REPOSITORY), e);
+          "Component (group: %s; name: %s; version: %s) was found in Nexus Repository Manager repository : %s " +
+              "but was not expected", GROUP_ID, artifactId, VERSION, RELEASE_REPOSITORY), e);
     }
   }
 
