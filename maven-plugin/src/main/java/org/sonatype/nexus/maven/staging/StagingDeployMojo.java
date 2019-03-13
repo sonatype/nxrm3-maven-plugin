@@ -78,9 +78,6 @@ public class StagingDeployMojo
   @Parameter(defaultValue = "${project.attachedArtifacts}", readonly = true, required = true)
   private List<Artifact> attachedArtifacts;
 
-  @Parameter(defaultValue = "${settings.offline}", readonly = true, required = true)
-  private boolean offline;
-
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     if (skipNexusStagingDeployMojo) {
@@ -228,26 +225,7 @@ public class StagingDeployMojo
       getLog().warn("The stagingMode property is no longer supported and will be ignored");
     }
   }
-
-  /**
-   * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
-   *
-   * @throws MojoFailureException if Maven is invoked offline.
-   */
-  protected void failIfOffline()
-      throws MojoFailureException
-  {
-    if (offline) {
-      throw new MojoFailureException(
-          "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
-    }
-  }
-
-  @VisibleForTesting
-  void setOffline(final boolean offline) {
-    this.offline = offline;
-  }
-
+  
   @VisibleForTesting
   void setArtifact(final Artifact artifact) {
     this.artifact = artifact;
