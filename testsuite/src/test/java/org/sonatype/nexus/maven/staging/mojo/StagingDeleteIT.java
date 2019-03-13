@@ -12,15 +12,23 @@
  */
 package org.sonatype.nexus.maven.staging.mojo;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static java.util.UUID.randomUUID;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -65,7 +73,22 @@ public class StagingDeleteIT
 
   @Test
   public void testStagingDelete() throws Exception {
-    assertStagingWithDeleteGoal(deployTag);
+    setupProject(false);
+
+    verifier.addCliOption("-Dtag=" + deployTag);
+
+    verifier.executeGoals(DELETE_GOALS);
+
+    Map<String, String> search = getSearchQuery(RELEASE_REPOSITORY, GROUP_ID, artifactId, artifactId);
+    try {
+      await().atMost(10, SECONDS).until(() -> componentSearch(search).items, hasSize(0));
+
+    }
+    catch (Exception e) {
+      throw new AssertionError(String.format(
+          "Component (group: %s; name: %s; version: %s) was  found in Nexus Repository Manager repository : %s",
+          GROUP_ID, artifactId, VERSION, RELEASE_REPOSITORY), e);
+    }
   }
 
   @Test
