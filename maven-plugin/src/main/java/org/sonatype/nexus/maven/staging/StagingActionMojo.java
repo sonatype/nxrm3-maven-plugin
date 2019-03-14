@@ -22,7 +22,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  *
  * @since 1.0.0
  */
-abstract public class StagingActionMojo
+public abstract class StagingActionMojo
   extends StagingMojo
 {
   @Parameter(property = "tag")
