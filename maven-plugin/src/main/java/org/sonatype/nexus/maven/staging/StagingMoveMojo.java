@@ -90,7 +90,7 @@ public class StagingMoveMojo
   @VisibleForTesting
   String getTagForMoving() throws MojoExecutionException {
     if (tag == null || tag.isEmpty()) {
-      tag = getTagFromPropertiesFile().orElseThrow(() -> new MojoExecutionException("The parameter 'tag' is required"));
+      tag = getTagFromPropertiesFile();
     }
     return tag;
   }

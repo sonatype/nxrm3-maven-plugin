@@ -37,6 +37,7 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -143,9 +144,12 @@ public abstract class StagingMojo
     saveStagingProperties(properties);
   }
 
-  protected Optional<String> getTagFromPropertiesFile() {
+  protected String getTagFromPropertiesFile() throws MojoExecutionException {
     Properties stagingProperties = loadStagingProperties();
-    return Optional.ofNullable(stagingProperties.getProperty(TAG_ID));
+    return Optional.ofNullable(stagingProperties.getProperty(TAG_ID))
+        .filter(s -> !s.isEmpty())
+        .orElseThrow(() -> new MojoExecutionException("Property 'staging.tag' is either not defined or is empty in " +
+            "staging properties file"));
   }
 
   protected void saveStagingProperties(final Map<String, String> properties) {
@@ -171,13 +175,15 @@ public abstract class StagingMojo
     }
   }
 
-  protected Properties loadStagingProperties() {
+  protected Properties loadStagingProperties() throws MojoExecutionException {
     Properties properties = new Properties();
     try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
         properties.load(inputStream);
     }
     catch (IOException e) {
       getLog().error(e.getMessage());
+      throw new MojoExecutionException("Encountered an error while accessing 'staging.tag' " +
+          "property from staging properties file: " + getStagingPropertiesFile());
     }
     return properties;
   }
@@ -221,35 +227,6 @@ public abstract class StagingMojo
     return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
   }
 
-  protected String readTagFromStagingProperties() throws MojoExecutionException {
-    final Properties properties = new Properties();
-    try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
-      properties.load(inputStream);
-    }
-    catch (IOException e) { //NOSONAR
-      getLog().error(e.getMessage());
-      throw new MojoExecutionException("Encountered an error while accessing 'staging.tag' property from staging properties file: " + getStagingPropertiesFile());
-    }
-    return properties.getProperty("staging.tag");
-  }
-
-  /**
-   * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
-   *
-   * @throws MojoFailureException if Maven is invoked offline.
-   */
-  protected void failIfOffline() throws MojoFailureException {
-    if (offline) {
-      throw new MojoFailureException(
-          "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
-    }
-  }
-
-  protected Optional<String> getTagFromPropertiesFile() {
-    Properties stagingProperties = loadStagingProperties();
-    return Optional.ofNullable(stagingProperties.getProperty(TAG_ID));
-  }
-
   /**
    * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
    *
@@ -290,5 +267,4 @@ public abstract class StagingMojo
   void setOffline(final boolean offline) {
     this.offline = offline;
   }
-
 }

@@ -40,14 +40,10 @@ public class StagingDeleteMojo
     failIfOffline();
 
     if (tag == null || tag.isEmpty()) {
-      String tagFromStagingProperties = readTagFromStagingProperties();
-      if (tagFromStagingProperties == null || tagFromStagingProperties.isEmpty()) {
-        throw new MojoExecutionException("Property 'staging.tag' is either not defined or is empty in staging properties file");
-      }
-      tag = tagFromStagingProperties;
+      tag = getTagFromPropertiesFile();
     }
 
-    RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
+    RepositoryManagerV3Client client = getRepositoryManagerV3Client();
     try {
       List<ComponentInfo> deletedComponents = client.delete(tag);
       getLog().info(String.format("'%d' components deleted with tag '%s' ", deletedComponents.size(), tag));
