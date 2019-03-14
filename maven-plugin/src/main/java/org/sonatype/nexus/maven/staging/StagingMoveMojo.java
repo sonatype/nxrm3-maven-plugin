@@ -19,7 +19,6 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 import com.sonatype.nexus.api.repository.v3.SearchBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -33,13 +32,10 @@ import static java.lang.String.format;
  */
 @Mojo(name = "move", requiresOnline = true, requiresDirectInvocation=true, requiresProject=false)
 public class StagingMoveMojo
-    extends StagingMojo
+    extends StagingActionMojo
 {
   @Parameter(property = "repository", required = true)
   private String repository;
-
-  @Parameter(property = "tag")
-  private String tag;
 
   @Parameter(property = "destinationRepository", required = true)
   private String destinationRepository;
@@ -58,7 +54,7 @@ public class StagingMoveMojo
     }
 
     try {
-      tag = getTagForMoving();
+      tag = getTag();
 
       sourceRepository = getSourceRepository();
 
@@ -88,21 +84,8 @@ public class StagingMoveMojo
   }
 
   @VisibleForTesting
-  String getTagForMoving() throws MojoExecutionException {
-    if (tag == null || tag.isEmpty()) {
-      tag = getTagFromPropertiesFile();
-    }
-    return tag;
-  }
-
-  @VisibleForTesting
   Map<String, String> createSearchCriteria(final String repository, final String tag) {
     return SearchBuilder.create().withRepository(repository).withTag(tag).build();
-  }
-
-  @VisibleForTesting
-  void setTag(final String tag) {
-    this.tag = tag;
   }
 
   @VisibleForTesting
