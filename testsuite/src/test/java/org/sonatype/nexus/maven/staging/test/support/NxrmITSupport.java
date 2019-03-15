@@ -46,7 +46,6 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /*
  * Abstract base class for NXRM3 integration tests. Please note that the test container is started outside of the test
@@ -62,8 +61,6 @@ public abstract class NxrmITSupport
   static final String NX3_PORT_SYS_PROP = "nexus3.it.port";
 
   static final String SERVICE_URL_BASE = "/service/rest/v1/";
-
-  static final String SCRIPTS_ENDPOINT = SERVICE_URL_BASE + "script";
 
   protected static URI nexusItUri;
 
