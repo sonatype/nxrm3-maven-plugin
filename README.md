@@ -76,6 +76,43 @@ If no tag is specified, one will be generated in the format:
 
 e.g. ```myproject-1.5.7-1550242817039```
 
+## Performing a move
+The plugin currently provides a means for performing a ```move``` of artifacts. The move is performed by conducting a
+a search in a repository for all artifacts tagged with a defined tag. The move operation has three configuration
+properties, ``tag``, ```sourceRepository```, and ```destinationRepository```.
+
+The tag can be specified via ```-Dtag``` or the plugin configuration in the pom file. If a tag has not been 
+specified, the plugin will attempt to find a tag previously used (and stored) in the ```target``` directory 
+of project's the build.
+
+```sourceRepository``` is an optional configuration property which can be specified via ```-DsourceRepository``` 
+or the plugin configuration in the pom file. 
+
+NOTE: If the source repository property is not specfiied, the plugin will default to the ```repository```
+property in the plugin configuration in the pom file.
+
+The target repository is a required configuration property specified via ```-DdestinationRepository``` or within the 
+plugin configuration in the pom file.
+
+#####Move Usage Example
+e.g. ```mvn nexus-staging:move -Dtag=build-123 -DsourceRepository=maven-dev -DdestinationRepository=maven-qa``` 
+
+```
+<plugin>
+    ...
+    <configuration>
+      ...
+      <!--Optional configuration -->
+      <sourceRepository>...</sourceRepository>
+       ...
+       
+      <!--Required configuration -->
+      <destinationRepository>...</destinationRepository>
+        ...
+        
+      <tag>...</tag>
+```
+
 # Mutation testing
 
 Run ```mvn -DwithHistory org.pitest:pitest-maven:mutationCoverage``` to calculate mutation coverage. This needs to be 

@@ -13,6 +13,9 @@
 package org.sonatype.nexus.maven.staging.test.support;
 
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +25,12 @@ import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.entity.ContentType;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -38,7 +46,6 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /*
  * Abstract base class for NXRM3 integration tests. Please note that the test container is started outside of the test
@@ -52,6 +59,8 @@ public abstract class NxrmITSupport
   private static final ObjectMapper mapper = new ObjectMapper();
 
   static final String NX3_PORT_SYS_PROP = "nexus3.it.port";
+
+  static final String SERVICE_URL_BASE = "/service/rest/v1/";
 
   protected static URI nexusItUri;
 
@@ -132,6 +141,46 @@ public abstract class NxrmITSupport
     CloseableHttpClient http = HttpClientBuilder.create().build();
     String responseBody = http.execute(get, new BasicResponseHandler());
     return mapper.readerFor(ComponentsResponse.class).readValue(responseBody);
+  }
+
+  protected void maybeAddRepoScript() throws Exception {
+    try (CloseableHttpClient http = HttpClientBuilder.create().build()) {
+      URI scriptUri = nexusItUri.resolve("/service/rest/v1/script/");
+      HttpGet get = new HttpGet(scriptUri.resolve("api-test-create-repo"));
+      get.setHeader(HttpHeaders.AUTHORIZATION,
+          "Basic " + Base64.getEncoder().encodeToString("admin:admin123".getBytes()));
+
+      try {
+        http.execute(get, new BasicResponseHandler());
+      }
+      catch (HttpResponseException e) {
+        if (e.getStatusCode() != 404) {
+          throw e;
+        }
+
+        StringEntity scriptEntity = new StringEntity(new String(Files.readAllBytes(
+            Paths.get(getClass().getResource("/create-repo.json").toURI()))));
+        HttpPost post = new HttpPost(scriptUri);
+        post.setEntity(scriptEntity);
+        post.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        post.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+        post.setHeader(HttpHeaders.AUTHORIZATION,
+            "Basic " + Base64.getEncoder().encodeToString("admin:admin123".getBytes()));
+        http.execute(post, new BasicResponseHandler());
+      }
+    }
+  }
+
+  protected void createTargetRepo(final String repoName) throws Exception {
+    try (CloseableHttpClient http = HttpClientBuilder.create().build()) {
+      URI runUri = nexusItUri.resolve("/service/rest/v1/script/api-test-create-repo/run");
+      HttpPost run = new HttpPost(runUri);
+      run.setEntity(new StringEntity("{\"repoName\": \"" + repoName + "\"}"));
+      run.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_PLAIN.getMimeType());
+      run.setHeader(HttpHeaders.AUTHORIZATION,
+          "Basic " + Base64.getEncoder().encodeToString("admin:admin123".getBytes()));
+      http.execute(run, new BasicResponseHandler());
+    }
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)

@@ -113,6 +113,24 @@ public abstract class StagingMavenPluginITSupport
     fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
   }
 
+  protected void createProject(final File dir,
+                               final String repository,
+                               final String groupId,
+                               final String artifactId,
+                               final String version,
+                               final String sourceRepository,
+                               final String targetRepository)
+  {
+    final File pom = new File(dir, "pom.xml");
+    final File rawPom = new File(dir, "raw-pom-with-move.xml");
+
+    final Properties properties = getDefaultProperties(repository, groupId, artifactId, version, JAR_PACKAGING);
+    properties.setProperty("nexus.destinationRepository", targetRepository);
+    properties.setProperty("nexus.sourceRepository", sourceRepository);
+
+    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+  }
+
   private Properties getDefaultProperties(final String repository,
                                           final String groupId,
                                           final String artifactId,

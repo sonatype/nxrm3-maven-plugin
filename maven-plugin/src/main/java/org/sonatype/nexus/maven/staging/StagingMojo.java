@@ -22,10 +22,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 
 import com.sonatype.nexus.api.common.Authentication;
 import com.sonatype.nexus.api.common.ServerConfig;
+import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 import org.sonatype.maven.mojo.execution.MojoExecution;
 import org.sonatype.maven.mojo.settings.MavenSettings;
@@ -79,7 +81,7 @@ public abstract class StagingMojo
 
   @Parameter(defaultValue = "${plugin.artifactId}", readonly = true, required = true)
   private String pluginArtifactId;
-  
+
   @Parameter(defaultValue = "${settings.offline}", readonly = true, required = true)
   private boolean offline;
 
@@ -142,6 +144,14 @@ public abstract class StagingMojo
     saveStagingProperties(properties);
   }
 
+  protected String getTagFromPropertiesFile() throws MojoExecutionException {
+    Properties stagingProperties = loadStagingProperties();
+    return Optional.ofNullable(stagingProperties.getProperty(TAG_ID))
+        .filter(s -> !s.isEmpty())
+        .orElseThrow(() -> new MojoExecutionException("Property 'staging.tag' is either not defined or is empty in " +
+            "staging properties file"));
+  }
+
   protected void saveStagingProperties(final Map<String, String> properties) {
     final Properties stagingProperties = new Properties();
 
@@ -165,6 +175,19 @@ public abstract class StagingMojo
     }
   }
 
+  protected Properties loadStagingProperties() throws MojoExecutionException {
+    Properties properties = new Properties();
+    try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
+        properties.load(inputStream);
+    }
+    catch (IOException e) { //NOSONAR
+      getLog().error(e.getMessage());
+      throw new MojoExecutionException("Encountered an error while accessing 'staging.tag' " +
+          "property from staging properties file: " + getStagingPropertiesFile());
+    }
+    return properties;
+  }
+
   /**
    * Returns the first project in reactor that has this plugin defined.
    */
@@ -179,6 +202,13 @@ public abstract class StagingMojo
    */
   protected File getStagingDirectoryRoot() {
     return new File(getWorkDirectoryRoot(), "staging");
+  }
+
+  /**
+   * Returns an instance of the {@link RepositoryManagerV3Client}
+   */
+  protected RepositoryManagerV3Client getRepositoryManagerV3Client() {
+    return getClientFactory().build(getServerConfiguration(getMavenSession()));
   }
 
   protected String getNexusUrl() {
@@ -197,18 +227,6 @@ public abstract class StagingMojo
     return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
   }
 
-  protected String readTagFromStagingProperties() throws MojoExecutionException {
-    final Properties properties = new Properties();
-    try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
-      properties.load(inputStream);
-    }
-    catch (IOException e) { //NOSONAR
-      getLog().error(e.getMessage());
-      throw new MojoExecutionException("Encountered an error while accessing 'staging.tag' property from staging properties file: " + getStagingPropertiesFile());
-    }
-    return properties.getProperty("staging.tag");
-  }
-  
   /**
    * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
    *
@@ -220,7 +238,7 @@ public abstract class StagingMojo
           "Cannot use Staging features in Offline mode, as REST Requests are needed to be made against NXRM");
     }
   }
-  
+
   @VisibleForTesting
   void setMavenSession(final MavenSession session) {
     this.mavenSession = session;
@@ -249,5 +267,4 @@ public abstract class StagingMojo
   void setOffline(final boolean offline) {
     this.offline = offline;
   }
-  
 }
