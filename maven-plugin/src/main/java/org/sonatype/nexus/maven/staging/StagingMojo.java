@@ -13,16 +13,13 @@
 package org.sonatype.nexus.maven.staging;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Properties;
 
 import com.sonatype.nexus.api.common.Authentication;
@@ -37,7 +34,6 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -52,7 +48,7 @@ import org.apache.maven.settings.Server;
 public abstract class StagingMojo
     extends AbstractMojo
 {
-  private static final String TAG_ID = "staging.tag";
+  static final String TAG_ID = "staging.tag";
   
   private static final String STAGING_PROPERTIES_FILENAME = "staging.properties";
   
@@ -144,14 +140,6 @@ public abstract class StagingMojo
     saveStagingProperties(properties);
   }
 
-  protected String getTagFromPropertiesFile() throws MojoExecutionException {
-    Properties stagingProperties = loadStagingProperties();
-    return Optional.ofNullable(stagingProperties.getProperty(TAG_ID))
-        .filter(s -> !s.isEmpty())
-        .orElseThrow(() -> new MojoExecutionException("Property 'staging.tag' is either not defined or is empty in " +
-            "staging properties file"));
-  }
-
   protected void saveStagingProperties(final Map<String, String> properties) {
     final Properties stagingProperties = new Properties();
 
@@ -173,19 +161,6 @@ public abstract class StagingMojo
     catch (IOException e) {
       getLog().error(e);
     }
-  }
-
-  protected Properties loadStagingProperties() throws MojoExecutionException {
-    Properties properties = new Properties();
-    try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
-        properties.load(inputStream);
-    }
-    catch (IOException e) { //NOSONAR
-      getLog().error(e.getMessage());
-      throw new MojoExecutionException("Encountered an error while accessing 'staging.tag' " +
-          "property from staging properties file: " + getStagingPropertiesFile());
-    }
-    return properties;
   }
 
   /**

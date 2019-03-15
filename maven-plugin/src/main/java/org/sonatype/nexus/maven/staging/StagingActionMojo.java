@@ -12,6 +12,12 @@
  */
 package org.sonatype.nexus.maven.staging;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
+import java.util.Properties;
+
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -39,5 +45,26 @@ public abstract class StagingActionMojo
   @VisibleForTesting
   void setTag(final String tag) {
     this.tag = tag;
+  }
+
+  private String getTagFromPropertiesFile() throws MojoExecutionException {
+    Properties stagingProperties = loadStagingProperties();
+    return Optional.ofNullable(stagingProperties.getProperty(TAG_ID))
+        .filter(s -> !s.isEmpty())
+        .orElseThrow(() -> new MojoExecutionException("Property 'staging.tag' is either not defined or is empty in " +
+            "staging properties file"));
+  }
+
+  private Properties loadStagingProperties() throws MojoExecutionException {
+    Properties properties = new Properties();
+    try (InputStream inputStream = new FileInputStream(getStagingPropertiesFile())) {
+      properties.load(inputStream);
+    }
+    catch (IOException e) { //NOSONAR
+      getLog().error(e.getMessage());
+      throw new MojoExecutionException("Encountered an error while accessing 'staging.tag' " +
+          "property from staging properties file: " + getStagingPropertiesFile());
+    }
+    return properties;
   }
 }
