@@ -129,7 +129,7 @@ public class StagingMoveMojoTest
     setupPropertiesFile("staging.tag=" + TAG);
     underTest.setTag(null);
 
-    assertThat(underTest.getTagForMoving(), equalTo(TAG));
+    assertThat(underTest.getTag(), equalTo(TAG));
   }
 
   @Test(expected = MojoFailureException.class)

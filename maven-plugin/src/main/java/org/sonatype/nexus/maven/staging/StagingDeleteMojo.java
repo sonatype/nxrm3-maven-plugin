@@ -17,9 +17,7 @@ import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.sonatype.nexus.api.repository.v3.ComponentInfo;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
@@ -30,18 +28,13 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
  */
 @Mojo(name = "delete", requiresOnline = true, threadSafe = true, requiresDirectInvocation=true, requiresProject=false)
 public class StagingDeleteMojo
-    extends StagingMojo
+    extends StagingActionMojo
 {
-  @Parameter(property = "tag")
-  private String tag;
-
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     failIfOffline();
 
-    if (tag == null || tag.isEmpty()) {
-      tag = getTagFromPropertiesFile();
-    }
+    tag = getTag();
 
     RepositoryManagerV3Client client = getRepositoryManagerV3Client();
     try {
@@ -54,10 +47,5 @@ public class StagingDeleteMojo
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
-  }
-
-  @VisibleForTesting
-  void setTag(final String tag) {
-    this.tag = tag;
   }
 }
