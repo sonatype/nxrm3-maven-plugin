@@ -77,8 +77,7 @@ If no tag is specified, one will be generated in the format:
 e.g. ```myproject-1.5.7-1550242817039```
 
 ## Performing a move
-The plugin currently provides a means for performing a ```move``` of artifacts. The move is performed by conducting a
-a search in a repository for all artifacts tagged with a defined tag. The move operation has three configuration
+The plugin currently provides a means for performing a ```move``` of artifacts. The move is performed by conducting a search in a repository for all artifacts tagged with a defined tag. The move operation has three configuration
 properties, ``tag``, ```sourceRepository```, and ```destinationRepository```.
 
 The tag can be specified via ```-Dtag``` or the plugin configuration in the pom file. If a tag has not been 
@@ -94,7 +93,7 @@ property in the plugin configuration in the pom file.
 The target repository is a required configuration property specified via ```-DdestinationRepository``` or within the 
 plugin configuration in the pom file.
 
-#####Move Usage Example
+### Move Usage Example
 e.g. ```mvn nexus-staging:move -Dtag=build-123 -DsourceRepository=maven-dev -DdestinationRepository=maven-qa``` 
 
 ```
@@ -112,6 +111,15 @@ e.g. ```mvn nexus-staging:move -Dtag=build-123 -DsourceRepository=maven-dev -Dde
         
       <tag>...</tag>
 ```
+
+## Performing a delete
+The plugin provides a means for performing a ```delete``` of tagged artifacts. The delete operates in a similar way to the move operation whereby it performs a search for all artifacts with the specified ```tag```.
+The delete operation makes use of a single property ```tag``` and operates as described in [Example Usage](#example-usage)
+
+### Delete Usage Example
+```mvn nexus-staging:delete -Dtag=build-123```
+
+Note: Delete searches **all** repositories for tagged assets.
 
 # Mutation testing
 
