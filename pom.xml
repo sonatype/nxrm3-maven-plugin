@@ -29,7 +29,7 @@
   <artifactId>nexus-staging</artifactId>
   <packaging>pom</packaging>
 
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <inceptionYear>2019</inceptionYear>
 

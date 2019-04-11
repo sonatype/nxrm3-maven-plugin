@@ -22,7 +22,7 @@
   <parent>
     <artifactId>nexus-staging</artifactId>
     <groupId>org.sonatype.plugins</groupId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-staging-maven-plugin</artifactId>
