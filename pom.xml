@@ -53,7 +53,7 @@
   <scm>
     <url>https://github.com/sonatype/maven-staging-plugin</url>
     <connection>scm:git:git://github.com/sonatype/maven-staging-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/maven-staging-plugin.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/maven-staging-plugin.git</developerConnection>
   </scm>
 
   <properties>
