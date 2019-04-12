@@ -40,7 +40,7 @@ public class StagingDeployIT
 
   private static final String VERSION = "1.0.0";
 
-  private static final String STAGING_DEPLOY = "nexus-staging:staging-deploy";
+  private static final String STAGING_DEPLOY = "nxrm3-staging:staging-deploy";
 
   private static final String DEPLOY = "deploy";
 
