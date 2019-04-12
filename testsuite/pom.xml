@@ -22,7 +22,7 @@
   <parent>
     <artifactId>nxrm3-staging</artifactId>
     <groupId>org.sonatype.plugins</groupId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>nxrm3-staging-maven-plugin-testsuite</artifactId>
