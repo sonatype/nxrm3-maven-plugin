@@ -20,12 +20,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>nxrm-staging</artifactId>
+    <artifactId>nxrm3-staging</artifactId>
     <groupId>org.sonatype.plugins</groupId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nxrm-staging-maven-plugin</artifactId>
+  <artifactId>nxrm3-staging-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
   <name>Nexus Staging Maven Plugin</name>
