@@ -22,7 +22,7 @@ The basic build configuration requires a url (nexusUrl), repository to deploy (r
 ```
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nxrm3-staging-maven-plugin</artifactId>
+        <artifactId>nxrm3-maven-plugin</artifactId>
         <version>${project.version}</version>
         <extensions>true</extensions>
         <configuration>
@@ -59,7 +59,7 @@ when the plugins deploy goal is activated.
 
 The plugin allows a tag to be specified via ```-Dtag``` or as a parameter in the plugin configuration in the pom file.
 
-e.g. ```mvn install nxrm3-staging:deploy -Dtag=test``` or 
+e.g. ```mvn install nxrm3:deploy -Dtag=test``` or 
 
 ```
 <plugin>
@@ -94,7 +94,7 @@ The target repository is a required configuration property specified via ```-Dde
 plugin configuration in the pom file.
 
 ### Move Usage Example
-e.g. ```mvn nxrm3-staging:move -Dtag=build-123 -DsourceRepository=maven-dev -DdestinationRepository=maven-qa``` 
+e.g. ```mvn nxrm3:move -Dtag=build-123 -DsourceRepository=maven-dev -DdestinationRepository=maven-qa``` 
 
 ```
 <plugin>
@@ -117,7 +117,7 @@ The plugin provides a means for performing a ```delete``` of tagged artifacts. T
 The delete operation makes use of a single property ```tag``` and operates as described in [Example Usage](#example-usage)
 
 ### Delete Usage Example
-```mvn nxrm3-staging:delete -Dtag=build-123```
+```mvn nxrm3:delete -Dtag=build-123```
 
 Note: Delete searches **all** repositories for tagged assets.
 

@@ -36,7 +36,7 @@
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nxrm3-staging-maven-plugin</artifactId>
+        <artifactId>nxrm3-maven-plugin</artifactId>
         <version>${project.version}</version>
         <extensions>true</extensions>
         <executions>
