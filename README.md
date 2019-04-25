@@ -14,7 +14,7 @@
 -->
 # NXRM3 Maven Plugin
 
-This plugin allows Maven projects to be handled for a Nexus Repository Manager 3 repository.
+This plugin handles Nexus Repository Manager 3 operations for Maven projects.
 
 # Example configuration
 
