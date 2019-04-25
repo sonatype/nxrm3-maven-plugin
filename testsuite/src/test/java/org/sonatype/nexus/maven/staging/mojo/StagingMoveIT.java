@@ -43,13 +43,13 @@ public class StagingMoveIT
 
   private static final String VERSION = "1.0.0";
 
-  private static final String STAGING_DEPLOY = "nxrm3-staging:staging-deploy";
+  private static final String STAGING_DEPLOY = "nxrm3:staging-deploy";
 
-  private static final String STAGING_MOVE = "nxrm3-staging:move";
+  private static final String STAGING_MOVE = "nxrm3:staging-move";
 
   private static final String INSTALL = "install";
 
-  private static final List<String> MOVE_GOALS = ImmutableList.of("nxrm3-staging:move");
+  private static final List<String> MOVE_GOALS = ImmutableList.of("nxrm3:staging-move");
 
   @Test
   public void failIfOffline() throws Exception {

@@ -224,7 +224,7 @@ public class StagingDeleteMojoTest
 
   private StagingDeleteMojo lookupMojo() throws Exception {
     File testPom = getPom();
-    StagingDeleteMojo mojo = (StagingDeleteMojo) lookupMojo("delete", testPom);
+    StagingDeleteMojo mojo = (StagingDeleteMojo) lookupMojo("staging-delete", testPom);
 
     mojo.setMavenSession(session);
     mojo.setTag(TAG);

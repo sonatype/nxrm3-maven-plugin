@@ -30,7 +30,7 @@ import static java.lang.String.format;
  *
  * @since 1.0.0
  */
-@Mojo(name = "move", requiresOnline = true, requiresDirectInvocation=true, requiresProject=false)
+@Mojo(name = "staging-move", requiresOnline = true, requiresDirectInvocation=true, requiresProject=false)
 public class StagingMoveMojo
     extends StagingActionMojo
 {

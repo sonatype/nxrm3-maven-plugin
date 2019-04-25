@@ -26,7 +26,7 @@
   </parent>
 
   <groupId>org.sonatype.plugins</groupId>
-  <artifactId>nxrm3-staging</artifactId>
+  <artifactId>nxrm3</artifactId>
   <packaging>pom</packaging>
 
   <version>1.0.2-SNAPSHOT</version>
@@ -51,9 +51,9 @@
   </issueManagement>
 
   <scm>
-    <url>https://github.com/sonatype/maven-staging-plugin</url>
-    <connection>scm:git:git://github.com/sonatype/maven-staging-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/maven-staging-plugin.git</developerConnection>
+    <url>https://github.com/sonatype/nxrm3-maven-plugin</url>
+    <connection>scm:git:git://github.com/sonatype/nxrm3-maven-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/nxrm3-maven-plugin.git</developerConnection>
   </scm>
 
   <properties>

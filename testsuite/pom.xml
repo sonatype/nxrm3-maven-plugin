@@ -20,12 +20,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>nxrm3-staging</artifactId>
+    <artifactId>nxrm3</artifactId>
     <groupId>org.sonatype.plugins</groupId>
     <version>1.0.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nxrm3-staging-maven-plugin-testsuite</artifactId>
+  <artifactId>nxrm3-maven-plugin-testsuite</artifactId>
   
   <properties>
     <nexus3.version>3.15.2-01</nexus3.version>

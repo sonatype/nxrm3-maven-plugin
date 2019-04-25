@@ -12,9 +12,9 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-# NXRM3 Maven Staging Plugin
+# NXRM3 Maven Plugin
 
-This plugin allows Maven projects to be staged in a Nexus Repository Manager 3 repository.
+This plugin handles Nexus Repository Manager 3 operations for Maven projects.
 
 # Example configuration
 
@@ -22,7 +22,7 @@ The basic build configuration requires a url (nexusUrl), repository to deploy (r
 ```
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nxrm3-staging-maven-plugin</artifactId>
+        <artifactId>nxrm3-maven-plugin</artifactId>
         <version>${project.version}</version>
         <extensions>true</extensions>
         <configuration>
@@ -55,11 +55,12 @@ when the plugins deploy goal is activated.
         </executions>
 ```
 
-# Example usage
+# Staging
+## Example staging usage
 
 The plugin allows a tag to be specified via ```-Dtag``` or as a parameter in the plugin configuration in the pom file.
 
-e.g. ```mvn install nxrm3-staging:deploy -Dtag=test``` or 
+e.g. ```mvn install nxrm3:staging-deploy -Dtag=test``` or 
 
 ```
 <plugin>
@@ -76,7 +77,7 @@ If no tag is specified, one will be generated in the format:
 
 e.g. ```myproject-1.5.7-1550242817039```
 
-## Performing a move
+### Performing a staging move
 The plugin currently provides a means for performing a ```move``` of artifacts. The move is performed by conducting a search in a repository for all artifacts tagged with a defined tag. The move operation has three configuration
 properties, ``tag``, ```sourceRepository```, and ```destinationRepository```.
 
@@ -87,14 +88,14 @@ of project's the build.
 ```sourceRepository``` is an optional configuration property which can be specified via ```-DsourceRepository``` 
 or the plugin configuration in the pom file. 
 
-NOTE: If the source repository property is not specfiied, the plugin will default to the ```repository```
+NOTE: If the source repository property is not specified, the plugin will default to the ```repository```
 property in the plugin configuration in the pom file.
 
 The target repository is a required configuration property specified via ```-DdestinationRepository``` or within the 
 plugin configuration in the pom file.
 
-### Move Usage Example
-e.g. ```mvn nxrm3-staging:move -Dtag=build-123 -DsourceRepository=maven-dev -DdestinationRepository=maven-qa``` 
+#### Staging Move Usage Example
+e.g. ```mvn nxrm3:staging-move -Dtag=build-123 -DsourceRepository=maven-dev -DdestinationRepository=maven-qa``` 
 
 ```
 <plugin>
@@ -112,12 +113,12 @@ e.g. ```mvn nxrm3-staging:move -Dtag=build-123 -DsourceRepository=maven-dev -Dde
       <tag>...</tag>
 ```
 
-## Performing a delete
+### Performing a staging delete
 The plugin provides a means for performing a ```delete``` of tagged artifacts. The delete operates in a similar way to the move operation whereby it performs a search for all artifacts with the specified ```tag```.
-The delete operation makes use of a single property ```tag``` and operates as described in [Example Usage](#example-usage)
+The delete operation makes use of a single property ```tag``` and operates as described in [Example staging usage](#example-staging-usage)
 
-### Delete Usage Example
-```mvn nxrm3-staging:delete -Dtag=build-123```
+#### Staging Delete Usage Example
+```mvn nxrm3:staging-delete -Dtag=build-123```
 
 Note: Delete searches **all** repositories for tagged assets.
 
