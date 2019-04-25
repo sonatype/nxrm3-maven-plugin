@@ -157,7 +157,7 @@ public class StagingMoveMojoTest
 
   private StagingMoveMojo lookupMojo() throws Exception {
     File testPom = getPom();
-    StagingMoveMojo mojo = (StagingMoveMojo) lookupMojo("move", testPom);
+    StagingMoveMojo mojo = (StagingMoveMojo) lookupMojo("staging-move", testPom);
 
     mojo.setMavenSession(session);
     mojo.setTag(TAG);
