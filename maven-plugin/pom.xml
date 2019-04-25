@@ -28,9 +28,9 @@
   <artifactId>nxrm3-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Nexus Staging Maven Plugin</name>
+  <name>Nexus Maven Plugin</name>
   <description>
-    Provides support to access staging functionality in a remote Nexus Professional server.
+    Provides support to access functionality in a remote Nexus Professional server.
   </description>
   
   <build>
