@@ -44,7 +44,7 @@ public class StagingDeleteIT
 
   private static final List<String> DEPLOY_GOALS = Arrays.asList("install", "nxrm3:staging-deploy");
 
-  private static final List<String> DELETE_GOALS = Arrays.asList("nxrm3:delete");
+  private static final List<String> DELETE_GOALS = Arrays.asList("nxrm3:staging-delete");
 
   private String artifactId;
 
