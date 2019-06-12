@@ -143,5 +143,5 @@ e.g. ```mvn clean install -Plocal-nexus3```
 
 Looking to contribute or need some help?
 
-* If you have an issue, file a ticket [on our public JIRA](https://issues.sonatype.org/projects/NEXUS/)
+* If you have an issue, file a ticket [on our public JIRA](https://issues.sonatype.org/projects/NEXUS/) using the identifying component 'nxrm3-maven-plugin'
 * If you have questions, ask on our [Nexus Repository User List](https://groups.google.com/a/glists.sonatype.com/forum/?hl=en#!forum/nexus-users)
