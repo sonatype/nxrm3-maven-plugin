@@ -15,6 +15,7 @@ package org.sonatype.nexus.maven.staging;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -46,6 +47,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -227,12 +230,17 @@ public class StagingDeployMojoTest
     assertThat(attributes.get(VERSION_KEY), is(equalTo(VERSION)));
 
     Collection<Asset> assets = component.getAssets();
+    assertThat(assets.size(), is(equalTo(3)));
 
-    assertThat(assets.size(), is(equalTo(2)));
+    // check pom asset
+    List<Asset> pomAssets = assets.stream().filter(this::isPomAsset).collect(toList());
+    assertThat(pomAssets.size(), is(equalTo(1)));
+    assertThat(pomAssets.get(0).getFilename(), is(equalTo(getPom().getName())));
+    assertThat(pomAssets.get(0).getData(), notNullValue());
 
-    for (Asset asset : assets) {
+    // check all other assets
+    for (Asset asset : assets.stream().filter(asset -> !isPomAsset(asset)).collect(toList())) {
       Map<String, String> assetAttributes = asset.getAttributes();
-
       assertThat(assetAttributes.get(EXTENSION_KEY), is(equalTo(EXTENSION)));
       assertThat(assetAttributes.get(CLASSIFIER_KEY), is(equalTo(CLASSIFIER)));
     }
@@ -344,6 +352,11 @@ public class StagingDeployMojoTest
 
   private File getPom() {
     return new File(getBasedir(), "src/test/resources/example-pom.xml");
+  }
+
+  private boolean isPomAsset(final Asset asset) {
+    String extension = asset.getAttributes().get("extension");
+    return nonNull(extension) && extension.equals("pom");
   }
 
   private void setupMockBehaviour() throws Exception {

@@ -101,14 +101,35 @@ public abstract class NxrmITSupport
 
     try {
       component = waitForComponentWithTags(search, tags);
+      stream(tags).forEach(tag -> assertThat(component.tags, hasItem(tag)));
     }
     catch (Exception e) {
-      throw new AssertionError(String.format(
-          "Component (group: %s; name: %s; version: %s) was not found in Nexus Repository Manager repository : %s",
-          group, name, version, repository), e);
+      throwComponentNotFoundAssertionError(group, name, version, repository, e);
     }
+  }
 
-    stream(tags).forEach(tag -> assertThat(component.tags, hasItem(tag)));
+  protected void verifyPomAssetForComponent(
+      final String repository,
+      final String group,
+      final String name,
+      final String version) {
+
+    Map<String, String> search = getSearchQuery(repository, group, name, version);
+
+    ComponentItem component;
+
+    try {
+      component = waitForComponent(search);
+      component.assets.stream()
+          .filter(asset -> asset.path.endsWith(".pom"))
+          .findAny()
+          .orElseThrow(() -> new AssertionError(String.format(
+              "Component (group: %s; name: %s; version: %s) no pom found in Nexus Repository Manager repository : %s",
+              group, name, version, repository)));
+    }
+    catch (Exception e) {
+      throwComponentNotFoundAssertionError(group, name, version, repository, e);
+    }
   }
   
   protected Map<String, String> getSearchQuery(final String repository,
@@ -181,6 +202,16 @@ public abstract class NxrmITSupport
           "Basic " + Base64.getEncoder().encodeToString("admin:admin123".getBytes()));
       http.execute(run, new BasicResponseHandler());
     }
+  }
+
+  private void throwComponentNotFoundAssertionError(final String group,
+                                                    final String name,
+                                                    final String version,
+                                                    final String repository,
+                                                    final Exception e) {
+    throw new AssertionError(String.format(
+        "Component (group: %s; name: %s; version: %s) was not found in Nexus Repository Manager repository : %s",
+        group, name, version, repository), e);
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)

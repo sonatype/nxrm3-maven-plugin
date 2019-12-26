@@ -14,6 +14,7 @@ package org.sonatype.nexus.maven.staging;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import com.sonatype.nexus.api.repository.v3.Tag;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -190,22 +192,21 @@ public class StagingDeployMojo
     File file = artifact.getFile();
 
     if (pomProject) {
-      deployables.add(createPomArtifact());
+      getLog().info("Prom project to deploy, deploying with attached artifacts.");
     }
     else if (file != null && file.isFile()) {
       deployables.add(artifact);
     }
-    else if (!attachedArtifacts.isEmpty() && !pomProject) {
+    else if (!attachedArtifacts.isEmpty()) {
       getLog().info("No primary artifact to deploy, deploying attached artifacts instead.");
-
-      Artifact pomArtifact = createPomArtifact();
-
-      deployables.add(pomArtifact);
     }
     else {
       throw new MojoExecutionException("The packaging for this project did not assign a file to the build artifact");
     }
 
+    // NEXUS-20029 - we now always add the pom. In the nexus-staging plugin this is done as well but a little different
+    // and it adds manually like this or after a certain point using the metadata. Here we chose to add it directly.
+    deployables.add(createPomArtifact());
     deployables.addAll(attachedArtifacts);
 
     return deployables;
