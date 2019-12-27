@@ -82,8 +82,13 @@ public class StagingDeployIT
     verifier.executeGoals(goals);
 
     verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+    verifyPomAssetForComponent(RELEASE_REPOSITORY, groupId, artifactId, version);
+
     verifyComponent(RELEASE_REPOSITORY, groupId, artifactId + "-module1", version, tag);
+    verifyPomAssetForComponent(RELEASE_REPOSITORY, groupId, artifactId + "-module1", version);
+
     verifyComponent(RELEASE_REPOSITORY, groupId, artifactId + "-module2", version, tag);
+    verifyPomAssetForComponent(RELEASE_REPOSITORY, groupId, artifactId + "-module2", version);
   }
 
   @Test
@@ -167,8 +172,13 @@ public class StagingDeployIT
     assertThat(generatedTag, startsWith(artifactId + "-" + VERSION + "-"));
 
     verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION, generatedTag);
+    verifyPomAssetForComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
+
     verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId + "-module1", VERSION, generatedTag);
+    verifyPomAssetForComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId + "-module1", VERSION);
+
     verifyComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId + "-module2", VERSION, generatedTag);
+    verifyPomAssetForComponent(RELEASE_REPOSITORY, GROUP_ID, artifactId + "-module2", VERSION);
   }
 
   @Test
@@ -342,6 +352,7 @@ public class StagingDeployIT
     verifier.executeGoals(goals);
 
     verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+    verifyPomAssetForComponent(RELEASE_REPOSITORY, groupId, artifactId, version);
   }
 
   private File getPropertiesFile(final File projectDir) {
