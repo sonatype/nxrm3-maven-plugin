@@ -190,7 +190,7 @@ public class StagingDeployMojo
     File file = artifact.getFile();
 
     if (pomProject) {
-      getLog().info("Prom project to deploy, deploying with attached artifacts.");
+      getLog().info("Pom project to deploy, deploying with attached artifacts.");
     }
     else if (file != null && file.isFile()) {
       deployables.add(artifact);
