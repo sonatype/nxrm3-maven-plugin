@@ -31,6 +31,7 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -109,6 +110,9 @@ public class StagingDeployMojoTest
 
   @Mock
   private Artifact artifact, attachedArtifact;
+
+  @Mock
+  private ArtifactHandler artifactHandler;
 
   @Mock
   private TagGenerator tagGenerator;
@@ -390,6 +394,8 @@ public class StagingDeployMojoTest
     when(artifact.getBaseVersion()).thenReturn(VERSION);
     when(artifact.getFile()).thenReturn(getPom());
     when(artifact.getType()).thenReturn(EXTENSION);
+    when(artifact.getArtifactHandler()).thenReturn(artifactHandler);
+    when(artifactHandler.getExtension()).thenReturn(EXTENSION);
     when(artifact.getClassifier()).thenReturn(CLASSIFIER);
   }
 }

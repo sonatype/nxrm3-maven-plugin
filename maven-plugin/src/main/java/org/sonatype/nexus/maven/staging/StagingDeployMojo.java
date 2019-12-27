@@ -161,7 +161,8 @@ public class StagingDeployMojo
 
         DefaultAsset asset = new DefaultAsset(deployableArtifact.getFile().getName(), stream);
 
-        asset.addAttribute("extension", deployableArtifact.getType());
+        // NEXUS-22246 - just like the maven class DefaultArtifactDeployer use the ArtifactHandler#getExtension()
+        asset.addAttribute("extension", deployableArtifact.getArtifactHandler().getExtension());
 
         if (deployableArtifact.getClassifier() != null) {
           asset.addAttribute("classifier", deployableArtifact.getClassifier());

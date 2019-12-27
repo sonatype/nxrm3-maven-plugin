@@ -188,9 +188,16 @@ public class StagingDeployIT
     List<String> goals = new ArrayList<>();
 
     goals.add("javadoc:jar");
+    goals.add("source:jar");
     goals.add(STAGING_DEPLOY);
 
-    assertStagingWithDeployGoal(goals, tag);
+    ComponentItem componentItem = assertStagingWithDeployGoal(goals, tag);
+    verifyAssetForComponent(RELEASE_REPOSITORY, componentItem, "javadoc.jar");
+    verifyAssetForComponent(RELEASE_REPOSITORY, componentItem, "javadoc.jar.md5");
+    verifyAssetForComponent(RELEASE_REPOSITORY, componentItem, "javadoc.jar.sha1");
+    verifyAssetForComponent(RELEASE_REPOSITORY, componentItem, "sources.jar");
+    verifyAssetForComponent(RELEASE_REPOSITORY, componentItem, "sources.jar.md5");
+    verifyAssetForComponent(RELEASE_REPOSITORY, componentItem, "sources.jar.sha1");
   }
 
   @Test
@@ -318,17 +325,17 @@ public class StagingDeployIT
     assertStagingWithDeployGoal(goals, tag);
   }
 
-  private void assertStagingWithDeployGoal(final List<String> goals,
-                                           final String tag) throws Exception
+  private ComponentItem assertStagingWithDeployGoal(final List<String> goals,
+                                                    final String tag) throws Exception
   {
     initialiseVerifier(projectDir);
 
-    assertStagingWithDeployGoal(goals, tag, JAR_PACKAGING);
+    return assertStagingWithDeployGoal(goals, tag, JAR_PACKAGING);
   }
 
-  private void assertStagingWithDeployGoal(final List<String> goals,
-                                           final String tag,
-                                           final String packaging) throws Exception
+  private ComponentItem assertStagingWithDeployGoal(final List<String> goals,
+                                                    final String tag,
+                                                    final String packaging) throws Exception
   {
     String groupId = GROUP_ID;
     String artifactId = randomUUID().toString();
@@ -336,14 +343,14 @@ public class StagingDeployIT
 
     createProject(projectDir, RELEASE_REPOSITORY, groupId, artifactId, version);
 
-    deployAndVerify(goals, tag, groupId, artifactId, version);
+    return deployAndVerify(goals, tag, groupId, artifactId, version);
   }
 
-  private void deployAndVerify(final List<String> goals,
-                               final String tag,
-                               final String groupId,
-                               final String artifactId,
-                               final String version) throws VerificationException
+  private ComponentItem deployAndVerify(final List<String> goals,
+                                        final String tag,
+                                        final String groupId,
+                                        final String artifactId,
+                                        final String version) throws VerificationException
   {
     verifier.setDebug(true);
 
@@ -351,8 +358,10 @@ public class StagingDeployIT
 
     verifier.executeGoals(goals);
 
-    verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
-    verifyPomAssetForComponent(RELEASE_REPOSITORY, groupId, artifactId, version);
+    ComponentItem componentItem = verifyComponent(RELEASE_REPOSITORY, groupId, artifactId, version, tag);
+    verifyPomAssetForComponent(RELEASE_REPOSITORY, componentItem.group, componentItem.name, componentItem.version);
+
+    return componentItem;
   }
 
   private File getPropertiesFile(final File projectDir) {
