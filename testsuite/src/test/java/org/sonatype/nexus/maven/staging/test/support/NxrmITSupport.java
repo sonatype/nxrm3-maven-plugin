@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.sonatype.nexus.api.repository.v3.SearchBuilder;
 
@@ -34,6 +35,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.maven.it.util.StringUtils;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 
@@ -89,11 +91,11 @@ public abstract class NxrmITSupport
     return await().atMost(10, SECONDS).until(() -> componentSearch(search).items, hasSize(1)).get(0);
   }
 
-  protected void verifyComponent(final String repository,
-                                 final String group,
-                                 final String name,
-                                 final String version,
-                                 final String... tags)
+  protected ComponentItem verifyComponent(final String repository,
+                                          final String group,
+                                          final String name,
+                                          final String version,
+                                          final String... tags)
   {
     Map<String, String> search = getSearchQuery(repository, group, name, version);
 
@@ -102,36 +104,56 @@ public abstract class NxrmITSupport
     try {
       component = waitForComponentWithTags(search, tags);
       stream(tags).forEach(tag -> assertThat(component.tags, hasItem(tag)));
+      return component;
+
     }
     catch (Exception e) {
       throwComponentNotFoundAssertionError(group, name, version, repository, e);
     }
+
+    // should never get here, if so it's ok tests will fail properly
+    return null;
   }
 
-  protected void verifyPomAssetForComponent(
-      final String repository,
-      final String group,
-      final String name,
-      final String version) {
+  protected void verifyPomAssetForComponent(final String repository,
+                                            final String group,
+                                            final String name,
+                                            final String version)
+  {
+    verifyAssetForComponent(repository, group, name, version, ".pom");
+  }
 
+  protected void verifyAssetForComponent(final String repository,
+                                         final String group,
+                                         final String name,
+                                         final String version,
+                                         final String extension)
+  {
     Map<String, String> search = getSearchQuery(repository, group, name, version);
 
     ComponentItem component;
 
     try {
       component = waitForComponent(search);
-      component.assets.stream()
-          .filter(asset -> asset.path.endsWith(".pom"))
-          .findAny()
-          .orElseThrow(() -> new AssertionError(String.format(
-              "Component (group: %s; name: %s; version: %s) no pom found in Nexus Repository Manager repository : %s",
-              group, name, version, repository)));
+      verifyAssetForComponent(repository, component, extension);
     }
     catch (Exception e) {
       throwComponentNotFoundAssertionError(group, name, version, repository, e);
     }
   }
-  
+
+  protected void verifyAssetForComponent(final String repository,
+                                         final ComponentItem component,
+                                         final String extension)
+  {
+    component.assets.stream()
+        .filter(asset -> asset.path.endsWith(extension))
+        .findAny()
+        .orElseThrow(() -> new AssertionError(String.format(
+            "Component (group: %s; name: %s; version: %s) no '%s' found in Nexus Repository Manager repository : %s",
+            component.group, component.name, component.version, extension, repository)));
+  }
+
   protected Map<String, String> getSearchQuery(final String repository,
                                              final String group,
                                              final String name,
