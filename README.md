@@ -14,6 +14,8 @@
 -->
 # NXRM3 Maven Plugin
 
+[![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.plugins/nxrm3-maven-plugin.svg?label=Maven%20Central)](https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.sonatype.plugins%22%20AND%20a%3A%22nxrm3-maven-plugin%22)
+
 This plugin handles Nexus Repository Manager 3 operations for Maven projects.
 
 # Example configuration
@@ -23,7 +25,7 @@ The basic build configuration requires a url (nexusUrl), repository to deploy (r
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nxrm3-maven-plugin</artifactId>
-        <version>${project.version}</version>
+        <version><!-- choose a version --></version>
         <extensions>true</extensions>
         <configuration>
           <nexusUrl>http://localhost:8081</nexusUrl>
