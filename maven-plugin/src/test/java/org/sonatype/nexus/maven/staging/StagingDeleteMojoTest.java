@@ -45,8 +45,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
@@ -67,9 +65,6 @@ public class StagingDeleteMojoTest
 
   @Mock
   private Settings settings;
-
-  @Mock
-  private SecDispatcher secDispatcher;
 
   @Mock
   private Nxrm3ClientFactory clientFactory;
@@ -124,15 +119,6 @@ public class StagingDeleteMojoTest
     underTest.execute();
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void executeFailsWhenSecDispatcherThrowsException() throws Exception {
-    when(secDispatcher.decrypt(anyString())).thenThrow(new SecDispatcherException());
-
-    underTest.setSecDispatcher(secDispatcher);
-
-    underTest.execute();
-  }
-  
   @Test
   public void testDefaultValueWhenTagIsNull() throws Exception {
     createPropertiesFile(TAG, true);
