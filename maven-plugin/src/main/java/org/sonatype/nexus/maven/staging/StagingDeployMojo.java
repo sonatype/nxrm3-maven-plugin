@@ -51,6 +51,9 @@ public class StagingDeployMojo
   @Parameter(property = "repository", required = true)
   private String repository;
 
+  @Parameter(property = "snapshotRepository")
+  private String snapshotRepository;
+
   @Parameter(property = "tag")
   private String tag;
 
@@ -95,13 +98,20 @@ public class StagingDeployMojo
 
     failIfOffline();
 
+    String repository;
+    if (artifact.isSnapshot() && snapshotRepository != null && !snapshotRepository.trim().isEmpty()) {
+      repository = snapshotRepository;
+    } else {
+      repository = this.repository;
+    }
+
     List<Artifact> deployables = prepareDeployables();
 
     try {
       tag = getProvidedOrGeneratedTag();
       maybeCreateTag(client, tag);
       getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
-      doUpload(client, deployables, tag);
+      doUpload(client, repository, deployables, tag);
     }
     catch (MojoExecutionException e) {
       throw e;
@@ -147,6 +157,7 @@ public class StagingDeployMojo
   }
 
   private void doUpload(final RepositoryManagerV3Client client,
+                        final String repository,
                         final List<Artifact> deployables,
                         final String tag) throws Exception
   {
@@ -259,5 +270,10 @@ public class StagingDeployMojo
   @VisibleForTesting
   void setTagGenerator(final TagGenerator tagGenerator) {
     this.tagGenerator = tagGenerator;
+  }
+
+  @VisibleForTesting
+  void setSnapshotRepository(String snapshotRepository) {
+    this.snapshotRepository = snapshotRepository;
   }
 }

@@ -89,6 +89,8 @@ public class StagingDeployMojoTest
 
   private static final String REPOSITORY = "maven-releases";
 
+  private static final String SNAPSHOT_REPOSITORY = "maven-snapshots";
+
   private static final String ARTIFACT_ID_KEY = "artifactId";
 
   private static final String GROUP_ID_KEY = "groupId";
@@ -225,6 +227,109 @@ public class StagingDeployMojoTest
     ArgumentCaptor<Component> componentArgumentCaptor = ArgumentCaptor.forClass(Component.class);
 
     verify(client).upload(eq(REPOSITORY), componentArgumentCaptor.capture(), eq(TAG));
+
+    Component component = componentArgumentCaptor.getValue();
+
+    Map<String, String> attributes = component.getAttributes();
+    assertThat(attributes.get(ARTIFACT_ID_KEY), is(equalTo(ARTIFACT_ID)));
+    assertThat(attributes.get(GROUP_ID_KEY), is(equalTo(GROUP_ID)));
+    assertThat(attributes.get(VERSION_KEY), is(equalTo(VERSION)));
+
+    Collection<Asset> assets = component.getAssets();
+    assertThat(assets.size(), is(equalTo(3)));
+
+    // check pom asset
+    List<Asset> pomAssets = assets.stream().filter(this::isPomAsset).collect(toList());
+    assertThat(pomAssets.size(), is(equalTo(1)));
+    assertThat(pomAssets.get(0).getFilename(), is(equalTo(getPom().getName())));
+    assertThat(pomAssets.get(0).getData(), notNullValue());
+
+    // check all other assets
+    for (Asset asset : assets.stream().filter(asset -> !isPomAsset(asset)).collect(toList())) {
+      Map<String, String> assetAttributes = asset.getAttributes();
+      assertThat(assetAttributes.get(EXTENSION_KEY), is(equalTo(EXTENSION)));
+      assertThat(assetAttributes.get(CLASSIFIER_KEY), is(equalTo(CLASSIFIER)));
+    }
+  }
+
+  @Test
+  public void uploadReleaseWithSnapshotConfigured() throws Exception {
+    underTest.setSnapshotRepository(SNAPSHOT_REPOSITORY);
+
+    underTest.execute();
+
+    ArgumentCaptor<Component> componentArgumentCaptor = ArgumentCaptor.forClass(Component.class);
+
+    verify(client).upload(eq(REPOSITORY), componentArgumentCaptor.capture(), eq(TAG));
+
+    Component component = componentArgumentCaptor.getValue();
+
+    Map<String, String> attributes = component.getAttributes();
+    assertThat(attributes.get(ARTIFACT_ID_KEY), is(equalTo(ARTIFACT_ID)));
+    assertThat(attributes.get(GROUP_ID_KEY), is(equalTo(GROUP_ID)));
+    assertThat(attributes.get(VERSION_KEY), is(equalTo(VERSION)));
+
+    Collection<Asset> assets = component.getAssets();
+    assertThat(assets.size(), is(equalTo(3)));
+
+    // check pom asset
+    List<Asset> pomAssets = assets.stream().filter(this::isPomAsset).collect(toList());
+    assertThat(pomAssets.size(), is(equalTo(1)));
+    assertThat(pomAssets.get(0).getFilename(), is(equalTo(getPom().getName())));
+    assertThat(pomAssets.get(0).getData(), notNullValue());
+
+    // check all other assets
+    for (Asset asset : assets.stream().filter(asset -> !isPomAsset(asset)).collect(toList())) {
+      Map<String, String> assetAttributes = asset.getAttributes();
+      assertThat(assetAttributes.get(EXTENSION_KEY), is(equalTo(EXTENSION)));
+      assertThat(assetAttributes.get(CLASSIFIER_KEY), is(equalTo(CLASSIFIER)));
+    }
+  }
+
+  @Test
+  public void uploadSnapshotSameDestination() throws Exception {
+    when(artifact.isSnapshot()).thenReturn(true);
+
+    underTest.execute();
+
+    ArgumentCaptor<Component> componentArgumentCaptor = ArgumentCaptor.forClass(Component.class);
+
+    verify(client).upload(eq(REPOSITORY), componentArgumentCaptor.capture(), eq(TAG));
+
+    Component component = componentArgumentCaptor.getValue();
+
+    Map<String, String> attributes = component.getAttributes();
+    assertThat(attributes.get(ARTIFACT_ID_KEY), is(equalTo(ARTIFACT_ID)));
+    assertThat(attributes.get(GROUP_ID_KEY), is(equalTo(GROUP_ID)));
+    assertThat(attributes.get(VERSION_KEY), is(equalTo(VERSION)));
+
+    Collection<Asset> assets = component.getAssets();
+    assertThat(assets.size(), is(equalTo(3)));
+
+    // check pom asset
+    List<Asset> pomAssets = assets.stream().filter(this::isPomAsset).collect(toList());
+    assertThat(pomAssets.size(), is(equalTo(1)));
+    assertThat(pomAssets.get(0).getFilename(), is(equalTo(getPom().getName())));
+    assertThat(pomAssets.get(0).getData(), notNullValue());
+
+    // check all other assets
+    for (Asset asset : assets.stream().filter(asset -> !isPomAsset(asset)).collect(toList())) {
+      Map<String, String> assetAttributes = asset.getAttributes();
+      assertThat(assetAttributes.get(EXTENSION_KEY), is(equalTo(EXTENSION)));
+      assertThat(assetAttributes.get(CLASSIFIER_KEY), is(equalTo(CLASSIFIER)));
+    }
+  }
+
+  @Test
+  public void uploadSnapshotDifferentDestination() throws Exception {
+    underTest.setSnapshotRepository(SNAPSHOT_REPOSITORY);
+    when(artifact.isSnapshot()).thenReturn(true);
+
+    underTest.execute();
+
+    ArgumentCaptor<Component> componentArgumentCaptor = ArgumentCaptor.forClass(Component.class);
+
+    verify(client).upload(eq(SNAPSHOT_REPOSITORY), componentArgumentCaptor.capture(), eq(TAG));
 
     Component component = componentArgumentCaptor.getValue();
 
