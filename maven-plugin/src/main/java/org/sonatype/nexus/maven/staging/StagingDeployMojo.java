@@ -84,6 +84,10 @@ public class StagingDeployMojo
       getLog().info("Skipping NXRM Staging Deploy Mojo at user's demand.");
       return;
     }
+    if (artifact.isSnapshot()) {
+      getLog().info("Skipping NXRM Staging Deploy Mojo as " + artifact.getVersion() + " is a SNAPSHOT version");
+      return;
+    }
 
     maybeWarnAboutDeprecatedStagingModeProperty();
 
