@@ -28,8 +28,6 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 import org.sonatype.maven.mojo.execution.MojoExecution;
 import org.sonatype.maven.mojo.settings.MavenSettings;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.execution.MavenSession;
@@ -39,6 +37,9 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
+import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
+import org.apache.maven.settings.crypto.SettingsDecrypter;
+import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 
 /**
  * Parent for all staging MOJOs (goals)
@@ -82,25 +83,22 @@ public abstract class StagingMojo
   private boolean offline;
 
   @Component
-  private SecDispatcher secDispatcher;
+  private SettingsDecrypter settingsDecrypter;
 
   private Nxrm3ClientFactory clientFactory = new Nxrm3ClientFactory();
 
   protected ServerConfig getServerConfiguration(final MavenSession mavenSession) {
     final Server server = MavenSettings.selectServer(mavenSession.getSettings(), serverId);
-    try {
-      if (server != null) {
-        Server decryptedServer = MavenSettings.decrypt(secDispatcher, server);
+    if (server != null) {
+      SettingsDecryptionResult result = settingsDecrypter.decrypt(new DefaultSettingsDecryptionRequest(server));
 
-        return new ServerConfig(URI.create(nexusUrl),
-            new Authentication(decryptedServer.getUsername(), decryptedServer.getPassword()));
-      }
-      else {
-        throw new IllegalArgumentException("Server with ID \"" + serverId + "\" not found!");
-      }
+      Server decryptedServer = result.getServer();
+
+      return new ServerConfig(URI.create(nexusUrl),
+          new Authentication(decryptedServer.getUsername(), decryptedServer.getPassword()));
     }
-    catch (SecDispatcherException e) {
-      throw new IllegalArgumentException("Cannot decipher credentials to be used with Nexus!", e);
+    else {
+      throw new IllegalArgumentException("Server with ID \"" + serverId + "\" not found!");
     }
   }
 
@@ -217,11 +215,6 @@ public abstract class StagingMojo
   @VisibleForTesting
   void setMavenSession(final MavenSession session) {
     this.mavenSession = session;
-  }
-
-  @VisibleForTesting
-  void setSecDispatcher(final SecDispatcher secDispatcher) {
-    this.secDispatcher = secDispatcher;
   }
 
   protected Nxrm3ClientFactory getClientFactory() {

@@ -26,9 +26,6 @@ import com.sonatype.nexus.api.repository.v3.Component;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 import com.sonatype.nexus.api.repository.v3.Tag;
 
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
-
 import com.google.common.collect.ImmutableList;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -106,9 +103,6 @@ public class StagingDeployMojoTest
   private Settings settings;
 
   @Mock
-  private SecDispatcher secDispatcher;
-
-  @Mock
   private Artifact artifact, attachedArtifact;
 
   @Mock
@@ -167,15 +161,6 @@ public class StagingDeployMojoTest
   @Test(expected = MojoFailureException.class)
   public void executeFailsWhenOffline() throws Exception {
     underTest.setOffline(true);
-
-    underTest.execute();
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void executeFailsWhenSecDispatcherThrowsException() throws Exception {
-    when(secDispatcher.decrypt(anyString())).thenThrow(new SecDispatcherException());
-
-    underTest.setSecDispatcher(secDispatcher);
 
     underTest.execute();
   }
