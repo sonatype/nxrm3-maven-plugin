@@ -21,13 +21,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import com.sonatype.nexus.api.exception.RepositoryManagerException;
-import com.sonatype.nexus.api.repository.v3.DefaultAsset;
-import com.sonatype.nexus.api.repository.v3.DefaultComponent;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.Tag;
-
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -36,6 +29,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.repository.RepositorySystem;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.sonatype.nexus.api.dv;
+import com.sonatype.nexus.api.exception.RepositoryManagerException;
+import com.sonatype.nexus.api.repository.v3.DefaultAsset;
+import com.sonatype.nexus.api.repository.v3.DefaultComponent;
+import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import com.sonatype.nexus.api.repository.v3.Tag;
 
 /**
  * Goal to tag and deploy artifacts to NXRM 3.
@@ -106,6 +107,12 @@ public class StagingDeployMojo
     catch (MojoExecutionException e) {
       throw e;
     }
+    catch (dv ex) {
+        Optional<String> message = ex.b();
+        if(message.isPresent())
+        	throw new MojoFailureException(ex.getMessage() + " - " + message.get(), ex);
+    	throw new MojoFailureException(ex.getMessage(), ex);
+    }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
@@ -151,7 +158,7 @@ public class StagingDeployMojo
                         final String tag) throws Exception
   {
     List<InputStream> streams = new ArrayList<>();
-    
+
     try {
       DefaultComponent component = getDefaultComponent(deployables.get(0));
 
@@ -225,7 +232,7 @@ public class StagingDeployMojo
       getLog().warn("The stagingMode property is no longer supported and will be ignored");
     }
   }
-  
+
   @VisibleForTesting
   void setArtifact(final Artifact artifact) {
     this.artifact = artifact;
@@ -245,7 +252,7 @@ public class StagingDeployMojo
   void setPomFile(final File pomFile) {
     this.pomFile = pomFile;
   }
-  
+
   @VisibleForTesting
   void setPackaging(final String packaging) {
     this.packaging = packaging;
