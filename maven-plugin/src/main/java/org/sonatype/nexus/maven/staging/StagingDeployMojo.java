@@ -16,8 +16,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -162,7 +164,12 @@ public class StagingDeployMojo
     try {
       DefaultComponent component = getDefaultComponent(deployables.get(0));
 
+      Set<String> attachedAssets = new HashSet<String>();
+
       for (Artifact deployableArtifact : deployables) {
+    	if(!attachedAssets.add(deployableArtifact.getDependencyConflictId())) {
+    		throw new MojoExecutionException("Duplicate artifact found, which is not allowed: " + deployableArtifact.getDependencyConflictId());
+    	}
         FileInputStream stream = new FileInputStream(deployableArtifact.getFile());
         streams.add(stream);
 
