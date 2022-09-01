@@ -2,7 +2,6 @@ library('private-pipeline-library')
 library('jenkins-shared')
 
 def settings =[
-    deployBranch: 'main',
     onSuccess: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
     },
