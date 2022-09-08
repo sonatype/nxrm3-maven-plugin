@@ -39,7 +39,8 @@ import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -47,7 +48,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Goal to tag and deploy artifacts to NXRM 3.
@@ -93,18 +93,18 @@ public class StagingDeployMojo
   @Inject
   private TagGenerator tagGenerator;
 
-  @Requirement
+  @Component
   private ArtifactInstaller artifactInstaller;
 
-  @Requirement
+  @Component
   private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-  @Requirement
+  @Component
   private ArtifactRepositoryLayout artifactRepositoryLayout;
 
-  private Lock readWriteLock;
+  private final Lock readWriteLock;
 
-  private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   public StagingDeployMojo() {
     super();
@@ -204,7 +204,7 @@ public class StagingDeployMojo
 
       try {
         artifactInstaller.install(artifact.getFile(), artifact, artifactRepository);
-        attachToIndex(index, artifact, tag);
+        attachToIndex(index, artifact, tag, artifactRepository);
       }
       catch (IOException e) {
         getLog().error("error accessing files for local installation: ", e);
@@ -220,7 +220,27 @@ public class StagingDeployMojo
     }
   }
 
-  private void attachToIndex(final File index, final Artifact artifact, final String tag) throws IOException {
+  private void attachToIndex(
+      final File index,
+      final Artifact artifact,
+      final String tag,
+      final ArtifactRepository artifactRepository) throws IOException
+  {
+
+    Optional<String> maybePluginPrefix = artifact.getMetadataList()
+        .stream()
+        .filter(metadata -> metadata instanceof GroupRepositoryMetadata)
+        .map(metadata -> ((GroupRepositoryMetadata) metadata).getMetadata().getPlugins())
+        .filter(plugins -> !plugins.isEmpty())
+        .flatMap(List::stream)
+        .map(Plugin::getPrefix)
+        .findFirst();
+
+    Optional<String> maybePomFileName = artifact.getMetadataList()
+        .stream()
+        .filter(metadata -> metadata instanceof ProjectArtifactMetadata)
+        .map(projectMetadata -> projectMetadata.getLocalFilename(artifactRepository))
+        .findFirst();
 
     ArtifactInfo artifactInfo = new ArtifactInfo();
     artifactInfo.setGroup(artifact.getGroupId());
@@ -230,9 +250,10 @@ public class StagingDeployMojo
     artifactInfo.setClassifier(Optional.ofNullable(artifact.getClassifier()).orElse("n/a"));
     artifactInfo.setPackaging(artifact.getType());
     artifactInfo.setExtension(artifact.getArtifactHandler().getExtension());
+    artifactInfo.setPomFileName(maybePomFileName.orElse("n/a"));
+    artifactInfo.setPluginPrefix(maybePluginPrefix.orElse("n/a"));
     artifactInfo.setRepositoryId(getServerId());
     artifactInfo.setRepositoryUrl(getNexusUrl());
-    //TODO : find plugin prefix and pom file name
 
     if (index.exists()) {
       List<ArtifactInfo> currentData = objectMapper.readValue(index, new TypeReference<List<ArtifactInfo>>() { });
