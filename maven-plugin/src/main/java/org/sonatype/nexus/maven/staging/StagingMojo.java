@@ -235,4 +235,6 @@ public abstract class StagingMojo
   void setOffline(final boolean offline) {
     this.offline = offline;
   }
+
+
 }

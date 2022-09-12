@@ -242,12 +242,14 @@ public class StagingDeployMojo
         .map(projectMetadata -> projectMetadata.getLocalFilename(artifactRepository))
         .findFirst();
 
+    Optional<String> maybeClassifier = Optional.ofNullable(artifact.getClassifier());
+
     ArtifactInfo artifactInfo = new ArtifactInfo();
     artifactInfo.setGroup(artifact.getGroupId());
     artifactInfo.setArtifactId(artifact.getArtifactId());
     artifactInfo.setVersion(artifact.getVersion());
     artifactInfo.setTag(tag);
-    artifactInfo.setClassifier(Optional.ofNullable(artifact.getClassifier()).orElse("n/a"));
+    artifactInfo.setClassifier(maybeClassifier.orElse("n/a"));
     artifactInfo.setPackaging(artifact.getType());
     artifactInfo.setExtension(artifact.getArtifactHandler().getExtension());
     artifactInfo.setPomFileName(maybePomFileName.orElse("n/a"));
@@ -418,5 +420,25 @@ public class StagingDeployMojo
   @VisibleForTesting
   void setTagGenerator(final TagGenerator tagGenerator) {
     this.tagGenerator = tagGenerator;
+  }
+
+  @VisibleForTesting
+  void setStageLocally() {
+    this.stageLocally = !this.stageLocally;
+  }
+
+  @VisibleForTesting
+  void setArtifactInstaller(final ArtifactInstaller artifactInstaller) {
+    this.artifactInstaller = artifactInstaller;
+  }
+
+  @VisibleForTesting
+  void setArtifactRepositoryFactory(final ArtifactRepositoryFactory artifactRepositoryFactory) {
+    this.artifactRepositoryFactory = artifactRepositoryFactory;
+  }
+
+  @VisibleForTesting
+  void setArtifactRepositoryLayout(final ArtifactRepositoryLayout artifactRepositoryLayout) {
+    this.artifactRepositoryLayout = artifactRepositoryLayout;
   }
 }

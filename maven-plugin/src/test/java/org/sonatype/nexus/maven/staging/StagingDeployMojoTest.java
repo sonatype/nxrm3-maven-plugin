@@ -26,9 +26,15 @@ import com.sonatype.nexus.api.repository.v3.Component;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 import com.sonatype.nexus.api.repository.v3.Tag;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -55,10 +61,13 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -152,9 +161,9 @@ public class StagingDeployMojoTest
   @Test
   public void getAltWorkingDirectoryWhenConfigured() throws Exception {
     File dir = new File("test");
-    
+
     underTest.setAltStagingDirectory(dir);
-    
+
     assertThat(underTest.getWorkDirectoryRoot(), is(equalTo(dir)));
   }
 
@@ -204,7 +213,7 @@ public class StagingDeployMojoTest
   }
 
   @Test
-  public void upload() throws Exception {
+  public void deployToRemote() throws Exception {
     underTest.execute();
 
     ArgumentCaptor<Component> componentArgumentCaptor = ArgumentCaptor.forClass(Component.class);
@@ -233,6 +242,39 @@ public class StagingDeployMojoTest
       assertThat(assetAttributes.get(EXTENSION_KEY), is(equalTo(EXTENSION)));
       assertThat(assetAttributes.get(CLASSIFIER_KEY), is(equalTo(CLASSIFIER)));
     }
+  }
+
+  @Test
+  public void deployLocally() throws Exception {
+    ArtifactInstaller artifactInstaller = mock(ArtifactInstaller.class);
+    ArtifactRepositoryFactory artifactRepositoryFactory = mock(ArtifactRepositoryFactory.class);
+    ArtifactRepositoryLayout artifactRepositoryLayout = mock(ArtifactRepositoryLayout.class);
+
+    ArtifactRepository artifactRepository = mock(ArtifactRepository.class);
+
+    when(artifactRepositoryFactory.createDeploymentArtifactRepository(anyString(), anyString(),
+        eq(artifactRepositoryLayout), anyBoolean()))
+        .thenReturn(artifactRepository);
+
+    underTest.setStageLocally();
+    underTest.setArtifactInstaller(artifactInstaller);
+    underTest.setArtifactRepositoryFactory(artifactRepositoryFactory);
+    underTest.setArtifactRepositoryLayout(artifactRepositoryLayout);
+
+    underTest.execute();
+
+    verify(artifactRepositoryFactory, times(1))
+        .createDeploymentArtifactRepository(anyString(), anyString(), any(ArtifactRepositoryLayout.class),
+            anyBoolean());
+    verify(artifactInstaller, times(3)).install(any(), any(), any());
+
+    ObjectMapper mapper = new ObjectMapper();
+
+    List<ArtifactInfo> indexData = mapper.readValue(new File(tempDirectory + "/target/nexus-staging/.index"),
+        new TypeReference<List<ArtifactInfo>>() { });
+
+    assertNotNull(indexData);
+    assertEquals(3, indexData.size());
   }
 
   @Test(expected = MojoFailureException.class)
