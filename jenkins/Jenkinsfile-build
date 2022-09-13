@@ -9,6 +9,11 @@ def settings =[
     },
     onFailure: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
+    },
+    iqPolicyEvaluation: { stage ->
+      nexusPolicyEvaluation iqStage: stage, iqApplication: 'nxrm3-maven-plugin',
+      iqScanPatterns: [[scanPattern: 'scan_nothing']],
+      iqModuleExcludes: [[moduleExclude: 'testsuite/**']],
     }
 ]
 
