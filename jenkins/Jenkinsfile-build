@@ -3,7 +3,7 @@ library('jenkins-shared')
 
 def settings =[
     deployBranch: 'main',
-    performSonarAnalysis: true,
+    performSonarAnalysis: false,
     onSuccess: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
     },
