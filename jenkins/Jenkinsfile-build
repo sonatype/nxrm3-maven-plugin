@@ -14,7 +14,7 @@ def settings =[
       nexusPolicyEvaluation iqStage: stage, iqApplication: 'nxrm3-maven-plugin',
       iqScanPatterns: [[scanPattern: 'scan_nothing']],
       iqModuleExcludes: [[moduleExclude: 'testsuite/**']],
-    }
+    },
 ]
 
 mavenSnapshotPipeline(settings)
