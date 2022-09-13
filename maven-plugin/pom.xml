@@ -33,6 +33,10 @@
     Provides support to access functionality in a remote Nexus Professional server.
   </description>
 
+  <properties>
+    <clm.skip>false</clm.skip>
+  </properties>
+
   <build>
     <plugins>
       <plugin>

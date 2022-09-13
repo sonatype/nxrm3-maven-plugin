@@ -61,6 +61,9 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.version>3.8.5</maven.version>
     <maven.plugin.annotations.version>3.5.1</maven.plugin.annotations.version>
+
+    <clm.applicationId>nxrm3-maven-plugin</clm.applicationId>
+    <clm.skip>true</clm.skip>
   </properties>
 
   <modules>
@@ -164,7 +167,29 @@
           <artifactId>maven-gpg-plugin</artifactId>
           <version>3.0.1</version>
         </plugin>
+        <plugin>
+          <groupId>com.sonatype.clm</groupId>
+          <artifactId>clm-maven-plugin</artifactId>
+          <version>2.16.0-01</version>
+        </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>com.sonatype.clm</groupId>
+        <artifactId>clm-maven-plugin</artifactId>
+        <configuration>
+          <skip>${clm.skip}</skip>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>index</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>
