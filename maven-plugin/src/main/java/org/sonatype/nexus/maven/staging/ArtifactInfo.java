@@ -30,9 +30,6 @@ public class ArtifactInfo
   private String repositoryId;
   private String repositoryUrl;
 
-  public ArtifactInfo() {
-  }
-
   public String getGroup() {
     return group;
   }

@@ -60,6 +60,8 @@ public class StagingDeployMojo
 {
   private static final String FORMAT = "maven2";
 
+  private static final String NOT_APPLIES = "n/a";
+
   @Parameter(property = "repository", required = true)
   private String repository;
 
@@ -161,7 +163,7 @@ public class StagingDeployMojo
   {
     File target = getWorkDirectoryRoot();
     File index = new File(target, ".index");
-    ArtifactRepository stagingRepository = createFileRepository("local-deployment", target);
+    ArtifactRepository stagingRepository = createFileRepository(target);
 
     try {
       for (Artifact artifact : deployables) {
@@ -173,7 +175,7 @@ public class StagingDeployMojo
     }
   }
 
-  private ArtifactRepository createFileRepository(String id, File target) throws MojoExecutionException {
+  private ArtifactRepository createFileRepository(final File target) throws MojoExecutionException {
     if (target.exists() && (!target.canWrite() || !target.isDirectory())) {
       throw new MojoExecutionException(
           "Staging failed: staging directory points to an existing file but is not a directory or is not writable!");
@@ -184,7 +186,8 @@ public class StagingDeployMojo
 
     try {
       String url = target.getCanonicalFile().toURI().toURL().toExternalForm();
-      return artifactRepositoryFactory.createDeploymentArtifactRepository(id, url, artifactRepositoryLayout, true);
+      return artifactRepositoryFactory.createDeploymentArtifactRepository("local-deployment", url,
+          artifactRepositoryLayout, true);
     }
     catch (IOException e) {
       throw new MojoExecutionException(
@@ -249,11 +252,11 @@ public class StagingDeployMojo
     artifactInfo.setArtifactId(artifact.getArtifactId());
     artifactInfo.setVersion(artifact.getVersion());
     artifactInfo.setTag(tag);
-    artifactInfo.setClassifier(maybeClassifier.orElse("n/a"));
+    artifactInfo.setClassifier(maybeClassifier.orElse(NOT_APPLIES));
     artifactInfo.setPackaging(artifact.getType());
     artifactInfo.setExtension(artifact.getArtifactHandler().getExtension());
-    artifactInfo.setPomFileName(maybePomFileName.orElse("n/a"));
-    artifactInfo.setPluginPrefix(maybePluginPrefix.orElse("n/a"));
+    artifactInfo.setPomFileName(maybePomFileName.orElse(NOT_APPLIES));
+    artifactInfo.setPluginPrefix(maybePluginPrefix.orElse(NOT_APPLIES));
     artifactInfo.setRepositoryId(getServerId());
     artifactInfo.setRepositoryUrl(getNexusUrl());
 
