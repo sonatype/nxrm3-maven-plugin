@@ -12,22 +12,22 @@
  */
 package org.sonatype.nexus.maven.staging;
 
+import static java.lang.reflect.Modifier.isPublic;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
-import com.sonatype.nexus.api.exception.RepositoryManagerException;
-import com.sonatype.nexus.api.repository.v3.DefaultAsset;
-import com.sonatype.nexus.api.repository.v3.DefaultComponent;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.Tag;
-
-import com.google.common.annotations.VisibleForTesting;
+import org.apache.http.client.HttpResponseException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -36,6 +36,13 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.repository.RepositorySystem;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.sonatype.nexus.api.exception.RepositoryManagerException;
+import com.sonatype.nexus.api.repository.v3.DefaultAsset;
+import com.sonatype.nexus.api.repository.v3.DefaultComponent;
+import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import com.sonatype.nexus.api.repository.v3.Tag;
 
 /**
  * Goal to tag and deploy artifacts to NXRM 3.
@@ -106,12 +113,47 @@ public class StagingDeployMojo
     catch (MojoExecutionException e) {
       throw e;
     }
+    catch (RepositoryManagerException ex) {
+        Optional<String> message = findJsonErrorMessage(ex);
+        if(message.isPresent())
+        	throw new MojoFailureException(ex.getMessage() + ": " + message.get(), ex);
+    	throw new MojoFailureException(ex.getMessage(), ex);
+    }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
   }
 
-  private String getProvidedOrGeneratedTag() {
+  private Optional<String> findJsonErrorMessage(Throwable e) {
+	if(e == null)
+	  return Optional.empty();
+
+	if(e instanceof HttpResponseException) {
+		Method[] declaredMethods = e.getClass().getDeclaredMethods();
+		for (Method method : declaredMethods) {
+			if(method.getParameterCount() == 0 && isPublic(method.getModifiers()) && Optional.class.isAssignableFrom(method.getReturnType())) {
+				try {
+					Optional<?> result = (Optional<?>) method.invoke(e);
+					if(result.isPresent()) {
+						Object potentialMessage = result.get();
+						// filter out the raw json message
+						if(potentialMessage instanceof String && !((String)potentialMessage).contains("\"message\"")) {
+							return Optional.of((String)potentialMessage);
+						}
+					}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+					// ignore and continue
+				}
+			}
+		}
+		// nothing found
+        return Optional.empty();
+	}
+
+	return findJsonErrorMessage(e.getCause());
+}
+
+private String getProvidedOrGeneratedTag() {
     if (tag == null || tag.isEmpty()) {
       String generatedTag = tagGenerator.generate(artifact.getArtifactId(), artifact.getBaseVersion());
       getMavenSession().getUserProperties().setProperty("tag", generatedTag);
@@ -151,11 +193,16 @@ public class StagingDeployMojo
                         final String tag) throws Exception
   {
     List<InputStream> streams = new ArrayList<>();
-    
+
     try {
       DefaultComponent component = getDefaultComponent(deployables.get(0));
 
+      Set<String> attachedAssets = new HashSet<String>();
+
       for (Artifact deployableArtifact : deployables) {
+    	if(!attachedAssets.add(deployableArtifact.getDependencyConflictId())) {
+    		throw new MojoExecutionException("Duplicate artifact found, which is not allowed: " + deployableArtifact.getDependencyConflictId());
+    	}
         FileInputStream stream = new FileInputStream(deployableArtifact.getFile());
         streams.add(stream);
 
@@ -225,7 +272,7 @@ public class StagingDeployMojo
       getLog().warn("The stagingMode property is no longer supported and will be ignored");
     }
   }
-  
+
   @VisibleForTesting
   void setArtifact(final Artifact artifact) {
     this.artifact = artifact;
@@ -245,7 +292,7 @@ public class StagingDeployMojo
   void setPomFile(final File pomFile) {
     this.pomFile = pomFile;
   }
-  
+
   @VisibleForTesting
   void setPackaging(final String packaging) {
     this.packaging = packaging;
