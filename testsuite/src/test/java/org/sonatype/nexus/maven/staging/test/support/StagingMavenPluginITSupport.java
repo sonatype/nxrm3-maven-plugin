@@ -13,6 +13,10 @@
 package org.sonatype.nexus.maven.staging.test.support;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -150,7 +154,10 @@ public abstract class StagingMavenPluginITSupport
   protected void initialiseVerifier(final File projectRoot) throws Exception {
     String settingsXml = new File(projectRoot, "preset-nexus-maven-settings.xml").getAbsolutePath();
 
-    System.setProperty("maven.home" , "~/.m2/wrapper/dist/apache-maven-3.8.6-bin");
+    Path m2Home = getM2Home();
+    if (m2Home != null) {
+      System.setProperty("maven.home", m2Home.toAbsolutePath().toString());
+    }
 
     verifier = new Verifier(projectRoot.getAbsolutePath(), settingsXml);
 
@@ -163,5 +170,34 @@ public abstract class StagingMavenPluginITSupport
     options.add("-Djava.awt.headless=true"); // on Mac a Dock icon bumps on ever Verifier invocation
     options.add("-s " + settingsXml);
     verifier.setCliOptions(options);
+  }
+
+  private Path getM2Home() {
+    String mavenUserHome = System.getProperty("maven.user.home");
+    String envMavenUserHome = System.getProperty("MAVEN_USER_HOME");
+
+    final Path mavenHome;
+    if (mavenUserHome != null) {
+      mavenHome = Paths.get(mavenUserHome);
+    }
+    else if (envMavenUserHome != null) {
+      mavenHome = Paths.get(envMavenUserHome);
+    }
+    else {
+      mavenHome = Paths.get( System.getProperty( "user.home" ) ).resolve( ".m2" );
+    }
+    try {
+      return Files.find(
+          mavenHome.resolve("wrapper"),
+          6,
+          (path, basicFileAttributes) ->
+              path.getFileName().equals("apache-maven-3.8.6") && Files.exists(path.resolve("bin"))
+      ).findFirst().orElse(null);
+    }
+    catch (IOException e) {
+      System.out.println("Unable to locate maven wrapper directory");
+      e.printStackTrace();
+      return null;
+    }
   }
 }
