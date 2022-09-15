@@ -34,6 +34,8 @@ import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 public abstract class StagingMavenPluginITSupport
     extends NxrmITSupport
 {
+  private static final String MAVEN_VERSION = "3.8.6";
+
   private static final String DIRECTORY = "/maven3-project";
 
   private static final String MULTI_MODULE_DIRECTORY = "/multi-module-maven3-project";
@@ -154,9 +156,9 @@ public abstract class StagingMavenPluginITSupport
   protected void initialiseVerifier(final File projectRoot) throws Exception {
     String settingsXml = new File(projectRoot, "preset-nexus-maven-settings.xml").getAbsolutePath();
 
-    Path m2Home = getM2Home();
-    if (m2Home != null) {
-      System.setProperty("maven.home", m2Home.toAbsolutePath().toString());
+    Path mvnwHome = getMvnwHome();
+    if (mvnwHome != null) {
+      System.setProperty("maven.home", mvnwHome.toAbsolutePath().toString());
     }
 
     verifier = new Verifier(projectRoot.getAbsolutePath(), settingsXml);
@@ -172,7 +174,7 @@ public abstract class StagingMavenPluginITSupport
     verifier.setCliOptions(options);
   }
 
-  private Path getM2Home() {
+  private Path getMvnwHome() {
     String mavenUserHome = System.getProperty("maven.user.home");
     String envMavenUserHome = System.getProperty("MAVEN_USER_HOME");
 
@@ -184,19 +186,19 @@ public abstract class StagingMavenPluginITSupport
       mavenHome = Paths.get(envMavenUserHome);
     }
     else {
-      mavenHome = Paths.get( System.getProperty( "user.home" ) ).resolve( ".m2" );
+      mavenHome = Paths.get(System.getProperty("user.home")).resolve(".m2");
     }
     try {
       Path wrappedMavenHome = Files.find(
           mavenHome.resolve("wrapper"),
           5,
           (path, basicFileAttributes) ->
-              path.getFileName().toString().equals("apache-maven-3.8.6") && Files.exists(path.resolve("bin"))
+              path.getFileName().toString().equals("apache-maven-" + MAVEN_VERSION) && Files.exists(path.resolve("bin"))
       ).findFirst().orElse(null);
 
       return wrappedMavenHome;
     }
-    catch (IOException e) {
+    catch (Exception e) {
       System.out.println("Unable to locate maven wrapper directory");
       e.printStackTrace();
       return null;
