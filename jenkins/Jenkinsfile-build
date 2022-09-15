@@ -2,6 +2,8 @@ library('private-pipeline-library')
 library('jenkins-shared')
 
 def settings =[
+    mavenVersion: 'Maven 3.8.6',
+    useMvnw: true,
     deployBranch: 'main',
     performSonarAnalysis: false,
     onSuccess: { build, env ->
