@@ -150,6 +150,8 @@ public abstract class StagingMavenPluginITSupport
   protected void initialiseVerifier(final File projectRoot) throws Exception {
     String settingsXml = new File(projectRoot, "preset-nexus-maven-settings.xml").getAbsolutePath();
 
+    System.setProperty("maven.home" , "~/.m2/wrapper/dist/apache-maven-3.8.6-bin");
+
     verifier = new Verifier(projectRoot.getAbsolutePath(), settingsXml);
 
     verifier.setMavenDebug(true);
