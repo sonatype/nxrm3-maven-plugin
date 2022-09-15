@@ -187,12 +187,14 @@ public abstract class StagingMavenPluginITSupport
       mavenHome = Paths.get( System.getProperty( "user.home" ) ).resolve( ".m2" );
     }
     try {
-      return Files.find(
+      Path wrappedMavenHome = Files.find(
           mavenHome.resolve("wrapper"),
-          6,
+          5,
           (path, basicFileAttributes) ->
-              path.getFileName().equals("apache-maven-3.8.6") && Files.exists(path.resolve("bin"))
+              path.getFileName().toString().equals("apache-maven-3.8.6") && Files.exists(path.resolve("bin"))
       ).findFirst().orElse(null);
+
+      return wrappedMavenHome;
     }
     catch (IOException e) {
       System.out.println("Unable to locate maven wrapper directory");
