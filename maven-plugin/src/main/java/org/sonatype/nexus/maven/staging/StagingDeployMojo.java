@@ -14,11 +14,14 @@ package org.sonatype.nexus.maven.staging;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import com.sonatype.nexus.api.exception.RepositoryManagerException;
@@ -27,8 +30,17 @@ import com.sonatype.nexus.api.repository.v3.DefaultComponent;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 import com.sonatype.nexus.api.repository.v3.Tag;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.installer.ArtifactInstallationException;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -48,7 +60,9 @@ public class StagingDeployMojo
 {
   private static final String FORMAT = "maven2";
 
-  @Parameter(property = "repository", required = true)
+  private static final String NOT_APPLIES = "n/a";
+
+  @Parameter(property = "repository")
   private String repository;
 
   @Parameter(property = "tag")
@@ -60,11 +74,8 @@ public class StagingDeployMojo
   @Parameter(property = "stagingMode")
   private String stagingMode;
 
-  @Component
-  private RepositorySystem repositorySystem;
-
-  @Inject
-  private TagGenerator tagGenerator;
+  @Parameter(property = "stageLocally")
+  private boolean stageLocally;
 
   @Parameter(defaultValue = "${project.artifact}", readonly = true, required = true)
   private Artifact artifact;
@@ -77,6 +88,31 @@ public class StagingDeployMojo
 
   @Parameter(defaultValue = "${project.attachedArtifacts}", readonly = true, required = true)
   private List<Artifact> attachedArtifacts;
+
+  @Component
+  private RepositorySystem repositorySystem;
+
+  @Inject
+  private TagGenerator tagGenerator;
+
+  @Component
+  private ArtifactInstaller artifactInstaller;
+
+  @Component
+  private ArtifactRepositoryFactory artifactRepositoryFactory;
+
+  @Component
+  private ArtifactRepositoryLayout artifactRepositoryLayout;
+
+  private final Lock readWriteLock;
+
+  private final ObjectMapper objectMapper;
+
+  public StagingDeployMojo() {
+    super();
+    this.readWriteLock = new ReentrantLock();
+    this.objectMapper = new ObjectMapper();
+  }
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -91,14 +127,25 @@ public class StagingDeployMojo
   }
 
   private void doExecute() throws MojoFailureException, MojoExecutionException {
+    List<Artifact> deployables = prepareDeployables();
+    tag = getProvidedOrGeneratedTag();
+
+    if (stageLocally) {
+      deployLocally(deployables, tag);
+    }
+    else {
+      deployToRemote(deployables, tag);
+    }
+  }
+
+  private void deployToRemote(final List<Artifact> deployables, String tag)
+      throws MojoFailureException, MojoExecutionException
+  {
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
 
     failIfOffline();
 
-    List<Artifact> deployables = prepareDeployables();
-
     try {
-      tag = getProvidedOrGeneratedTag();
       maybeCreateTag(client, tag);
       getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
       doUpload(client, deployables, tag);
@@ -108,6 +155,122 @@ public class StagingDeployMojo
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
+    }
+  }
+
+  private void deployLocally(final List<Artifact> deployables, @Nonnull final String tag)
+      throws MojoExecutionException
+  {
+    File target = getWorkDirectoryRoot();
+    File index = new File(target, ".index");
+    ArtifactRepository stagingRepository = createFileRepository(target);
+
+    try {
+      for (Artifact artifact : deployables) {
+        installLocally(index, artifact, stagingRepository, tag);
+      }
+    }
+    catch (ArtifactInstallationException e) {
+      throw new MojoExecutionException("error installing artifact locally", e);
+    }
+  }
+
+  private ArtifactRepository createFileRepository(final File target) throws MojoExecutionException {
+    if (target.exists() && (!target.canWrite() || !target.isDirectory())) {
+      throw new MojoExecutionException(
+          "Staging failed: staging directory points to an existing file but is not a directory or is not writable!");
+    }
+    else if (!target.exists()) {
+      target.mkdirs();
+    }
+
+    try {
+      String url = target.getCanonicalFile().toURI().toURL().toExternalForm();
+      return artifactRepositoryFactory.createDeploymentArtifactRepository("local-deployment", url,
+          artifactRepositoryLayout, true);
+    }
+    catch (IOException e) {
+      throw new MojoExecutionException(
+          "Staging failed: staging directory path cannot be converted to canonical one!", e);
+    }
+  }
+
+  private void installLocally(
+      final File index,
+      final Artifact artifact,
+      final ArtifactRepository artifactRepository,
+      final String tag) throws ArtifactInstallationException
+  {
+    try {
+      //lock to make thread safe code since working with IO
+      readWriteLock.lock();
+
+      try {
+        artifactInstaller.install(artifact.getFile(), artifact, artifactRepository);
+        attachToIndex(index, artifact, tag, artifactRepository);
+      }
+      catch (IOException e) {
+        getLog().error("error accessing files for local installation: ", e);
+        throw new ArtifactInstallationException(e);
+      }
+      catch (ArtifactInstallationException e) {
+        getLog().error("error installing artifact: ", e);
+        throw e;
+      }
+    }
+    finally {
+      readWriteLock.unlock();
+    }
+  }
+
+  private void attachToIndex(
+      final File index,
+      final Artifact artifact,
+      final String tag,
+      final ArtifactRepository artifactRepository) throws IOException
+  {
+
+    Optional<String> maybePluginPrefix = artifact.getMetadataList()
+        .stream()
+        .filter(metadata -> metadata instanceof GroupRepositoryMetadata)
+        .map(metadata -> ((GroupRepositoryMetadata) metadata).getMetadata().getPlugins())
+        .filter(plugins -> !plugins.isEmpty())
+        .flatMap(List::stream)
+        .map(Plugin::getPrefix)
+        .findFirst();
+
+    Optional<String> maybePomFileName = artifact.getMetadataList()
+        .stream()
+        .filter(metadata -> metadata instanceof ProjectArtifactMetadata)
+        .map(projectMetadata -> projectMetadata.getLocalFilename(artifactRepository))
+        .findFirst();
+
+    Optional<String> maybeClassifier = Optional.ofNullable(artifact.getClassifier());
+
+    ArtifactInfo artifactInfo = new ArtifactInfo();
+    artifactInfo.setGroup(artifact.getGroupId());
+    artifactInfo.setArtifactId(artifact.getArtifactId());
+    artifactInfo.setVersion(artifact.getVersion());
+    artifactInfo.setTag(tag);
+    artifactInfo.setClassifier(maybeClassifier.orElse(NOT_APPLIES));
+    artifactInfo.setPackaging(artifact.getType());
+    artifactInfo.setExtension(artifact.getArtifactHandler().getExtension());
+    artifactInfo.setPomFileName(maybePomFileName.orElse(NOT_APPLIES));
+    artifactInfo.setPluginPrefix(maybePluginPrefix.orElse(NOT_APPLIES));
+    artifactInfo.setRepositoryId(getServerId());
+    artifactInfo.setRepositoryUrl(getNexusUrl());
+
+    if (index.exists()) {
+      List<ArtifactInfo> currentData = objectMapper.readValue(index, new TypeReference<List<ArtifactInfo>>() { });
+      currentData.add(artifactInfo);
+
+      objectMapper.writeValue(index, currentData);
+    }
+    else {
+      List<ArtifactInfo> data = new ArrayList<>();
+      data.add(artifactInfo);
+
+      objectMapper.writeValue(index, data);
     }
   }
 
@@ -146,12 +309,13 @@ public class StagingDeployMojo
     return component;
   }
 
-  private void doUpload(final RepositoryManagerV3Client client,
-                        final List<Artifact> deployables,
-                        final String tag) throws Exception
+  private void doUpload(
+      final RepositoryManagerV3Client client,
+      final List<Artifact> deployables,
+      final String tag) throws Exception
   {
     List<InputStream> streams = new ArrayList<>();
-    
+
     try {
       DefaultComponent component = getDefaultComponent(deployables.get(0));
 
@@ -225,7 +389,7 @@ public class StagingDeployMojo
       getLog().warn("The stagingMode property is no longer supported and will be ignored");
     }
   }
-  
+
   @VisibleForTesting
   void setArtifact(final Artifact artifact) {
     this.artifact = artifact;
@@ -245,7 +409,7 @@ public class StagingDeployMojo
   void setPomFile(final File pomFile) {
     this.pomFile = pomFile;
   }
-  
+
   @VisibleForTesting
   void setPackaging(final String packaging) {
     this.packaging = packaging;
@@ -259,5 +423,25 @@ public class StagingDeployMojo
   @VisibleForTesting
   void setTagGenerator(final TagGenerator tagGenerator) {
     this.tagGenerator = tagGenerator;
+  }
+
+  @VisibleForTesting
+  void setStageLocally() {
+    this.stageLocally = !this.stageLocally;
+  }
+
+  @VisibleForTesting
+  void setArtifactInstaller(final ArtifactInstaller artifactInstaller) {
+    this.artifactInstaller = artifactInstaller;
+  }
+
+  @VisibleForTesting
+  void setArtifactRepositoryFactory(final ArtifactRepositoryFactory artifactRepositoryFactory) {
+    this.artifactRepositoryFactory = artifactRepositoryFactory;
+  }
+
+  @VisibleForTesting
+  void setArtifactRepositoryLayout(final ArtifactRepositoryLayout artifactRepositoryLayout) {
+    this.artifactRepositoryLayout = artifactRepositoryLayout;
   }
 }

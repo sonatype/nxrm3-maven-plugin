@@ -126,7 +126,7 @@ Note: Delete searches **all** repositories for tagged assets.
 
 # Mutation testing
 
-Run ```mvn -DwithHistory org.pitest:pitest-maven:mutationCoverage``` to calculate mutation coverage. This needs to be 
+Run ```./mvnw -DwithHistory org.pitest:pitest-maven:mutationCoverage``` to calculate mutation coverage. This needs to be 
 run from inside the maven-plugin directory rather than at the root of the project to detect the tests.
 
 # Integration testing
@@ -135,11 +135,11 @@ To run the integration tests against a docker instance specify the port you woul
 
 ```-Dnexus.it.port=8085``` 
 
-e.g. ```mvn clean install -Dnexus.it.port=8085```
+e.g. ```./mvnw clean install -Dnexus.it.port=8085```
 
 To run the integration tests against a local instance use the profile ```local-nexus3```
 
-e.g. ```mvn clean install -Plocal-nexus3```
+e.g. ```./mvnw clean install -Plocal-nexus3```
 
 # Getting Help
 
