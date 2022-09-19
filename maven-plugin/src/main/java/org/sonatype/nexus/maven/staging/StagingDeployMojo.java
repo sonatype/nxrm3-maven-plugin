@@ -62,7 +62,7 @@ public class StagingDeployMojo
 
   private static final String NOT_APPLIES = "n/a";
 
-  @Parameter(property = "repository", required = true)
+  @Parameter(property = "repository")
   private String repository;
 
   @Parameter(property = "tag")

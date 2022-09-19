@@ -58,10 +58,10 @@ public abstract class StagingMojo
   @Parameter(defaultValue = "${session}", readonly = true, required = true)
   private MavenSession mavenSession;
   
-  @Parameter(property = "serverId", required = true)
+  @Parameter(property = "serverId")
   private String serverId;
 
-  @Parameter(property = "nexusUrl", required = true)
+  @Parameter(property = "nexusUrl")
   private String nexusUrl;
 
   /**
