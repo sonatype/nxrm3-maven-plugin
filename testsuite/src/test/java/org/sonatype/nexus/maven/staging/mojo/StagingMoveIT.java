@@ -163,8 +163,6 @@ public class StagingMoveIT
     String tag = randomUUID().toString();
     String artifactId = randomUUID().toString();
 
-    //maybeAddRepoScript();
-
     //Perform initial deploy and move using default and user defined properties
     createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
     createTargetRepo(testName.getMethodName());
@@ -249,8 +247,6 @@ public class StagingMoveIT
   }
 
   private void prepareForMove(final String tag, final String artifactId) throws Exception  {
-    //maybeAddRepoScript();
-
     assertStagingWithDeployGoal(STAGING_DEPLOY, artifactId, tag);
 
     createTargetRepo(testName.getMethodName());
