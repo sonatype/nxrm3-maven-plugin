@@ -37,3 +37,4 @@ override.tf
 .terraform
 .mvn/
 .nxrm/
+*.versionsBackup

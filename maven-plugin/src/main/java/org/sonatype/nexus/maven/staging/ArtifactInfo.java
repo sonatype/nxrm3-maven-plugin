@@ -17,7 +17,9 @@ package org.sonatype.nexus.maven.staging;
  */
 public class ArtifactInfo
 {
+  private static final String NOT_APPLICABLE = "n/a";
 
+  private String artifactPath;
   private String group;
   private String artifactId;
   private String version;
@@ -29,6 +31,10 @@ public class ArtifactInfo
   private String pluginPrefix;
   private String repositoryId;
   private String repositoryUrl;
+
+  public String getArtifactPath() { return artifactPath; }
+
+  public void setArtifactPath(final String artifactPath) { this.artifactPath = artifactPath; }
 
   public String getGroup() {
     return group;
@@ -64,11 +70,11 @@ public class ArtifactInfo
 
 
   public String getClassifier() {
-    return classifier;
+    return NOT_APPLICABLE.equals(classifier) ? null: classifier;
   }
 
   public void setClassifier(final String classifier) {
-    this.classifier = classifier;
+    this.classifier = classifier != null ? classifier : NOT_APPLICABLE;
   }
 
   public String getPackaging() {
@@ -88,19 +94,19 @@ public class ArtifactInfo
   }
 
   public String getPomFileName() {
-    return pomFileName;
+    return NOT_APPLICABLE.equals(pomFileName) ? null: pomFileName;
   }
 
   public void setPomFileName(final String pomFileName) {
-    this.pomFileName = pomFileName;
+    this.pomFileName = pomFileName != null ? pomFileName : NOT_APPLICABLE;
   }
 
   public String getPluginPrefix() {
-    return pluginPrefix;
+    return NOT_APPLICABLE.equals(pluginPrefix) ? null: pluginPrefix;
   }
 
   public void setPluginPrefix(final String pluginPrefix) {
-    this.pluginPrefix = pluginPrefix;
+    this.pluginPrefix = pluginPrefix != null ? pluginPrefix : NOT_APPLICABLE;
   }
 
   public String getRepositoryId() {

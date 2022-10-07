@@ -1,0 +1,30 @@
+[
+  {
+    "artifactPath": "local/test/maven-test-project/1.0/maven-test-project-1.0.jar",
+    "group": "local.test",
+    "artifactId": "maven-test-project",
+    "version": "1.0",
+    "tag": "generatedTag",
+    "classifier": null,
+    "packaging": "jar",
+    "extension": "jar",
+    "pomFileName": "maven-test-project-1.0.pom",
+    "pluginPrefix": null,
+    "repositoryId": "local-nexus",
+    "repositoryUrl": "http://localhost:8081"
+  },
+  {
+    "artifactPath": "local/test/maven-test-project/1.0/maven-test-project-1.0.pom",
+    "group": "local.test",
+    "artifactId": "maven-test-project",
+    "version": "1.0",
+    "tag": "generatedTag",
+    "classifier": null,
+    "packaging": "pom",
+    "extension": "pom",
+    "pomFileName": null,
+    "pluginPrefix": null,
+    "repositoryId": "local-nexus",
+    "repositoryUrl": "http://localhost:8081"
+  }
+]

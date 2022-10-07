@@ -15,6 +15,7 @@ package org.sonatype.nexus.maven.staging.mojo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -162,7 +163,7 @@ public class StagingMoveIT
     String tag = randomUUID().toString();
     String artifactId = randomUUID().toString();
 
-    maybeAddRepoScript();
+    //maybeAddRepoScript();
 
     //Perform initial deploy and move using default and user defined properties
     createProject(projectDir, RELEASE_REPOSITORY, GROUP_ID, artifactId, VERSION);
@@ -248,7 +249,7 @@ public class StagingMoveIT
   }
 
   private void prepareForMove(final String tag, final String artifactId) throws Exception  {
-    maybeAddRepoScript();
+    //maybeAddRepoScript();
 
     assertStagingWithDeployGoal(STAGING_DEPLOY, artifactId, tag);
 
@@ -311,7 +312,7 @@ public class StagingMoveIT
   private Properties loadStagingProperties() throws Exception {
     File propertiesFile = new File(projectDir.getAbsolutePath() + "/target/nexus-staging/staging/staging.properties");
     final Properties properties = new Properties();
-    try (InputStream inputStream = new FileInputStream(propertiesFile)) {
+    try (InputStream inputStream = Files.newInputStream(propertiesFile.toPath())) {
       properties.load(inputStream);
     }
     return properties;
