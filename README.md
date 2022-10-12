@@ -14,9 +14,9 @@
 -->
 # NXRM3 Maven Plugin
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.plugins/nxrm3-maven-plugin.svg?label=Maven%20Central)](https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.sonatype.plugins%22%20AND%20a%3A%22nxrm3-maven-plugin%22)
+[![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.plugins/nxrm3-maven-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.sonatype.plugins/nxrm3-maven-plugin)
 
-This plugin handles Nexus Repository Manager 3 operations for Maven projects.
+This [Repository Manager for Maven Plugin](https://help.sonatype.com/integrations/nexus-and-continuous-integration/repository-manager-for-maven-plugin) handles [Nexus Repository Manager 3 staging operations](https://help.sonatype.com/repomanager3/nexus-repository-administration/staging) for Maven projects.
 
 # Example configuration
 
