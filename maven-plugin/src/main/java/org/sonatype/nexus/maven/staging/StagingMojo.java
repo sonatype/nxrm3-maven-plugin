@@ -96,7 +96,7 @@ public abstract class StagingMojo
 
       Server decryptedServer = result.getServer();
 
-      return new ServerConfig(URI.create(nexusUrl),
+      return new ServerConfig(URI.create(getNexusUrl()),
           new Authentication(decryptedServer.getUsername(), decryptedServer.getPassword()));
     }
     else {

@@ -25,7 +25,8 @@ import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 import com.sonatype.nexus.api.repository.v3.Tag;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -83,11 +84,7 @@ public class StagingUploadMojoTest
   @Mock
   private Settings settings;
 
-  @Mock
-  private Artifact artifact, attachedArtifact;
-
-  @Mock
-  private ArtifactHandler artifactHandler;
+  private Artifact artifact;
 
   @Mock
   private TagGenerator tagGenerator;
@@ -115,8 +112,10 @@ public class StagingUploadMojoTest
   public void setup() throws Exception {
     super.setUp();
     tempDirectory = createTempDirectory("test");
-    underTest = lookupMojo();
+    artifact = new DefaultArtifact(GROUP_ID, ARTIFACT_ID, VERSION, null, EXTENSION, CLASSIFIER,
+        new DefaultArtifactHandler());
     setupMockBehaviour();
+    underTest = lookupMojo();
   }
 
   @Test
@@ -245,24 +244,10 @@ public class StagingUploadMojoTest
 
     when(settings.getServer(anyString())).thenReturn(server);
 
-    mockArtifact(artifact);
-    mockArtifact(attachedArtifact);
-
     when(tagGenerator.generate(ARTIFACT_ID, VERSION)).thenReturn(GENERATED_TAG);
 
     when(clientFactory.build(any())).thenReturn(client);
 
     when(client.getTag(TAG)).thenReturn(Optional.of(new Tag(TAG)));
-  }
-
-  private void mockArtifact(final Artifact artifact) {
-    when(artifact.getGroupId()).thenReturn(GROUP_ID);
-    when(artifact.getArtifactId()).thenReturn(ARTIFACT_ID);
-    when(artifact.getBaseVersion()).thenReturn(VERSION);
-    when(artifact.getFile()).thenReturn(getPom());
-    when(artifact.getType()).thenReturn(EXTENSION);
-    when(artifact.getArtifactHandler()).thenReturn(artifactHandler);
-    when(artifactHandler.getExtension()).thenReturn(EXTENSION);
-    when(artifact.getClassifier()).thenReturn(CLASSIFIER);
   }
 }

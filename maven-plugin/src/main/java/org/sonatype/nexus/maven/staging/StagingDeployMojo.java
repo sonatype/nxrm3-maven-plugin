@@ -137,7 +137,7 @@ public class StagingDeployMojo
   }
 
   private void deployToRemote(final List<Artifact> deployables, final String tag)
-      throws MojoFailureException, MojoExecutionException
+      throws MojoFailureException
   {
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
 
@@ -147,9 +147,6 @@ public class StagingDeployMojo
       maybeCreateTag(client, tag);
       getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
       doUpload(client, deployables, tag);
-    }
-    catch (MojoExecutionException e) {
-      throw e;
     }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
@@ -248,7 +245,6 @@ public class StagingDeployMojo
         .orElse(null);
 
     ArtifactInfo artifactInfo = new ArtifactInfo();
-    artifactInfo.setArtifactPath(artifactRepository.pathOf(artifact));
     artifactInfo.setGroup(artifact.getGroupId());
     artifactInfo.setArtifactId(artifact.getArtifactId());
     artifactInfo.setVersion(artifact.getVersion());
@@ -258,8 +254,6 @@ public class StagingDeployMojo
     artifactInfo.setExtension(artifact.getArtifactHandler().getExtension());
     artifactInfo.setPomFileName(pomFileName);
     artifactInfo.setPluginPrefix(pluginPrefix);
-    artifactInfo.setRepositoryId(getServerId());
-    artifactInfo.setRepositoryUrl(getNexusUrl());
 
     if (index.exists()) {
       List<ArtifactInfo> currentData = objectMapper.readValue(index, new TypeReference<List<ArtifactInfo>>() { });
@@ -313,7 +307,7 @@ public class StagingDeployMojo
   private void doUpload(
       final RepositoryManagerV3Client client,
       final List<Artifact> deployables,
-      final String tag) throws Exception
+      final String tag) throws IOException, RepositoryManagerException
   {
     List<InputStream> streams = new ArrayList<>();
 

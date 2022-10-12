@@ -65,8 +65,11 @@ public class StagingUploadMojo
 {
   private static final String FORMAT = "maven2";
 
-  @Parameter(property = "repository")
+  @Parameter(property = "repository", required = true)
   private String repository;
+
+  @Parameter(property = "nexusUrl", required = true)
+  private String nexusUrl;
 
   @Parameter(property = "tag")
   private String tag;
@@ -378,8 +381,10 @@ public class StagingUploadMojo
     }
   }
 
-  @VisibleForTesting
-  void setRepository(final String repositoryName) { this.repository = repositoryName; }
+  @Override
+  protected String getNexusUrl() {
+    return nexusUrl;
+  }
 
   @VisibleForTesting
   void setArtifact(final Artifact artifact) {
@@ -394,15 +399,5 @@ public class StagingUploadMojo
   @VisibleForTesting
   void setTagGenerator(final TagGenerator tagGenerator) {
     this.tagGenerator = tagGenerator;
-  }
-
-  @VisibleForTesting
-  void setArtifactRepositoryFactory(final ArtifactRepositoryFactory artifactRepositoryFactory) {
-    this.artifactRepositoryFactory = artifactRepositoryFactory;
-  }
-
-  @VisibleForTesting
-  void setArtifactRepositoryLayout(final ArtifactRepositoryLayout artifactRepositoryLayout) {
-    this.artifactRepositoryLayout = artifactRepositoryLayout;
   }
 }
