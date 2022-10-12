@@ -18,24 +18,20 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.sonatype.nexus.api.repository.v3.SearchBuilder;
-
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.entity.ContentType;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.maven.it.util.StringUtils;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 
@@ -91,11 +87,12 @@ public abstract class NxrmITSupport
     return await().atMost(10, SECONDS).until(() -> componentSearch(search).items, hasSize(1)).get(0);
   }
 
-  protected ComponentItem verifyComponent(final String repository,
-                                          final String group,
-                                          final String name,
-                                          final String version,
-                                          final String... tags)
+  protected ComponentItem verifyComponent(
+      final String repository,
+      final String group,
+      final String name,
+      final String version,
+      final String... tags)
   {
     Map<String, String> search = getSearchQuery(repository, group, name, version);
 
@@ -105,7 +102,6 @@ public abstract class NxrmITSupport
       component = waitForComponentWithTags(search, tags);
       stream(tags).forEach(tag -> assertThat(component.tags, hasItem(tag)));
       return component;
-
     }
     catch (Exception e) {
       throwComponentNotFoundAssertionError(group, name, version, repository, e);
@@ -115,19 +111,21 @@ public abstract class NxrmITSupport
     return null;
   }
 
-  protected void verifyPomAssetForComponent(final String repository,
-                                            final String group,
-                                            final String name,
-                                            final String version)
+  protected void verifyPomAssetForComponent(
+      final String repository,
+      final String group,
+      final String name,
+      final String version)
   {
     verifyAssetForComponent(repository, group, name, version, ".pom");
   }
 
-  protected void verifyAssetForComponent(final String repository,
-                                         final String group,
-                                         final String name,
-                                         final String version,
-                                         final String extension)
+  protected void verifyAssetForComponent(
+      final String repository,
+      final String group,
+      final String name,
+      final String version,
+      final String extension)
   {
     Map<String, String> search = getSearchQuery(repository, group, name, version);
 
@@ -142,9 +140,10 @@ public abstract class NxrmITSupport
     }
   }
 
-  protected void verifyAssetForComponent(final String repository,
-                                         final ComponentItem component,
-                                         final String extension)
+  protected void verifyAssetForComponent(
+      final String repository,
+      final ComponentItem component,
+      final String extension)
   {
     component.assets.stream()
         .filter(asset -> asset.path.endsWith(extension))
@@ -154,10 +153,11 @@ public abstract class NxrmITSupport
             component.group, component.name, component.version, extension, repository)));
   }
 
-  protected Map<String, String> getSearchQuery(final String repository,
-                                             final String group,
-                                             final String name,
-                                             final String version)
+  protected Map<String, String> getSearchQuery(
+      final String repository,
+      final String group,
+      final String name,
+      final String version)
   {
     // verify server can retrieve the component
     return SearchBuilder.create().withRepository(repository).withGroup(group).withName(name)
@@ -167,7 +167,7 @@ public abstract class NxrmITSupport
   protected ComponentsResponse componentSearch(final Map<String, String> search)
       throws Exception
   {
-    StringBuilder query = new StringBuilder("/service/rest/v1/search?");
+    StringBuilder query = new StringBuilder(SERVICE_URL_BASE + "search?");
 
     for (String key : search.keySet()) {
       query.append(key).append("=").append(search.get(key)).append("&");
@@ -181,56 +181,34 @@ public abstract class NxrmITSupport
   {
     HttpGet get = new HttpGet(nexusItUri.resolve(query));
     get.setHeader("Accept", "application/json");
-    CloseableHttpClient http = HttpClientBuilder.create().build();
-    String responseBody = http.execute(get, new BasicResponseHandler());
-    return mapper.readerFor(ComponentsResponse.class).readValue(responseBody);
-  }
-
-  protected void maybeAddRepoScript() throws Exception {
     try (CloseableHttpClient http = HttpClientBuilder.create().build()) {
-      URI scriptUri = nexusItUri.resolve("/service/rest/v1/script/");
-      HttpGet get = new HttpGet(scriptUri.resolve("api-test-create-repo"));
-      get.setHeader(HttpHeaders.AUTHORIZATION,
-          "Basic " + Base64.getEncoder().encodeToString("admin:admin123".getBytes()));
-
-      try {
-        http.execute(get, new BasicResponseHandler());
-      }
-      catch (HttpResponseException e) {
-        if (e.getStatusCode() != 404) {
-          throw e;
-        }
-
-        StringEntity scriptEntity = new StringEntity(new String(Files.readAllBytes(
-            Paths.get(getClass().getResource("/create-repo.json").toURI()))));
-        HttpPost post = new HttpPost(scriptUri);
-        post.setEntity(scriptEntity);
-        post.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-        post.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
-        post.setHeader(HttpHeaders.AUTHORIZATION,
-            "Basic " + Base64.getEncoder().encodeToString("admin:admin123".getBytes()));
-        http.execute(post, new BasicResponseHandler());
-      }
+      String responseBody = http.execute(get, new BasicResponseHandler());
+      return mapper.readerFor(ComponentsResponse.class).readValue(responseBody);
     }
   }
 
   protected void createTargetRepo(final String repoName) throws Exception {
+    String payload = new String(Files.readAllBytes(
+        Paths.get(getClass().getResource("/create-maven-hosted-repo.json").toURI())));
     try (CloseableHttpClient http = HttpClientBuilder.create().build()) {
-      URI runUri = nexusItUri.resolve("/service/rest/v1/script/api-test-create-repo/run");
+      URI runUri = nexusItUri.resolve(SERVICE_URL_BASE + "repositories/maven/hosted");
       HttpPost run = new HttpPost(runUri);
-      run.setEntity(new StringEntity("{\"repoName\": \"" + repoName + "\"}"));
-      run.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_PLAIN.getMimeType());
+      run.setEntity(new StringEntity(payload.replace("$NAME", repoName)));
+      run.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+      run.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
       run.setHeader(HttpHeaders.AUTHORIZATION,
           "Basic " + Base64.getEncoder().encodeToString("admin:admin123".getBytes()));
       http.execute(run, new BasicResponseHandler());
     }
   }
 
-  private void throwComponentNotFoundAssertionError(final String group,
-                                                    final String name,
-                                                    final String version,
-                                                    final String repository,
-                                                    final Exception e) {
+  private void throwComponentNotFoundAssertionError(
+      final String group,
+      final String name,
+      final String version,
+      final String repository,
+      final Exception e)
+  {
     throw new AssertionError(String.format(
         "Component (group: %s; name: %s; version: %s) was not found in Nexus Repository Manager repository : %s",
         group, name, version, repository), e);
@@ -241,7 +219,7 @@ public abstract class NxrmITSupport
   {
     public List<ComponentItem> items;
 
-    public ComponentsResponse() {}
+    public ComponentsResponse() { }
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -257,7 +235,7 @@ public abstract class NxrmITSupport
 
     public List<String> tags;
 
-    public ComponentItem() {}
+    public ComponentItem() { }
 
     public List<String> getTags() {
       return tags;
@@ -275,7 +253,7 @@ public abstract class NxrmITSupport
 
     public Checksum checksum;
 
-    public AssetItem() {}
+    public AssetItem() { }
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -283,6 +261,6 @@ public abstract class NxrmITSupport
   {
     public String md5;
 
-    public Checksum() {}
+    public Checksum() { }
   }
 }

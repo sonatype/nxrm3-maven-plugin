@@ -60,8 +60,6 @@ public class StagingDeployMojo
 {
   private static final String FORMAT = "maven2";
 
-  private static final String NOT_APPLIES = "n/a";
-
   @Parameter(property = "repository")
   private String repository;
 
@@ -138,8 +136,8 @@ public class StagingDeployMojo
     }
   }
 
-  private void deployToRemote(final List<Artifact> deployables, String tag)
-      throws MojoFailureException, MojoExecutionException
+  private void deployToRemote(final List<Artifact> deployables, final String tag)
+      throws MojoFailureException
   {
     RepositoryManagerV3Client client = getClientFactory().build(getServerConfiguration(getMavenSession()));
 
@@ -150,9 +148,6 @@ public class StagingDeployMojo
       getLog().info(String.format("Deploying to repository '%s' with tag '%s'", repository, tag));
       doUpload(client, deployables, tag);
     }
-    catch (MojoExecutionException e) {
-      throw e;
-    }
     catch (Exception ex) {
       throw new MojoFailureException(ex.getMessage(), ex);
     }
@@ -162,12 +157,11 @@ public class StagingDeployMojo
       throws MojoExecutionException
   {
     File target = getWorkDirectoryRoot();
-    File index = new File(target, ".index");
     ArtifactRepository stagingRepository = createFileRepository(target);
 
     try {
       for (Artifact artifact : deployables) {
-        installLocally(index, artifact, stagingRepository, tag);
+        installLocally(getStagingIndexFile(), artifact, stagingRepository, tag);
       }
     }
     catch (ArtifactInstallationException e) {
@@ -178,10 +172,13 @@ public class StagingDeployMojo
   private ArtifactRepository createFileRepository(final File target) throws MojoExecutionException {
     if (target.exists() && (!target.canWrite() || !target.isDirectory())) {
       throw new MojoExecutionException(
-          "Staging failed: staging directory points to an existing file but is not a directory or is not writable!");
+          "Staging failed: staging directory points to an existing file but is not a directory or is not writable");
     }
     else if (!target.exists()) {
-      target.mkdirs();
+      if (!target.mkdirs()) {
+        throw new MojoExecutionException(
+            String.format("Staging failed: unable to create directory: %s", target));
+      }
     }
 
     try {
@@ -230,35 +227,33 @@ public class StagingDeployMojo
       final ArtifactRepository artifactRepository) throws IOException
   {
 
-    Optional<String> maybePluginPrefix = artifact.getMetadataList()
+    String pluginPrefix = artifact.getMetadataList()
         .stream()
-        .filter(metadata -> metadata instanceof GroupRepositoryMetadata)
+        .filter(GroupRepositoryMetadata.class::isInstance)
         .map(metadata -> ((GroupRepositoryMetadata) metadata).getMetadata().getPlugins())
         .filter(plugins -> !plugins.isEmpty())
         .flatMap(List::stream)
         .map(Plugin::getPrefix)
-        .findFirst();
+        .findFirst()
+        .orElse(null);
 
-    Optional<String> maybePomFileName = artifact.getMetadataList()
+    String pomFileName = artifact.getMetadataList()
         .stream()
-        .filter(metadata -> metadata instanceof ProjectArtifactMetadata)
+        .filter(ProjectArtifactMetadata.class::isInstance)
         .map(projectMetadata -> projectMetadata.getLocalFilename(artifactRepository))
-        .findFirst();
-
-    Optional<String> maybeClassifier = Optional.ofNullable(artifact.getClassifier());
+        .findFirst()
+        .orElse(null);
 
     ArtifactInfo artifactInfo = new ArtifactInfo();
     artifactInfo.setGroup(artifact.getGroupId());
     artifactInfo.setArtifactId(artifact.getArtifactId());
     artifactInfo.setVersion(artifact.getVersion());
     artifactInfo.setTag(tag);
-    artifactInfo.setClassifier(maybeClassifier.orElse(NOT_APPLIES));
+    artifactInfo.setClassifier(artifact.getClassifier());
     artifactInfo.setPackaging(artifact.getType());
     artifactInfo.setExtension(artifact.getArtifactHandler().getExtension());
-    artifactInfo.setPomFileName(maybePomFileName.orElse(NOT_APPLIES));
-    artifactInfo.setPluginPrefix(maybePluginPrefix.orElse(NOT_APPLIES));
-    artifactInfo.setRepositoryId(getServerId());
-    artifactInfo.setRepositoryUrl(getNexusUrl());
+    artifactInfo.setPomFileName(pomFileName);
+    artifactInfo.setPluginPrefix(pluginPrefix);
 
     if (index.exists()) {
       List<ArtifactInfo> currentData = objectMapper.readValue(index, new TypeReference<List<ArtifactInfo>>() { });
@@ -312,7 +307,7 @@ public class StagingDeployMojo
   private void doUpload(
       final RepositoryManagerV3Client client,
       final List<Artifact> deployables,
-      final String tag) throws Exception
+      final String tag) throws IOException, RepositoryManagerException
   {
     List<InputStream> streams = new ArrayList<>();
 

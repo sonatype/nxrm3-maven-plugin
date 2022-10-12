@@ -17,7 +17,6 @@ package org.sonatype.nexus.maven.staging;
  */
 public class ArtifactInfo
 {
-
   private String group;
   private String artifactId;
   private String version;
@@ -27,8 +26,6 @@ public class ArtifactInfo
   private String extension;
   private String pomFileName;
   private String pluginPrefix;
-  private String repositoryId;
-  private String repositoryUrl;
 
   public String getGroup() {
     return group;
@@ -101,21 +98,5 @@ public class ArtifactInfo
 
   public void setPluginPrefix(final String pluginPrefix) {
     this.pluginPrefix = pluginPrefix;
-  }
-
-  public String getRepositoryId() {
-    return repositoryId;
-  }
-
-  public void setRepositoryId(final String repositoryId) {
-    this.repositoryId = repositoryId;
-  }
-
-  public String getRepositoryUrl() {
-    return repositoryUrl;
-  }
-
-  public void setRepositoryUrl(final String repositoryUrl) {
-    this.repositoryUrl = repositoryUrl;
   }
 }

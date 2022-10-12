@@ -1,0 +1,20 @@
+{
+  "name": "$NAME",
+  "online": true,
+  "storage": {
+    "blobStoreName": "default",
+    "strictContentTypeValidation": true,
+    "writePolicy": "allow_once"
+  },
+  "cleanup": {
+    "policyNames": []
+  },
+  "component": {
+    "proprietaryComponents": true
+  },
+  "maven": {
+    "versionPolicy": "MIXED",
+    "layoutPolicy": "STRICT",
+    "contentDisposition": "ATTACHMENT"
+  }
+}

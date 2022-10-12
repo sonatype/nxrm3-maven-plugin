@@ -1,5 +1,0 @@
-{
-  "name": "api-test-create-repo",
-  "content": "import groovy.json.JsonSlurper\ndef arg = new JsonSlurper().parseText(args)\nrepository.createMavenHosted(arg.repoName)",
-  "type": "groovy"
-}

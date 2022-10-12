@@ -1,0 +1,24 @@
+[
+  {
+    "group": "local.test",
+    "artifactId": "maven-test-project",
+    "version": "1.0",
+    "tag": "generatedTag",
+    "classifier": null,
+    "packaging": "jar",
+    "extension": "jar",
+    "pomFileName": "maven-test-project-1.0.pom",
+    "pluginPrefix": null
+  },
+  {
+    "group": "local.test",
+    "artifactId": "maven-test-project",
+    "version": "1.0",
+    "tag": "generatedTag",
+    "classifier": null,
+    "packaging": "pom",
+    "extension": "pom",
+    "pomFileName": null,
+    "pluginPrefix": null
+  }
+]

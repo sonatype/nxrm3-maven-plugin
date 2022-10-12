@@ -73,6 +73,8 @@ public abstract class StagingMojo
   @Parameter(property = "altStagingDirectory")
   private File altStagingDirectory;
 
+  private String stagingIndexFilename = ".index";
+
   @Parameter(defaultValue = "${plugin.groupId}", readonly = true, required = true)
   private String pluginGroupId;
 
@@ -94,7 +96,7 @@ public abstract class StagingMojo
 
       Server decryptedServer = result.getServer();
 
-      return new ServerConfig(URI.create(nexusUrl),
+      return new ServerConfig(URI.create(getNexusUrl()),
           new Authentication(decryptedServer.getUsername(), decryptedServer.getPassword()));
     }
     else {
@@ -200,6 +202,8 @@ public abstract class StagingMojo
     return new File(getStagingDirectoryRoot(), STAGING_PROPERTIES_FILENAME);
   }
 
+  protected File getStagingIndexFile() { return new File(getWorkDirectoryRoot(), stagingIndexFilename); }
+
   /**
    * Throws {@link MojoFailureException} if Maven is invoked offline, as this plugin MUST WORK online.
    *
@@ -236,5 +240,9 @@ public abstract class StagingMojo
     this.offline = offline;
   }
 
+  @VisibleForTesting
+  void setStagingIndexFilename(final String filename) {
+    this.stagingIndexFilename = filename;
+  }
 
 }

@@ -13,14 +13,12 @@
 package org.sonatype.nexus.maven.staging.test.support;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 import javax.inject.Inject;
 
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
@@ -169,8 +167,8 @@ public abstract class StagingMavenPluginITSupport
     verifier.deleteArtifact(GROUP_ID, ARTIFACT_ID, VERSION, POM_PACKAGING);
 
     List<String> options = new ArrayList<>();
-    options.add("-Djava.awt.headless=true"); // on Mac a Dock icon bumps on ever Verifier invocation
-    options.add("-s " + settingsXml);
+    options.add("-Djava.awt.headless=true"); // on Mac a Dock icon bumps on every Verifier invocation
+    options.add("-gs " + settingsXml); // Override the global settings to allow local/user settings to be respected
     verifier.setCliOptions(options);
   }
 
