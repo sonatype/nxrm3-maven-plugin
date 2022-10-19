@@ -129,14 +129,13 @@ Note: Delete searches **all** repositories for tagged assets.
 There is sometimes a desire to stage the deployment separately from performing the upload. This capability exists via
 deferred deployment for release artifacts (Snapshots are not supported). 
 
-The pom file requires configuration as described in [Example configuration](#example-configuration) with the addition of
-a ```stageLocally``` property, that can be present within the pom or on the command-line as seen in the example below.
+The pom file requires configuration as described in [Example configuration](#example-configuration) to which you may add 
+a ```stageLocally``` property either within the pom or on the command-line as seen in the example below.
 
-There is also the ability to use the ```altStagingDirectory``` property to specify the directory that the local staging
-will be performed within. If not specified, this will default to ```target/nexus-staging``` (and as such will be removed
-with ```mvn clean```).
+You can also use the ```altStagingDirectory``` property to specify the directory in which to perform the local staging. If not specified, this will default to ```target/nexus-staging``` and will be removed
+with ```mvn clean```.
 
-e.g. ```mvn clean package nxrm3:deploy -DstageLocally -DaltStagingDirectory=myStagingDir``` or
+e.g. ,```mvn clean package nxrm3:deploy -DstageLocally -DaltStagingDirectory=myStagingDir``` or
 
 ```
 <plugin>
@@ -147,29 +146,29 @@ e.g. ```mvn clean package nxrm3:deploy -DstageLocally -DaltStagingDirectory=mySt
        ...
 ```
 
-Within the staging directory, a suitable structure will be automatically created when locally staged, along with a
-file (```.index```) that holds metadata to allow subsequent uploading. The staging directory may be moved elsewhere and
-subsequent uploads performed from the new location, so long as the new directory location is specified through the 
+When locally staged, a suitable structure will be automatically created within the staging directory along with a
+file (```.index```) that holds metadata to allow subsequent uploading. You can also move this staging directory and
+have subsequent uploads performed from the new location as long as the new directory location is specified through the 
 ```altStagingDirectory``` property on the upload command-line.
 
-For example: ```mvn nxrm3:upload ... -DaltStagingDirectory=<directory>```
+e.g., ```mvn nxrm3:upload ... -DaltStagingDirectory=<directory>```
 
 ### Deferred Deployment Example
 
-Stage the deployment, but defer the upload:
+The following example stages the deployment but defers the upload:
 
 ```mvn clean package nxrm3:deploy -DstageLocally```
 
-The staging directory may now be moved or left in place - it is important that nothing within this directory structure
-is modified externally, to guarantee the integrity of the deployment, and that appropriate ```altStagingDirectory```
-properties are provided where necessary.
+You may now move the staging directory or leave it in place. To guarantee deployment integrity, nothing within this directory structure
+should be modified externally, and you should provide appropriate ```altStagingDirectory```
+properties where necessary.
 
 At a later time:
 
 ```mvn nxrm3:upload -DserverId=<serverID> -Drepository=<repository> -DnexusUrl=<nexusUrl>```
 
-(The parameters above are required as they would typically be within the pom.xml as described in 
-[Example configuration](#example-configuration) but the pom is not required as part of the upload)
+The parameters above are required as they would typically be within the pom.xml as described in 
+[Example configuration](#example-configuration), but the pom is not required as part of the upload.
 
 
 # Mutation testing
