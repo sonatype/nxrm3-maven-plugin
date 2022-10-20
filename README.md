@@ -163,7 +163,7 @@ You may now move the staging directory or leave it in place. To guarantee deploy
 should be modified externally, and you should provide appropriate ```altStagingDirectory```
 properties where necessary.
 
-At a later time:
+Use the following at a later time to upload what was previously staged:
 
 ```mvn nxrm3:upload -DserverId=<serverID> -Drepository=<repository> -DnexusUrl=<nexusUrl>```
 
