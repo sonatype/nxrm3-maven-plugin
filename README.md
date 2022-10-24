@@ -124,6 +124,53 @@ The delete operation makes use of a single property ```tag``` and operates as de
 
 Note: Delete searches **all** repositories for tagged assets.
 
+# Deferred Deployment
+
+There is sometimes a desire to stage the deployment separately from performing the upload. This capability exists via
+deferred deployment for release artifacts (Snapshots are not supported). 
+
+The pom file requires configuration as described in [Example configuration](#example-configuration) to which you may add 
+a ```stageLocally``` property either within the pom or on the command-line as seen in the example below.
+
+You can also use the ```altStagingDirectory``` property to specify the directory in which to perform the local staging. If not specified, this will default to ```target/nexus-staging``` and will be removed
+with ```mvn clean```.
+
+e.g. ,```mvn clean package nxrm3:deploy -DstageLocally -DaltStagingDirectory=myStagingDir``` or
+
+```
+<plugin>
+    ...
+    <configuration>
+      ...
+      <altStagingDirectory>myStagingDir</altStagingDirectory>
+       ...
+```
+
+When locally staged, a suitable structure will be automatically created within the staging directory along with a
+file (```.index```) that holds metadata to allow subsequent uploading. You can also move this staging directory and
+have subsequent uploads performed from the new location as long as the new directory location is specified through the 
+```altStagingDirectory``` property on the upload command-line.
+
+e.g., ```mvn nxrm3:upload ... -DaltStagingDirectory=<directory>```
+
+### Deferred Deployment Example
+
+The following example stages the deployment but defers the upload:
+
+```mvn clean package nxrm3:deploy -DstageLocally```
+
+You may now move the staging directory or leave it in place. To guarantee deployment integrity, nothing within this directory structure
+should be modified externally, and you should provide appropriate ```altStagingDirectory```
+properties where necessary.
+
+Use the following at a later time to upload what was previously staged:
+
+```mvn nxrm3:upload -DserverId=<serverID> -Drepository=<repository> -DnexusUrl=<nexusUrl>```
+
+The parameters above are required as they would typically be within the pom.xml as described in 
+[Example configuration](#example-configuration), but the pom is not required as part of the upload.
+
+
 # Mutation testing
 
 Run ```./mvnw -DwithHistory org.pitest:pitest-maven:mutationCoverage``` to calculate mutation coverage. This needs to be 
