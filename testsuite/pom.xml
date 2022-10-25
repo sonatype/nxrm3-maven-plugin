@@ -28,6 +28,7 @@
   <artifactId>nxrm3-maven-plugin-testsuite</artifactId>
   
   <properties>
+    <nexus3.version>3.41.1-01</nexus3.version>
     <docker.skip>${skipTests}</docker.skip>
     <dockerArchive>${project.build.directory}/nxrm-pro-image.tar.gz</dockerArchive>
   </properties>
@@ -119,8 +120,7 @@
     <dependency>
       <groupId>com.sonatype.nexus.testsuite</groupId>
       <artifactId>nxrm-pro-image</artifactId>
-      <!-- LATEST is deprecated, but it prevents testing against out-of-date versions -->
-      <version>LATEST</version>
+      <version>${nexus3.version}</version>
       <type>tar.gz</type>
       <scope>test</scope>
     </dependency>
