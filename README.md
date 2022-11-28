@@ -26,7 +26,6 @@ The basic build configuration requires a url (nexusUrl), repository to deploy (r
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nxrm3-maven-plugin</artifactId>
         <version><!-- choose a version --></version>
-        <extensions>true</extensions>
         <configuration>
           <nexusUrl>http://localhost:8081</nexusUrl>
           
@@ -55,6 +54,44 @@ when the plugins deploy goal is activated.
             </goals>
           </execution>
         </executions>
+```
+    
+# Allowing deployment of -SNAPSHOTs
+
+The `nxrm3` plugin will not deploy `-SNAPSHOT` artifacts, and the Maven Deploy plugin will not tag release artifacts when deploying to Nexus.
+
+To allow your project to switch between deployment mechanisms, you will need the `prepare-deploy` goal bound to the lifecycle, e.g.
+
+```
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nxrm3-maven-plugin</artifactId>
+        <version><!-- choose a version --></version>
+        <configuration>
+          <nexusUrl>http://localhost:8081</nexusUrl>
+          
+          <!-- The server "id" element from settings to use authentication from settings.xml-->
+          <serverId>local-nexus</serverId>
+         
+          <!-- Which repository to deploy to -->
+          <repository>maven-releases</repository>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default-prepare-deploy</id>
+            <goals>
+              <goal>prepare-deploy</goal> <!-- this will set maven-deploy.skip to true for release versions -->
+            </goals>
+          </execution>
+          <execution>
+            <id>default-deploy</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>deploy</goal> <!-- this will only deploy release versions -->
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 ```
 
 # Staging
