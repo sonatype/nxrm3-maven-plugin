@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.sonatype.nexus.api.repository.v3.SearchBuilder;
-import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
+import org.sonatype.goodies.testsupport.inject.InjectedTestSupport;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
