@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.sonatype.nexus.api.repository.v3.SearchBuilder;
-import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
+import org.sonatype.goodies.testsupport.inject.InjectedTestSupport;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +35,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 
-import static com.jayway.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.await;
 import static java.util.Arrays.stream;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
