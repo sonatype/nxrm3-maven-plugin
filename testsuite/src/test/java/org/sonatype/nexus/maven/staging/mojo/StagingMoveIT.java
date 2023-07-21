@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.maven.it.VerificationException;
 import org.junit.Test;
 
-import static com.jayway.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.await;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;

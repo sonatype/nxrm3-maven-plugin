@@ -35,7 +35,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 
-import static com.jayway.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.await;
 import static java.util.Arrays.stream;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
