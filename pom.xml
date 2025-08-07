@@ -94,7 +94,7 @@
       <dependency>
         <groupId>com.sonatype.nexus</groupId>
         <artifactId>nexus-platform-api</artifactId>
-        <version>5.2.10-01</version>
+        <version>5.2.14-01</version>
       </dependency>
 
       <dependency>
@@ -153,8 +153,8 @@
 
       <dependency>
         <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>1.9.5</version>
+        <artifactId>mockito-core</artifactId>
+        <version>5.2.0</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
