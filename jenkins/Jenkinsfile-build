@@ -4,7 +4,7 @@ library('jenkins-shared')
 def settings =[
     useMvnw: true,
     deployBranch: 'main',
-    javaVersion : 'OpenJDK 11',
+    javaVersion : 'OpenJDK 8',
     performSonarAnalysis: false,
     onSuccess: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
