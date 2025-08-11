@@ -6,6 +6,7 @@ def settings =[
     deployBranch: 'main',
     javaVersion : 'OpenJDK 11',
     performSonarAnalysis: false,
+    mavenOptions: '-DskipTests',
     onSuccess: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
     },
