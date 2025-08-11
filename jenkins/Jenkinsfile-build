@@ -4,7 +4,7 @@ library('jenkins-shared')
 def settings =[
     useMvnw: true,
     deployBranch: 'main',
-    javaVersion : 'OpenJDK 11',
+    javaVersion : 'OpenJDK 17',
     performSonarAnalysis: false,
     mavenOptions: '-DskipTests',
     onSuccess: { build, env ->

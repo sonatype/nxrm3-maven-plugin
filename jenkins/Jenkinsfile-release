@@ -3,7 +3,7 @@ library('jenkins-shared')
 
 def settings =[
     useMvnw: true,
-    javaVersion : 'OpenJDK 11',
+    javaVersion : 'OpenJDK 17',
     onSuccess: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
     },
