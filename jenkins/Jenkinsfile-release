@@ -4,6 +4,7 @@ library('jenkins-shared')
 def settings =[
     useMvnw: true,
     javaVersion : 'OpenJDK 17',
+    mavenOptions: '-DskipTests',
     onSuccess: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
     },
