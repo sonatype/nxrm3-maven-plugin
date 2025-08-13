@@ -181,14 +181,14 @@ public class StagingDeleteMojoTest
     underTest.execute();
   }
 
-  //@Test(expected = IllegalArgumentException.class)
-  //public void throwIllegalArgumentExceptionWhenIncorrectServerId() throws Exception {
-  //  createPropertiesFile(TAG, true);
-  //
-  //  when(settings.getServer(anyString())).thenReturn(null);
-  //
-  //  underTest.execute();
-  //}
+  @Test(expected = IllegalArgumentException.class)
+  public void throwIllegalArgumentExceptionWhenIncorrectServerId() throws Exception {
+    createPropertiesFile(TAG, true);
+
+    when(settings.getServer(anyString())).thenReturn(null);
+
+    underTest.execute();
+  }
 
   @Test
   public void getServerConfiguration() throws Exception {
@@ -237,7 +237,6 @@ public class StagingDeleteMojoTest
 
     when(clientFactory.build(any())).thenReturn(client);
 
-    //when(client.getTag(TAG)).thenReturn(Optional.of(new Tag(TAG)));
   }
 
 }
