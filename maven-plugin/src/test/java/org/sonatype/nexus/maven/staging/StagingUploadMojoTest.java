@@ -101,13 +101,6 @@ public class StagingUploadMojoTest
 
   private StagingUploadMojo underTest;
 
-  @After
-  @Override
-  public void tearDown() throws Exception {
-    forceDelete(tempDirectory.toFile());
-    super.tearDown();
-  }
-
   @Before
   public void setup() throws Exception {
     super.setUp();
@@ -116,6 +109,18 @@ public class StagingUploadMojoTest
         new DefaultArtifactHandler());
     setupMockBehaviour();
     underTest = lookupMojo();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+
+    // Clean up staging.properties if it exists
+    File propsFile = new File(getBasedir(), "staging/staging.properties");
+    if (propsFile.exists()) {
+      propsFile.delete();
+    }
+    forceDelete(tempDirectory.toFile());
+    super.tearDown();
   }
 
   @Test

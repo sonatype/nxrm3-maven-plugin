@@ -30,7 +30,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
@@ -45,11 +44,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.quality.Strictness;
 
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.Tag;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StagingDeleteMojoTest
@@ -92,6 +89,10 @@ public class StagingDeleteMojoTest
 
   @After
   public void tearDown() throws Exception {
+    File propsFile = new File(getBasedir(), "staging/staging.properties");
+    if (propsFile.exists()) {
+      propsFile.delete();
+    }
     forceDelete(tempDirectory.toFile());
   }
 
