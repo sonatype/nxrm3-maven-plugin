@@ -56,12 +56,6 @@
         <configuration>
           <skipITs>true</skipITs>
         </configuration>
-<!--        This configuration was commented since IT tests won't run-->
-<!--        <configuration>-->
-<!--          <systemProperties>-->
-<!--            <nexus3.it.port>${nexus3.it.port}</nexus3.it.port>-->
-<!--          </systemProperties>-->
-<!--        </configuration>-->
       </plugin>
     </plugins>
   </build>
