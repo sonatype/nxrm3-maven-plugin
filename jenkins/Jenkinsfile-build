@@ -14,7 +14,7 @@ def settings =[
     },
     iqPolicyEvaluation: { stage ->
       nexusPolicyEvaluation iqStage: stage, iqApplication: 'nxrm3-maven-plugin',
-        iqScanPatterns: [[scanPattern: 'scan_nothing']],
+        iqScanPatterns: [[scanPattern: '**/target/*.jar']],
         iqModuleExcludes: [[moduleExclude: 'testsuite/**']]
     }
 ]
