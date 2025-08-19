@@ -38,3 +38,6 @@ override.tf
 .mvn/
 .nxrm/
 *.versionsBackup
+
+# temporary folder for tests
+maven-plugin/src/test/resources/staging/

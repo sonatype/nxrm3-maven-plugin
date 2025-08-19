@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static java.nio.file.Files.createTempDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
@@ -49,9 +49,9 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -101,13 +101,6 @@ public class StagingUploadMojoTest
 
   private StagingUploadMojo underTest;
 
-  @After
-  @Override
-  public void tearDown() throws Exception {
-    forceDelete(tempDirectory.toFile());
-    super.tearDown();
-  }
-
   @Before
   public void setup() throws Exception {
     super.setUp();
@@ -116,6 +109,18 @@ public class StagingUploadMojoTest
         new DefaultArtifactHandler());
     setupMockBehaviour();
     underTest = lookupMojo();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+
+    // Clean up staging.properties if it exists
+    File propsFile = new File(getBasedir(), "staging/staging.properties");
+    if (propsFile.exists()) {
+      propsFile.delete();
+    }
+    forceDelete(tempDirectory.toFile());
+    super.tearDown();
   }
 
   @Test

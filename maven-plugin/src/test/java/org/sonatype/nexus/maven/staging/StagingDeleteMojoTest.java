@@ -18,9 +18,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,7 +30,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
@@ -44,11 +43,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.Tag;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StagingDeleteMojoTest
@@ -91,6 +89,10 @@ public class StagingDeleteMojoTest
 
   @After
   public void tearDown() throws Exception {
+    File propsFile = new File(getBasedir(), "staging/staging.properties");
+    if (propsFile.exists()) {
+      propsFile.delete();
+    }
     forceDelete(tempDirectory.toFile());
   }
 
@@ -129,7 +131,7 @@ public class StagingDeleteMojoTest
 
     verify(client).delete(eq(TAG));
   }
-  
+
   @Test
   public void testDefaultValueWhenTagIsEmpty() throws Exception {
     createPropertiesFile(TAG, true);
@@ -195,7 +197,7 @@ public class StagingDeleteMojoTest
 
     assertThat(config, is(notNullValue()));
   }
-  
+
   private void createPropertiesFile(String tag, boolean addTag) throws IOException {
     File stagingPropertiesFile = new File(underTest.getWorkDirectoryRoot(), "staging/staging.properties");
     stagingPropertiesFile.getParentFile().mkdirs();
@@ -236,7 +238,6 @@ public class StagingDeleteMojoTest
 
     when(clientFactory.build(any())).thenReturn(client);
 
-    when(client.getTag(TAG)).thenReturn(Optional.of(new Tag(TAG)));
   }
 
 }
