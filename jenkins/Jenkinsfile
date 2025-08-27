@@ -6,6 +6,7 @@ def settings =[
     javaVersion : 'OpenJDK 17',
     runTests: true,
     performSonarAnalysis: false,
+    runFeatureBranchPolicyEvaluations: true,
     onSuccess: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
     },
