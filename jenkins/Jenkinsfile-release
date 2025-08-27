@@ -4,6 +4,12 @@ library('jenkins-shared')
 def settings =[
     useMvnw: true,
     javaVersion : 'OpenJDK 17',
+    runTests: true,
+    iqPolicyEvaluation: { stage ->
+      nexusPolicyEvaluation iqStage: release, iqApplication: 'nxrm3-maven-plugin',
+        iqScanPatterns: [[scanPattern: '**/target/*.jar']],
+        iqModuleExcludes: [[moduleExclude: 'testsuite/**']]
+    },
     onSuccess: { build, env ->
       notifyChat(env: env, currentBuild: build, room: 'nxrm-notifications')
     },
