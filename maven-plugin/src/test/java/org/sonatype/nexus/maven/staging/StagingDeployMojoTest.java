@@ -91,6 +91,8 @@ public class StagingDeployMojoTest
 
   private static final String CLASSIFIER = "classifier";
 
+  private static final String EMPTY_CLASSIFIER = "";
+
   private static final String EXTENSION = "extension";
 
   private static final String REPOSITORY = "maven-releases";
@@ -214,6 +216,19 @@ public class StagingDeployMojoTest
 
   @Test
   public void deployToRemote() throws Exception {
+
+    deployToRemoteTest(CLASSIFIER);
+  }
+
+  @Test
+  public void deployToRemoteEmptyClassifier() throws Exception {
+    when(artifact.getClassifier()).thenReturn(EMPTY_CLASSIFIER);
+    when(attachedArtifact.getClassifier()).thenReturn(EMPTY_CLASSIFIER);
+    deployToRemoteTest(null);
+  }
+
+  private void deployToRemoteTest(String expectedClassifier) throws Exception {
+
     underTest.execute();
 
     ArgumentCaptor<Component> componentArgumentCaptor = ArgumentCaptor.forClass(Component.class);
@@ -240,7 +255,7 @@ public class StagingDeployMojoTest
     for (Asset asset : assets.stream().filter(asset -> !isPomAsset(asset)).collect(toList())) {
       Map<String, String> assetAttributes = asset.getAttributes();
       assertThat(assetAttributes.get(EXTENSION_KEY), is(equalTo(EXTENSION)));
-      assertThat(assetAttributes.get(CLASSIFIER_KEY), is(equalTo(CLASSIFIER)));
+      assertThat(assetAttributes.get(CLASSIFIER_KEY), is(equalTo(expectedClassifier)));
     }
   }
 
