@@ -18,3 +18,5 @@ def settings =[
         iqModuleExcludes: [[moduleExclude: 'testsuite/**']]
     }
 ]
+
+mavenReleasePipeline(settings)
