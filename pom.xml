@@ -59,7 +59,7 @@
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <maven.version>3.8.6</maven.version>
+    <maven.version>3.9.0</maven.version>
     <maven.plugin.annotations.version>3.6.4</maven.plugin.annotations.version>
 
     <clm.applicationId>nxrm3-maven-plugin</clm.applicationId>
