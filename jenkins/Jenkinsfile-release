@@ -6,7 +6,7 @@ def settings =[
     javaVersion : 'OpenJDK 17',
     runTests: true,
     iqPolicyEvaluation: { stage ->
-      nexusPolicyEvaluation iqStage: release, iqApplication: 'nxrm3-maven-plugin',
+      nexusPolicyEvaluation iqStage: 'release', iqApplication: 'nxrm3-maven-plugin',
         iqScanPatterns: [[scanPattern: '**/target/*.jar']],
         iqModuleExcludes: [[moduleExclude: 'testsuite/**']]
     },
