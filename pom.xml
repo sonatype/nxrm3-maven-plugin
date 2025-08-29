@@ -59,7 +59,7 @@
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <maven.version>3.8.6</maven.version>
+    <maven.version>3.9.0</maven.version>
     <maven.plugin.annotations.version>3.6.4</maven.plugin.annotations.version>
 
     <clm.applicationId>nxrm3-maven-plugin</clm.applicationId>
@@ -156,6 +156,24 @@
         <artifactId>mockito-core</artifactId>
         <version>5.2.0</version>
         <scope>test</scope>
+      </dependency>
+      <!-- Security policy overrides for vulnerable dependencies -->
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>33.3.1-jre</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jgit</groupId>
+        <artifactId>org.eclipse.jgit</artifactId>
+        <version>6.10.1.202505221210-r</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.18.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
