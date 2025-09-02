@@ -228,7 +228,7 @@ e.g. ```./mvnw clean install -Plocal-nexus3```
 # How to publish to Maven Central
 
 https://sonatype.atlassian.net/wiki/spaces/BNR/pages/388301035/Publishing+Directly+to+Maven+Central
-Steps were addeed to the jenkinsfile-release to automate this.
+Steps were added to the jenkinsfile-release to automate this.
 To check if the release was successfully published check https://search.maven.org/artifact/org.sonatype.plugins/nxrm3-maven-plugin
 
 
