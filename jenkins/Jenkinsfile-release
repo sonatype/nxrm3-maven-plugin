@@ -3,8 +3,10 @@ library('jenkins-shared')
 
 def settings =[
     useMvnw: true,
+    deployBranch: 'main',
     javaVersion : 'OpenJDK 17',
     runTests: true,
+    additionalReleaseProfiles: ['publish-central'], // public publishing to central
     iqPolicyEvaluation: { stage ->
       nexusPolicyEvaluation iqStage: 'release', iqApplication: 'nxrm3-maven-plugin',
         iqScanPatterns: [[scanPattern: '**/target/*.jar']],
