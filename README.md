@@ -225,13 +225,6 @@ To run the integration tests against a local instance use the profile ```local-n
 
 e.g. ```./mvnw clean install -Plocal-nexus3```
 
-# How to publish to Maven Central
-
-https://sonatype.atlassian.net/wiki/spaces/BNR/pages/388301035/Publishing+Directly+to+Maven+Central
-Steps were added to the jenkinsfile-release to automate this.
-To check if the release was successfully published check https://search.maven.org/artifact/org.sonatype.plugins/nxrm3-maven-plugin
-
-
 # Getting Help
 
 Looking to contribute or need some help?
