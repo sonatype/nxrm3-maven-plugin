@@ -26,6 +26,7 @@
   </parent>
 
   <artifactId>nxrm3-maven-plugin-testsuite</artifactId>
+  <name>NXRM3 Maven Plugin Test Suite</name>
   
   <properties>
     <nexus3.version>3.41.1-01</nexus3.version>

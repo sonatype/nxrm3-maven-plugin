@@ -28,6 +28,7 @@
   <groupId>org.sonatype.plugins</groupId>
   <artifactId>nxrm3</artifactId>
   <packaging>pom</packaging>
+  <name>NXRM3 Maven Plugin</name>
 
   <version>1.0.10-SNAPSHOT</version>
 
