@@ -22,7 +22,7 @@
   <parent>
     <artifactId>nxrm3</artifactId>
     <groupId>org.sonatype.plugins</groupId>
-    <version>1.0.11</version>
+    <version>1.0.12-SNAPSHOT</version>
   </parent>
 
   <artifactId>nxrm3-maven-plugin</artifactId>
