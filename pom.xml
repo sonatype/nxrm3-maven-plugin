@@ -30,7 +30,7 @@
   <packaging>pom</packaging>
   <name>NXRM3 Maven Plugin</name>
 
-  <version>1.0.12-SNAPSHOT</version>
+  <version>1.0.12</version>
 
   <inceptionYear>2019</inceptionYear>
 
