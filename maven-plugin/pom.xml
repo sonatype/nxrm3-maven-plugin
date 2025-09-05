@@ -68,6 +68,36 @@
     <dependency>
       <groupId>com.sonatype.nexus</groupId>
       <artifactId>nexus-platform-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.sonatype.goodies.truezip</groupId>
+          <artifactId>truezip-file</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sonatype.goodies.truezip</groupId>
+          <artifactId>truezip-kernel</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sonatype.goodies.truezip</groupId>
+          <artifactId>truezip-driver-zip</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sonatype.goodies.truezip</groupId>
+          <artifactId>truezip-path</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sonatype.goodies.truezip</groupId>
+          <artifactId>truezip-driver-file</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sonatype.goodies.truezip</groupId>
+          <artifactId>truezip-driver-tar</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sonatype.data.commons</groupId>
+          <artifactId>ai-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
