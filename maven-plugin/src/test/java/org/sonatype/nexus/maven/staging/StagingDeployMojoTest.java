@@ -20,11 +20,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import com.sonatype.nexus.api.common.ServerConfig;
-import com.sonatype.nexus.api.repository.v3.Asset;
-import com.sonatype.nexus.api.repository.v3.Component;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.Tag;
+import org.sonatype.nexus.api.common.ServerConfig;
+import org.sonatype.nexus.api.repository.v3.Asset;
+import org.sonatype.nexus.api.repository.v3.Component;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.repository.v3.Tag;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

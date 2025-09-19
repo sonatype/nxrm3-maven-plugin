@@ -16,7 +16,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.maven.execution.MavenSession;

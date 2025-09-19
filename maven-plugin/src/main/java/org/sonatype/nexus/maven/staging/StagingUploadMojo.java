@@ -28,11 +28,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
-import com.sonatype.nexus.api.exception.RepositoryManagerException;
-import com.sonatype.nexus.api.repository.v3.DefaultAsset;
-import com.sonatype.nexus.api.repository.v3.DefaultComponent;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.Tag;
+import org.sonatype.nexus.api.exception.RepositoryManagerException;
+import org.sonatype.nexus.api.repository.v3.DefaultAsset;
+import org.sonatype.nexus.api.repository.v3.DefaultComponent;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.repository.v3.Tag;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

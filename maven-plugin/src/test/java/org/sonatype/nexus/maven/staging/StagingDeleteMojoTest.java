@@ -45,8 +45,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.sonatype.nexus.api.common.ServerConfig;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.common.ServerConfig;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StagingDeleteMojoTest

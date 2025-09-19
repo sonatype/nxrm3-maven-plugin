@@ -14,9 +14,9 @@ package org.sonatype.nexus.maven.staging;
 
 import java.util.Map;
 
-import com.sonatype.nexus.api.exception.RepositoryManagerException;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.SearchBuilder;
+import org.sonatype.nexus.api.exception.RepositoryManagerException;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.repository.v3.SearchBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.plugin.MojoFailureException;

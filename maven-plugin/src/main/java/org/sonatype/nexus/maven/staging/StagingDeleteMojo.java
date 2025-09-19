@@ -18,8 +18,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 
-import com.sonatype.nexus.api.repository.v3.ComponentInfo;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.repository.v3.ComponentInfo;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 /**
  * Goal to delete artifacts from NXRM 3.

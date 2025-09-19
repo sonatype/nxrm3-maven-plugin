@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import com.sonatype.nexus.api.common.ServerConfig;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.common.ServerConfig;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
