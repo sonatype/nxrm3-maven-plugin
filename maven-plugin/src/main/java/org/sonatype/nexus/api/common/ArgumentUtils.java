@@ -36,18 +36,9 @@ public class ArgumentUtils
     return checkArgument(argument, expression, null);
   }
 
-  /**
-   * Check the truth of an expression involving one or more parameters to the calling method.
-   *
-   * @param argument   the argument to return if the check passes
-   * @param expression a boolean expression
-   * @param message    the exception message to use if the check fails; will be converted to a string using
-   *                   {@link String#valueOf(Object)}
-   * @throws IllegalArgumentException if {@code expression} is false
-   */
   public static <T> T checkArgument(T argument, boolean expression, String message) throws IllegalArgumentException {
     if (!expression) {
-      throw isNotBlank(message) ? new IllegalArgumentException(message) : new IllegalArgumentException();
+      throw new IllegalArgumentException(message);
     }
 
     return argument;
