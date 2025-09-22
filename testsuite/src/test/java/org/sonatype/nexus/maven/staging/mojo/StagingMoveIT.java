@@ -23,7 +23,6 @@ import java.util.Properties;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.maven.it.VerificationException;
 import org.junit.Test;
 
@@ -50,7 +49,7 @@ public class StagingMoveIT
 
   private static final String INSTALL = "install";
 
-  private static final List<String> MOVE_GOALS = ImmutableList.of("nxrm3:staging-move");
+  private static final List<String> MOVE_GOALS = List.of("nxrm3:staging-move");
 
   @Test
   public void failIfOffline() throws Exception {
