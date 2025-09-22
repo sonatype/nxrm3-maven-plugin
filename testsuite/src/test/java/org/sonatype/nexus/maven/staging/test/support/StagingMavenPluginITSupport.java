@@ -93,8 +93,7 @@ public abstract class StagingMavenPluginITSupport
     final File rawPom = new File(dir, "raw-pom.xml");
 
     final Properties properties = getDefaultProperties(repository, groupId, artifactId, version, packaging);
-
-    copyAndFilterFile(rawPom, pom, properties);
+    createPom(rawPom, pom, properties);
   }
 
   protected void createProject(final File dir,
@@ -110,7 +109,7 @@ public abstract class StagingMavenPluginITSupport
     final Properties properties = getDefaultProperties(repository, groupId, artifactId, version, JAR_PACKAGING);
     properties.setProperty("nexus.skipNexusStagingDeployMojo", skip ? "true" : "false");
 
-    copyAndFilterFile(rawPom, pom, properties);
+    createPom(rawPom, pom, properties);
   }
 
   protected void createProject(final File dir,
@@ -128,7 +127,7 @@ public abstract class StagingMavenPluginITSupport
     properties.setProperty("nexus.destinationRepository", targetRepository);
     properties.setProperty("nexus.sourceRepository", sourceRepository);
 
-    copyAndFilterFile(rawPom, pom, properties);
+    createPom(rawPom, pom, properties);
   }
 
   private Properties getDefaultProperties(final String repository,
@@ -199,7 +198,7 @@ public abstract class StagingMavenPluginITSupport
     }
   }
 
-  private void copyAndFilterFile(final File sourceFile, final File targetFile, final Properties properties) throws IOException {
+  private static void createPom(final File sourceFile, final File targetFile, final Properties properties) throws IOException {
     String content = Files.readString(sourceFile.toPath(), StandardCharsets.UTF_8);
     
     for (String propertyName : properties.stringPropertyNames()) {

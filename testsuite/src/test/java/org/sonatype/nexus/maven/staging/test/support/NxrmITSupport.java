@@ -54,8 +54,6 @@ import static org.junit.Assert.assertNotNull;
  */
 public abstract class NxrmITSupport
 {
-  @Rule
-  public TestName testName = new TestName();
   private static final ObjectMapper mapper = new ObjectMapper();
 
   static final String NX3_PORT_SYS_PROP = "nexus3.it.port";
@@ -63,6 +61,9 @@ public abstract class NxrmITSupport
   static final String SERVICE_URL_BASE = "/service/rest/v1/";
 
   protected static URI nexusItUri;
+
+  @Rule
+  public TestName testName = new TestName();
 
   @BeforeClass
   public static void setupNexusUri() throws Exception {
