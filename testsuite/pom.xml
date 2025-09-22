@@ -35,26 +35,6 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <systemProperties>
-            <nexus3.it.port>${nexus3.it.port}</nexus3.it.port>
-          </systemProperties>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 
   <dependencies>
@@ -113,6 +93,27 @@
       <properties>
         <nexus3.it.port>8081</nexus3.it.port>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <systemProperties>
+                <nexus3.it.port>${nexus3.it.port}</nexus3.it.port>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
