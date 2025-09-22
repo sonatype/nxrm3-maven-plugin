@@ -26,9 +26,9 @@ public class RepositoryManagerException
 {
   private static final long serialVersionUID = 5688474593455306151L;
 
-  private final Optional<Integer> responseStatus;
+  private transient final Optional<Integer> responseStatus;
 
-  private final Optional<String> responseMessage;
+  private transient final Optional<String> responseMessage;
 
   /**
    * @param message the details about why the exception occurred.
