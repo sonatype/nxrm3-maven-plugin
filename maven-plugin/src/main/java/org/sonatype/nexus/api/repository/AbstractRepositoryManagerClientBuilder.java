@@ -81,11 +81,6 @@ public abstract class AbstractRepositoryManagerClientBuilder<T extends AbstractR
     }
 
     if (proxyConfig != null) {
-      HttpHost proxy = new HttpHost(proxyConfig.getHost(), proxyConfig.getPort());
-      // TODO how remplase ProxyExcludeHostsRoutePlanner
-     // DefaultProxyRoutePlanner routePlanner = new ProxyExcludeHostsRoutePlanner(proxy, proxyConfig.getNoProxyHosts());
-      //httpClientBuilder.setRoutePlanner(routePlanner);
-
       if (proxyConfig.getAuthentication() != null) {
         addCredentialsToProviderWithConfig(credentialsProvider, proxyConfig);
       }
