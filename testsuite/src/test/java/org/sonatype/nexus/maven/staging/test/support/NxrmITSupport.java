@@ -19,7 +19,8 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-import com.sonatype.nexus.api.repository.v3.SearchBuilder;
+import org.sonatype.nexus.api.repository.v3.SearchBuilder;
+
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
