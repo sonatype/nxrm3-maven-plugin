@@ -135,19 +135,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-file-tasks</artifactId>
-        <version>1.9</version>
-      </dependency>
-
-
-      <dependency>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>0.3.1</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility</artifactId>
         <version>4.2.0</version>
@@ -158,24 +145,6 @@
         <artifactId>mockito-core</artifactId>
         <version>5.2.0</version>
         <scope>test</scope>
-      </dependency>
-      <!-- Security policy overrides for vulnerable dependencies -->
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>33.3.1-jre</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jgit</groupId>
-        <artifactId>org.eclipse.jgit</artifactId>
-        <version>6.10.1.202505221210-r</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.18.0</version>
       </dependency>
 
       <dependency>
