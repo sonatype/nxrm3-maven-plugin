@@ -97,6 +97,8 @@ public class DefaultNexusRepositoryV3Client
 
   static final String TAG_NAME_IS_REQUIRED = "Tag name is required";
 
+  static final String SEARCH_PARAMETERS_ARE_REQUIRED = "Search parameters are required";
+
   private final ServerConfig serverConfig;
 
   private final NexusRepositoryHttpClient nxrmClient;
@@ -197,7 +199,7 @@ public class DefaultNexusRepositoryV3Client
       final Map<String, String> searchParameters) throws RepositoryManagerException
   {
     checkArgument(isNotBlank(tagName), TAG_NAME_IS_REQUIRED);
-    checkArgument(searchParameters != null && !searchParameters.isEmpty(), "Search parameters are required");
+    checkArgument(searchParameters != null && !searchParameters.isEmpty(), SEARCH_PARAMETERS_ARE_REQUIRED);
 
     URI associateUri = buildUri(serverConfig.getAddress().resolve(TAGS_ASSOCIATE_API + "/" + tagName),
         getRequestParameters(searchParameters));
@@ -212,7 +214,7 @@ public class DefaultNexusRepositoryV3Client
       final Map<String, String> searchParameters) throws RepositoryManagerException
   {
     checkArgument(isNotBlank(tagName), TAG_NAME_IS_REQUIRED);
-    checkArgument(searchParameters != null && !searchParameters.isEmpty(), "Search parameters are required");
+    checkArgument(searchParameters != null && !searchParameters.isEmpty(), SEARCH_PARAMETERS_ARE_REQUIRED);
 
     URI disassociateUrl = buildUri(serverConfig.getAddress().resolve(TAGS_ASSOCIATE_API + "/" + tagName),
         getRequestParameters(searchParameters));
@@ -233,7 +235,7 @@ public class DefaultNexusRepositoryV3Client
       final Map<String, String> searchParameters) throws RepositoryManagerException
   {
     checkArgument(isNotBlank(destination), "Destination repository is required");
-    checkArgument(searchParameters != null && !searchParameters.isEmpty(), "Search parameters are required");
+    checkArgument(searchParameters != null && !searchParameters.isEmpty(), SEARCH_PARAMETERS_ARE_REQUIRED);
 
     URI moveUri = buildUri(serverConfig.getAddress().resolve(MOVE_API + "/" + destination),
         getRequestParameters(searchParameters));
@@ -250,7 +252,7 @@ public class DefaultNexusRepositoryV3Client
 
   @Override
   public List<ComponentInfo> delete(final Map<String, String> searchParameters) throws RepositoryManagerException {
-    checkArgument(searchParameters != null && !searchParameters.isEmpty(), "Search parameters are required");
+    checkArgument(searchParameters != null && !searchParameters.isEmpty(), SEARCH_PARAMETERS_ARE_REQUIRED);
 
     URI deleteUri = buildUri(serverConfig.getAddress().resolve(DELETE_API), getRequestParameters(searchParameters));
     HttpPost post = new HttpPost(deleteUri);
