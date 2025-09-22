@@ -76,6 +76,7 @@ import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 public class DefaultNexusRepositoryV3Client
     implements RepositoryManagerV3Client
 {
+
   static final String BASE_API_PATH = "service/rest";
 
   static final String VERSION_API = BASE_API_PATH + "/wonderland/status";
@@ -93,6 +94,8 @@ public class DefaultNexusRepositoryV3Client
   static final String MOVE_API = STAGING_API + "/move";
 
   static final String DELETE_API = STAGING_API + "/delete";
+
+  static final String TAG_NAME_IS_REQUIRED = "Tag name is required";
 
   private final ServerConfig serverConfig;
 
@@ -163,7 +166,7 @@ public class DefaultNexusRepositoryV3Client
 
   @Override
   public Optional<Tag> getTag(final String name) throws RepositoryManagerException {
-    checkArgument(isNotBlank(name), "Tag name is required");
+    checkArgument(isNotBlank(name), TAG_NAME_IS_REQUIRED);
     URI getTagUri = buildUri(serverConfig.getAddress().resolve(TAGS_API + "/" + name));
     HttpGet get = new HttpGet(getTagUri);
     return nxrmClient.execute(get, new GetTagResponseHandler(), httpClientContext, of("Get tag"));
@@ -193,7 +196,7 @@ public class DefaultNexusRepositoryV3Client
       final String tagName,
       final Map<String, String> searchParameters) throws RepositoryManagerException
   {
-    checkArgument(isNotBlank(tagName), "Tag name is required");
+    checkArgument(isNotBlank(tagName), TAG_NAME_IS_REQUIRED);
     checkArgument(searchParameters != null && !searchParameters.isEmpty(), "Search parameters are required");
 
     URI associateUri = buildUri(serverConfig.getAddress().resolve(TAGS_ASSOCIATE_API + "/" + tagName),
@@ -208,7 +211,7 @@ public class DefaultNexusRepositoryV3Client
       final String tagName,
       final Map<String, String> searchParameters) throws RepositoryManagerException
   {
-    checkArgument(isNotBlank(tagName), "Tag name is required");
+    checkArgument(isNotBlank(tagName), TAG_NAME_IS_REQUIRED);
     checkArgument(searchParameters != null && !searchParameters.isEmpty(), "Search parameters are required");
 
     URI disassociateUrl = buildUri(serverConfig.getAddress().resolve(TAGS_ASSOCIATE_API + "/" + tagName),
@@ -220,7 +223,7 @@ public class DefaultNexusRepositoryV3Client
 
   @Override
   public List<ComponentInfo> move(final String destination, final String tagName) throws RepositoryManagerException {
-    checkArgument(isNotBlank(tagName), "Tag name is required");
+    checkArgument(isNotBlank(tagName), TAG_NAME_IS_REQUIRED);
     return move(destination, SearchBuilder.create().withTag(tagName).build());
   }
 
@@ -241,7 +244,7 @@ public class DefaultNexusRepositoryV3Client
 
   @Override
   public List<ComponentInfo> delete(final String tagName) throws RepositoryManagerException {
-    checkArgument(isNotBlank(tagName), "Tag name is required");
+    checkArgument(isNotBlank(tagName), TAG_NAME_IS_REQUIRED);
     return delete(SearchBuilder.create().withTag(tagName).build());
   }
 
