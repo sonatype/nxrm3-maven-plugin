@@ -20,7 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.sonatype.nexus.api.repository.v3.SearchBuilder;
-import org.sonatype.goodies.testsupport.inject.InjectedTestSupport;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,8 +53,9 @@ import static org.junit.Assert.assertNotNull;
  * image start
  */
 public abstract class NxrmITSupport
-    extends InjectedTestSupport
 {
+  @Rule
+  public TestName testName = new TestName();
   private static final ObjectMapper mapper = new ObjectMapper();
 
   static final String NX3_PORT_SYS_PROP = "nexus3.it.port";
