@@ -19,11 +19,11 @@ import java.util.Objects;
 
 import com.google.gson.Gson;
 
-import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
-import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.hash;
 import static java.util.Objects.requireNonNull;
+import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
+import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
 
 /**
  * Represents a tag in NXRM3. Tags have a name (must be unique) and optional attributes. The NXRM3 server defines a

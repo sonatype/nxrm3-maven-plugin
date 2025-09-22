@@ -16,10 +16,10 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
-import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
+import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
+import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
 
 /**
  * Default implementation for a NXRM3 {@link Asset}. Asset attributes will automatically be keyed

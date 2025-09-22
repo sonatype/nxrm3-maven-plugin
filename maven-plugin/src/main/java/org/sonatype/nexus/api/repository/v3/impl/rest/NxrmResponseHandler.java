@@ -14,8 +14,6 @@ package org.sonatype.nexus.api.repository.v3.impl.rest;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.api.repository.v3.impl.rest.NxrmResponseException;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;

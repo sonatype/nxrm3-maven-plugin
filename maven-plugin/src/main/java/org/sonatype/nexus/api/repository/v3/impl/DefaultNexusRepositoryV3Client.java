@@ -52,14 +52,6 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 
-import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
-import static org.sonatype.nexus.api.common.NexusStringUtils.isBlank;
-import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
-
-import static org.sonatype.nexus.api.repository.v3.impl.rest.StagingResponseHandlerFactory.newAssociateHandler;
-import static org.sonatype.nexus.api.repository.v3.impl.rest.StagingResponseHandlerFactory.newDeleteHandler;
-import static org.sonatype.nexus.api.repository.v3.impl.rest.StagingResponseHandlerFactory.newDisassociateHandler;
-import static org.sonatype.nexus.api.repository.v3.impl.rest.StagingResponseHandlerFactory.newMoveHandler;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
@@ -67,6 +59,13 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
+import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
+import static org.sonatype.nexus.api.common.NexusStringUtils.isBlank;
+import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
+import static org.sonatype.nexus.api.repository.v3.impl.rest.StagingResponseHandlerFactory.newAssociateHandler;
+import static org.sonatype.nexus.api.repository.v3.impl.rest.StagingResponseHandlerFactory.newDeleteHandler;
+import static org.sonatype.nexus.api.repository.v3.impl.rest.StagingResponseHandlerFactory.newDisassociateHandler;
+import static org.sonatype.nexus.api.repository.v3.impl.rest.StagingResponseHandlerFactory.newMoveHandler;
 
 /**
  * Nexus Repository Manager 3.x implementation of {@link RepositoryManagerV3Client}

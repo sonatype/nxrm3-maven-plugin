@@ -15,14 +15,12 @@ package org.sonatype.nexus.api.repository;
 import org.sonatype.nexus.api.common.ProxyConfig;
 import org.sonatype.nexus.api.common.ServerConfig;
 
-import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 
 /**
  * Base class for constructing a builder that will create a client for interacting with Nexus Repository Manager

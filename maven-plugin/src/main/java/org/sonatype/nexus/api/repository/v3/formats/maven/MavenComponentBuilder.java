@@ -25,14 +25,14 @@ import org.sonatype.nexus.api.repository.v3.Component;
 import org.sonatype.nexus.api.repository.v3.DefaultAsset;
 import org.sonatype.nexus.api.repository.v3.DefaultComponent;
 
-import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
-import static org.sonatype.nexus.api.common.NexusStringUtils.isBlank;
-import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
 import static java.nio.file.Files.exists;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.StandardOpenOption.READ;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
+import static org.sonatype.nexus.api.common.NexusStringUtils.isBlank;
+import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
 
 /**
  * Builder class to simply constructing a Maven {@link Component} for upload to NXRM3

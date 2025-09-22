@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.api.repository.v3.impl.rest;
 
-import org.sonatype.nexus.api.repository.v3.impl.rest.ComponentInfoResponseHandler;
-
 /**
  * Factory class to construct NXRM3 REST response handlers
  */

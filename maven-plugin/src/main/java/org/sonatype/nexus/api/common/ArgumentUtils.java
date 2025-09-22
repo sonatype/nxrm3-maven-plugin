@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.api.common;
 
-import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
-
 /**
  * Simple helper class for argument checks
  *

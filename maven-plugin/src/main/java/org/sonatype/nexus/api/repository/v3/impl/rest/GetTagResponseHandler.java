@@ -15,7 +15,6 @@ package org.sonatype.nexus.api.repository.v3.impl.rest;
 import java.util.Optional;
 
 import org.sonatype.nexus.api.repository.v3.Tag;
-import org.sonatype.nexus.api.repository.v3.impl.rest.NxrmResponseHandler;
 
 import com.google.gson.Gson;
 import org.apache.http.StatusLine;

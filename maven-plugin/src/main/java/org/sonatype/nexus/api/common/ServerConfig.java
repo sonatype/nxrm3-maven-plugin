@@ -17,8 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
-import org.sonatype.nexus.api.common.CertificateAuthentication;
-
 import static java.util.Objects.requireNonNull;
 
 /**

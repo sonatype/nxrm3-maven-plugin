@@ -17,10 +17,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
-import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
 import static java.util.Collections.unmodifiableCollection;
 import static java.util.Collections.unmodifiableMap;
+import static org.sonatype.nexus.api.common.ArgumentUtils.checkArgument;
+import static org.sonatype.nexus.api.common.NexusStringUtils.isNotBlank;
 
 /**
  * Represents a component for upload to NXRM3. A component is a collection of {@link Asset}s and associated

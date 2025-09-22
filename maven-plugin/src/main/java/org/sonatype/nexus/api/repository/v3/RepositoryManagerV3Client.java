@@ -17,10 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.sonatype.nexus.api.exception.RepositoryManagerException;
-import org.sonatype.nexus.api.repository.v3.ComponentInfo;
-import org.sonatype.nexus.api.repository.v3.Repository;
-import org.sonatype.nexus.api.repository.v3.SearchBuilder;
-import org.sonatype.nexus.api.repository.v3.Tag;
 
 /**
  * Defines the supported operations in Nexus Repository Manager 3.x (NXRM3)
