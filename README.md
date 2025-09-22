@@ -215,12 +215,6 @@ run from inside the maven-plugin directory rather than at the root of the projec
 
 # Integration testing
 
-To run the integration tests against a docker instance specify the port you would like the tests to run on:
-
-```-Dnexus.it.port=8085``` 
-
-e.g. ```./mvnw clean install -Dnexus.it.port=8085```
-
 To run the integration tests against a local instance use the profile ```local-nexus3```, the default url is http://localhost:8081/
 
 e.g. ```./mvnw clean install -Plocal-nexus3```
