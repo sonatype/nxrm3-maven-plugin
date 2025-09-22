@@ -22,12 +22,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.sonatype.maven.mojo.execution.MojoExecution;
+import org.sonatype.maven.mojo.settings.MavenSettings;
 import org.sonatype.nexus.api.common.Authentication;
 import org.sonatype.nexus.api.common.ServerConfig;
 import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-
-import org.sonatype.maven.mojo.execution.MojoExecution;
-import org.sonatype.maven.mojo.settings.MavenSettings;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.execution.MavenSession;

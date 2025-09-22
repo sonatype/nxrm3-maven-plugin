@@ -14,12 +14,12 @@ package org.sonatype.nexus.maven.staging;
 
 import java.util.List;
 
+import org.sonatype.nexus.api.repository.v3.ComponentInfo;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
-
-import org.sonatype.nexus.api.repository.v3.ComponentInfo;
-import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
 
 /**
  * Goal to delete artifacts from NXRM 3.

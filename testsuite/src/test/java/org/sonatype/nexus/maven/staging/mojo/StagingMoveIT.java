@@ -13,7 +13,6 @@
 package org.sonatype.nexus.maven.staging.mojo;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -26,9 +25,9 @@ import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport
 import org.apache.maven.it.VerificationException;
 import org.junit.Test;
 
-import static org.awaitility.Awaitility.await;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
