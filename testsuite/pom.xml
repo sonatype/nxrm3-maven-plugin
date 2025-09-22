@@ -28,12 +28,6 @@
   <artifactId>nxrm3-maven-plugin-testsuite</artifactId>
   <name>NXRM3 Maven Plugin Test Suite</name>
 
-  <properties>
-    <nexus3.version>3.41.1-01</nexus3.version>
-    <docker.skip>${skipTests}</docker.skip>
-    <dockerArchive>${project.build.directory}/nxrm-pro-image.tar.gz</dockerArchive>
-  </properties>
-
   <build>
     <testResources>
       <testResource>
@@ -111,14 +105,6 @@
       <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>com.sonatype.nexus.testsuite</groupId>
-      <artifactId>nxrm-pro-image</artifactId>
-      <version>${nexus3.version}</version>
-      <type>tar.gz</type>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <profiles>
@@ -127,85 +113,6 @@
       <properties>
         <nexus3.it.port>8081</nexus3.it.port>
       </properties>
-    </profile>
-    <profile>
-      <id>docker-nexus3</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>copy-dependencies</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>copy-dependencies</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                  <includeArtifactIds>nxrm-pro-image</includeArtifactIds>
-                  <stripVersion>true</stripVersion>
-                  <stripClassifier>true</stripClassifier>
-                  <excludeTransitive>true</excludeTransitive>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>io.fabric8</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>0.40.2</version>
-            <executions>
-              <execution>
-                <id>start-nexus3</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>build</goal>
-                  <goal>start</goal>
-                </goals>
-                <configuration>
-                  <images>
-                    <image>
-                      <name>nxrm-pro-image</name>
-                      <alias>nexus3-it</alias>
-                      <build>
-                        <dockerArchive>${dockerArchive}</dockerArchive>
-                      </build>
-                      <run>
-                        <env>
-                          <NEXUS_SECURITY_RANDOMPASSWORD>false</NEXUS_SECURITY_RANDOMPASSWORD>
-                        </env>
-                        <ports>
-                          <port>nexus3.it.port:8081</port>
-                        </ports>
-                        <wait>
-                          <http>
-                            <url>http://localhost:${nexus3.it.port}</url>
-                            <method>GET</method>
-                            <status>200..399</status>
-                          </http>
-                          <time>90000</time>
-                        </wait>
-                      </run>
-                    </image>
-                  </images>
-                </configuration>
-              </execution>
-              <execution>
-                <id>stop-nexus3</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>stop</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>
