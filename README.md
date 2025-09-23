@@ -215,9 +215,14 @@ run from inside the maven-plugin directory rather than at the root of the projec
 
 # Integration testing
 
-To run the integration tests against a local instance use the profile ```local-nexus3```, the default url is http://localhost:8081/
+To run the integration tests against a local instance use the profile ```local-nexus3```.
+These integration tests require a running Nexus Repository Manager 3 instance with the default admin user and password, the url has to be http://localhost:8081.
 
 e.g. ```./mvnw clean install -Plocal-nexus3```
+
+To run the integration tests against a deployed instance over the network like https://sonatype.dev.repo.saas.sonatype.dev 
+there is a pollinator job https://jenkins.ci.sonatype.dev/job/nxrm/job/nxrm3/job/nexus-pollinators/job/maven2/job/nxrm3-maven-plugin/job/run/.
+The source code of this pollinator is https://github.com/sonatype/nexus-pollinators/tree/main/maven2/nxrm3-maven-plugin.
 
 # Getting Help
 
