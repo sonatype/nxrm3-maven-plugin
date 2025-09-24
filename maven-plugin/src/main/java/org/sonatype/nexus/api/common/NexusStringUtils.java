@@ -10,30 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.maven.staging;
+package org.sonatype.nexus.api.common;
 
-import org.sonatype.nexus.api.common.ServerConfig;
-import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-
-@RunWith(MockitoJUnitRunner.class)
-public class Nxrm3ClientFactoryTest
+/**
+ * Simple string operations in lieu of adding additional libraries that provide these
+ *
+ * @since 3.0
+ */
+public class NexusStringUtils
 {
-  @Mock
-  private ServerConfig serverConfig;
+  private NexusStringUtils() {
+  }
 
-  @Test
-  public void buildClient() throws Exception {
-    RepositoryManagerV3Client client = new Nxrm3ClientFactory().build(serverConfig);
+  public static boolean isBlank(String s) {
+    return s == null || s.trim().isEmpty();
+  }
 
-    assertThat(client, is(notNullValue()));
+  public static boolean isNotBlank(String s) {
+    return !isBlank(s);
   }
 }

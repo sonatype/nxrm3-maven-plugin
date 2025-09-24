@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-import com.sonatype.nexus.api.common.ServerConfig;
-import com.sonatype.nexus.api.exception.RepositoryManagerException;
-import com.sonatype.nexus.api.repository.v3.Component;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.Tag;
+import org.sonatype.nexus.api.common.ServerConfig;
+import org.sonatype.nexus.api.exception.RepositoryManagerException;
+import org.sonatype.nexus.api.repository.v3.Component;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.repository.v3.Tag;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;

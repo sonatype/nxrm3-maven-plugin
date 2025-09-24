@@ -19,8 +19,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-import com.sonatype.nexus.api.repository.v3.SearchBuilder;
-import org.sonatype.goodies.testsupport.inject.InjectedTestSupport;
+import org.sonatype.nexus.api.repository.v3.SearchBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,10 +33,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
-import static org.awaitility.Awaitility.await;
 import static java.util.Arrays.stream;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasProperty;
@@ -52,7 +53,6 @@ import static org.junit.Assert.assertNotNull;
  * image start
  */
 public abstract class NxrmITSupport
-    extends InjectedTestSupport
 {
   private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -61,6 +61,9 @@ public abstract class NxrmITSupport
   static final String SERVICE_URL_BASE = "/service/rest/v1/";
 
   protected static URI nexusItUri;
+
+  @Rule
+  public TestName testName = new TestName();
 
   @BeforeClass
   public static void setupNexusUri() throws Exception {

@@ -13,7 +13,6 @@
 package org.sonatype.nexus.maven.staging.mojo;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -23,13 +22,12 @@ import java.util.Properties;
 
 import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.maven.it.VerificationException;
 import org.junit.Test;
 
-import static org.awaitility.Awaitility.await;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -50,7 +48,7 @@ public class StagingMoveIT
 
   private static final String INSTALL = "install";
 
-  private static final List<String> MOVE_GOALS = ImmutableList.of("nxrm3:staging-move");
+  private static final List<String> MOVE_GOALS = List.of("nxrm3:staging-move");
 
   @Test
   public void failIfOffline() throws Exception {

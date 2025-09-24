@@ -13,21 +13,19 @@
 package org.sonatype.nexus.maven.staging.test.support;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import javax.inject.Inject;
-
-import org.sonatype.sisu.filetasks.FileTaskBuilder;
 
 import org.apache.maven.it.Verifier;
 import org.junit.Before;
 
 import static org.apache.maven.it.util.ResourceExtractor.simpleExtractResources;
-import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 
 public abstract class StagingMavenPluginITSupport
     extends NxrmITSupport
@@ -54,8 +52,6 @@ public abstract class StagingMavenPluginITSupport
 
   protected static final String RELEASE_REPOSITORY = "maven-releases";
 
-  @Inject
-  private FileTaskBuilder fileTaskBuilder;
 
   protected File projectDir;
 
@@ -82,7 +78,7 @@ public abstract class StagingMavenPluginITSupport
                                final String repository,
                                final String groupId,
                                final String artifactId,
-                               final String version) {
+                               final String version) throws IOException {
     createProject(dir, repository, groupId, artifactId, version, JAR_PACKAGING);
   }
 
@@ -91,14 +87,13 @@ public abstract class StagingMavenPluginITSupport
                                final String groupId,
                                final String artifactId,
                                final String version,
-                               final String packaging)
+                               final String packaging) throws IOException
   {
     final File pom = new File(dir, "pom.xml");
     final File rawPom = new File(dir, "raw-pom.xml");
 
     final Properties properties = getDefaultProperties(repository, groupId, artifactId, version, packaging);
-
-    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+    createPom(rawPom, pom, properties);
   }
 
   protected void createProject(final File dir,
@@ -106,7 +101,7 @@ public abstract class StagingMavenPluginITSupport
                                final String groupId,
                                final String artifactId,
                                final String version,
-                               final boolean skip)
+                               final boolean skip) throws IOException
   {
     final File pom = new File(dir, "pom.xml");
     final File rawPom = new File(dir, "raw-pom-with-skip.xml");
@@ -114,7 +109,7 @@ public abstract class StagingMavenPluginITSupport
     final Properties properties = getDefaultProperties(repository, groupId, artifactId, version, JAR_PACKAGING);
     properties.setProperty("nexus.skipNexusStagingDeployMojo", skip ? "true" : "false");
 
-    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+    createPom(rawPom, pom, properties);
   }
 
   protected void createProject(final File dir,
@@ -123,7 +118,7 @@ public abstract class StagingMavenPluginITSupport
                                final String artifactId,
                                final String version,
                                final String sourceRepository,
-                               final String targetRepository)
+                               final String targetRepository) throws IOException
   {
     final File pom = new File(dir, "pom.xml");
     final File rawPom = new File(dir, "raw-pom-with-move.xml");
@@ -132,7 +127,7 @@ public abstract class StagingMavenPluginITSupport
     properties.setProperty("nexus.destinationRepository", targetRepository);
     properties.setProperty("nexus.sourceRepository", sourceRepository);
 
-    fileTaskBuilder.copy().file(file(rawPom)).filterUsing(properties).to().file(file(pom)).run();
+    createPom(rawPom, pom, properties);
   }
 
   private Properties getDefaultProperties(final String repository,
@@ -201,5 +196,16 @@ public abstract class StagingMavenPluginITSupport
       e.printStackTrace();
       return null;
     }
+  }
+
+  private static void createPom(final File sourceFile, final File targetFile, final Properties properties) throws IOException {
+    String content = Files.readString(sourceFile.toPath(), StandardCharsets.UTF_8);
+    
+    for (String propertyName : properties.stringPropertyNames()) {
+      String propertyValue = properties.getProperty(propertyName);
+      content = content.replace("${" + propertyName + "}", propertyValue);
+    }
+    
+    Files.writeString(targetFile.toPath(), content, StandardCharsets.UTF_8);
   }
 }

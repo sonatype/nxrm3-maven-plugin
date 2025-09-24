@@ -12,28 +12,25 @@
  */
 package org.sonatype.nexus.maven.staging.mojo;
 
-import static org.awaitility.Awaitility.await;
-import static java.util.UUID.randomUUID;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.commons.io.FileUtils.forceDelete;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.hamcrest.Matcher;
+import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.maven.staging.test.support.StagingMavenPluginITSupport;
+
+import static java.util.UUID.randomUUID;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.StringContains.containsString;
 
 public class StagingDeleteIT
     extends StagingMavenPluginITSupport

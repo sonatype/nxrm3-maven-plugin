@@ -66,43 +66,28 @@
     </dependency>
 
     <dependency>
-      <groupId>com.sonatype.nexus</groupId>
-      <artifactId>nexus-platform-api</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>com.sonatype.goodies.truezip</groupId>
-          <artifactId>truezip-file</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sonatype.goodies.truezip</groupId>
-          <artifactId>truezip-kernel</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sonatype.goodies.truezip</groupId>
-          <artifactId>truezip-driver-zip</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sonatype.goodies.truezip</groupId>
-          <artifactId>truezip-path</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sonatype.goodies.truezip</groupId>
-          <artifactId>truezip-driver-file</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sonatype.goodies.truezip</groupId>
-          <artifactId>truezip-driver-tar</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sonatype.data.commons</groupId>
-          <artifactId>ai-utils</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.sonatype.nexus.maven</groupId>
+      <artifactId>nexus-common</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.maven</groupId>
-      <artifactId>nexus-common</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
     </dependency>
 
     <dependency>
@@ -124,32 +109,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-commons</artifactId>
-      <version>1.10.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <version>5.10.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -27,12 +27,6 @@
 
   <artifactId>nxrm3-maven-plugin-testsuite</artifactId>
   <name>NXRM3 Maven Plugin Test Suite</name>
-  
-  <properties>
-    <nexus3.version>3.41.1-01</nexus3.version>
-    <docker.skip>${skipTests}</docker.skip>
-    <dockerArchive>${project.build.directory}/nxrm-pro-image.tar.gz</dockerArchive>
-  </properties>
 
   <build>
     <testResources>
@@ -41,30 +35,13 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <skipITs>true</skipITs>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.sonatype.plugins</groupId>
+      <artifactId>nxrm3-maven-plugin</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -81,32 +58,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.goodies</groupId>
-      <artifactId>goodies-httpfixture</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-file-tasks</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.goodies</groupId>
-       <artifactId>goodies-testsupport</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.inject</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sonatype.nexus</groupId>
-      <artifactId>nexus-platform-api</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -115,5 +68,41 @@
       <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>local-nexus3</id>
+      <properties>
+        <nexus3.it.port>8081</nexus3.it.port>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <systemProperties>
+                <nexus3.it.port>${nexus3.it.port}</nexus3.it.port>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

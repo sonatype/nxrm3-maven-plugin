@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.maven.staging;
 
-import com.sonatype.nexus.api.common.ServerConfig;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
-import com.sonatype.nexus.api.repository.v3.RepositoryManagerV3ClientBuilder;
+import org.sonatype.nexus.api.common.ServerConfig;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3Client;
+import org.sonatype.nexus.api.repository.v3.RepositoryManagerV3ClientBuilder;
 
 /**
  * Builds a REST client for communicating with NXRM 3
