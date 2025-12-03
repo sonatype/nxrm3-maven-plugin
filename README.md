@@ -222,7 +222,6 @@ e.g. ```./mvnw clean install -Plocal-nexus3```
 
 # Getting Help
 
-Looking to contribute or need some help?
+If you need assistance, visit the [official Sonatype Support site](https://support.sonatype.com/):
 
-* If you have an issue, file a ticket [on our public JIRA](https://issues.sonatype.org/projects/NEXUS/) using the identifying component 'nxrm3-maven-plugin'
-* If you have questions, ask on our [Nexus Repository User List](https://groups.google.com/a/glists.sonatype.com/forum/?hl=en#!forum/nexus-users)
+* https://support.sonatype.com/
