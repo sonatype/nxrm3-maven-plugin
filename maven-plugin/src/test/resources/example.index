@@ -15,7 +15,7 @@
     "artifactId": "maven-test-project",
     "version": "1.0",
     "tag": "generatedTag",
-    "classifier": null,
+    "classifier": "",
     "packaging": "pom",
     "extension": "pom",
     "pomFileName": null,
