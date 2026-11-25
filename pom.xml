@@ -158,7 +158,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.17.0</version>
+        <version>1.23.0</version>
       </dependency>
 
       <dependency>
